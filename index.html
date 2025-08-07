@@ -467,7 +467,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){return;}window.urlToMarkdownBookmarklet=true;const debug=(msg,obj)=>{console.log('🔍 Bookmarklet Debug:',msg,obj||'');};debug('Starting extraction on:',window.location.href);const fallbackExtract=()=>{debug('Using fallback extraction');const content=document.body||document.documentElement;const title=document.title||document.querySelector('h1,h2,h3')?.textContent||'Untitled';const textContent=content.textContent||content.innerText||'';debug('Fallback extracted:',{titleLength:title.length,contentLength:textContent.length});if(textContent.trim().length<50){throw new Error('Page appears to have no readable content (found only '+textContent.trim().length+' characters)');}return{title:title.trim(),content:content.innerHTML,textContent:textContent.trim()}};const googleSitesExtract=()=>{debug('Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const selector of selectors){main=document.querySelector(selector);if(main){debug('Found Google Sites content with selector:',selector);break;}}if(!main){debug('No specific Google Sites selectors found, using body');main=document.body;}const title=document.title||document.querySelector('h1,h2,h3,.zfr3Q')?.textContent||'Google Site';const textContent=main.textContent||main.innerText||'';debug('Google Sites extracted:',{titleLength:title.length,contentLength:textContent.length,selector:main.tagName});return{title:title.trim(),content:main.innerHTML,textContent:textContent.trim()}};const extractContent=()=>{try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.querySelector('.TeI8t');debug('Page type detection:',{isGoogleSite,hostname:window.location.hostname});let article;if(isGoogleSite){article=googleSitesExtract();}else{debug('Trying Readability extraction');if(typeof window.Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new window.Readability(documentClone);const readabilityResult=reader.parse();if(readabilityResult&&readabilityResult.content&&readabilityResult.textContent.trim().length>50){debug('Readability successful');article=readabilityResult;}else{debug('Readability returned insufficient content, using fallback');article=fallbackExtract();}}catch(e){debug('Readability failed:',e.message);article=fallbackExtract();}}else{debug('Readability not available, using fallback');article=fallbackExtract();}}if(!article||!article.content||!article.textContent||article.textContent.trim().length<20){debug('Insufficient content extracted:',{hasArticle:!!article,hasContent:!!(article&&article.content),hasTextContent:!!(article&&article.textContent),textLength:article&&article.textContent?article.textContent.trim().length:0});throw new Error('Could not find sufficient content on this page. Found only '+(article&&article.textContent?article.textContent.trim().length:0)+' characters. Try refreshing the page or check if the content is loaded.');}const extractedData={title:article.title||document.title||'Untitled',content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic',debug:{originalTextLength:article.textContent.length,isGoogleSite,hostname:window.location.hostname}};debug('Successfully extracted data:',{titleLength:extractedData.title.length,textLength:extractedData.textContent.length,pageType:extractedData.pageType});localStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));const toolUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';const currentUrl=window.location.href;debug('Opening tool at:',toolUrl);if(currentUrl.includes('bhwilkoff.github.io/url-to-markdown-converter')){debug('Same site, reloading');window.location.reload();}else{debug('Opening new window');const newWindow=window.open(toolUrl,'_blank');if(!newWindow){alert('Content extracted! Please visit https://bhwilkoff.github.io/url-to-markdown-converter/ to see the results. The content has been saved and will load automatically.');}}return article;}catch(error){debug('Extraction failed:',error);const errorMsg=error?.message||error?.toString()||'Unknown error occurred';alert('Extraction failed: '+errorMsg);console.error('🔍 Bookmarklet error details:',{error,url:window.location.href,title:document.title,bodyLength:document.body?.innerHTML?.length||0,googleSiteElements:document.querySelectorAll('.jZfhZe, .VEXWte, .TeI8t').length});return null;}};extractContent();})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){return;}window.urlToMarkdownBookmarklet=true;const debug=(msg,obj)=>{console.log('🔍 Bookmarklet Debug:',msg,obj||'');};debug('Starting extraction on:',window.location.href);const aggressiveContentExtract=()=>{debug('Using aggressive content extraction');const allElements=document.querySelectorAll('div, p, article, section, main, [role=main]');let bestElement=null;let maxTextLength=0;let contentElements=[];for(const el of allElements){const text=(el.textContent||el.innerText||'').trim();if(text.length>100&&text.length>maxTextLength){const childDivs=el.querySelectorAll('div').length;const childPs=el.querySelectorAll('p').length;const totalChildren=el.children.length;if(childDivs+childPs>2||totalChildren>3||text.length>500){bestElement=el;maxTextLength=text.length;contentElements.push({element:el,textLength:text.length,tag:el.tagName,class:el.className,id:el.id});}}}debug('Content candidates found:',contentElements.slice(0,5));if(bestElement){const title=document.title||bestElement.querySelector('h1,h2,h3')?.textContent||document.querySelector('h1,h2,h3')?.textContent||'Extracted Content';debug('Selected best element:',{tag:bestElement.tagName,class:bestElement.className,textLength:maxTextLength});return{title:title.trim(),content:bestElement.innerHTML,textContent:bestElement.textContent||bestElement.innerText||''};}const fullBodyText=(document.body.textContent||document.body.innerText||'').trim();if(fullBodyText.length>100){debug('Using full body as fallback',{textLength:fullBodyText.length});return{title:document.title||'Full Page Content',content:document.body.innerHTML,textContent:fullBodyText};}throw new Error('Could not find any substantial content on this page. Page may be empty or content may be loading.');};const googleSitesExtract=()=>{debug('Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc','.sites-embed-content-body','.sites-page-wrapper','.sites-page-main','.DM7qOc','.TQc1id','.CwaK9','.Fj6HLe div','.oKdM2c','.GJVK5c'];let main=null;let foundSelector='';for(const selector of selectors){main=document.querySelector(selector);if(main){const text=(main.textContent||main.innerText||'').trim();if(text.length>50){foundSelector=selector;debug('Found Google Sites content with selector:',selector,'Text length:',text.length);break;}else{debug('Selector found but insufficient content:',selector,'Text length:',text.length);main=null;}}}if(!main){debug('No specific Google Sites selectors worked, trying aggressive extraction');return aggressiveContentExtract();}const title=document.title||document.querySelector('h1,h2,h3,.zfr3Q')?.textContent||'Google Site';const textContent=main.textContent||main.innerText||'';debug('Google Sites extracted:',{titleLength:title.length,contentLength:textContent.length,selector:foundSelector,tag:main.tagName});return{title:title.trim(),content:main.innerHTML,textContent:textContent.trim()}};const fallbackExtract=()=>{debug('Using fallback extraction');try{return aggressiveContentExtract();}catch(e){debug('Aggressive extraction failed, using body:',e.message);const content=document.body||document.documentElement;const title=document.title||document.querySelector('h1,h2,h3')?.textContent||'Untitled';const textContent=content.textContent||content.innerText||'';debug('Final fallback:',{titleLength:title.length,contentLength:textContent.length});if(textContent.trim().length<50){throw new Error('Page appears to have no readable content (found only '+textContent.trim().length+' characters)');}return{title:title.trim(),content:content.innerHTML,textContent:textContent.trim()};}};const extractContent=()=>{try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.querySelector('.TeI8t')||document.title.includes('Google Sites');debug('Page type detection:',{isGoogleSite,hostname:window.location.hostname,title:document.title});let article;if(isGoogleSite){article=googleSitesExtract();}else{debug('Trying Readability extraction');if(typeof window.Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new window.Readability(documentClone);const readabilityResult=reader.parse();if(readabilityResult&&readabilityResult.content&&readabilityResult.textContent.trim().length>50){debug('Readability successful');article=readabilityResult;}else{debug('Readability returned insufficient content, using fallback');article=fallbackExtract();}}catch(e){debug('Readability failed:',e.message);article=fallbackExtract();}}else{debug('Readability not available, using fallback');article=fallbackExtract();}}if(!article||!article.content||!article.textContent||article.textContent.trim().length<20){debug('Insufficient content extracted:',{hasArticle:!!article,hasContent:!!(article&&article.content),hasTextContent:!!(article&&article.textContent),textLength:article&&article.textContent?article.textContent.trim().length:0});throw new Error('Could not find sufficient content on this page. Found only '+(article&&article.textContent?article.textContent.trim().length:0)+' characters. Try refreshing the page or check if the content is loaded.');}const extractedData={title:article.title||document.title||'Untitled',content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic',debug:{originalTextLength:article.textContent.length,isGoogleSite,hostname:window.location.hostname}};debug('Successfully extracted data:',{titleLength:extractedData.title.length,textLength:extractedData.textContent.length,pageType:extractedData.pageType});localStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));const toolUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';const currentUrl=window.location.href;debug('Opening tool at:',toolUrl);if(currentUrl.includes('bhwilkoff.github.io/url-to-markdown-converter')){debug('Same site, reloading');window.location.reload();}else{debug('Opening new window');const newWindow=window.open(toolUrl,'_blank');if(!newWindow){alert('Content extracted! Please visit https://bhwilkoff.github.io/url-to-markdown-converter/ to see the results. The content has been saved and will load automatically.');}}return article;}catch(error){debug('Extraction failed:',error);const errorMsg=error?.message||error?.toString()||'Unknown error occurred';alert('Extraction failed: '+errorMsg);console.error('🔍 Bookmarklet error details:',{error,url:window.location.href,title:document.title,bodyLength:document.body?.innerHTML?.length||0,googleSiteElements:document.querySelectorAll('.jZfhZe, .VEXWte, .TeI8t').length,allDivs:document.querySelectorAll('div').length,allPs:document.querySelectorAll('p').length});return null;}};extractContent();})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -944,52 +944,124 @@
 
         function testBookmarklet() {
             try {
+                // Enhanced content extraction logic matching the bookmarklet
+                const aggressiveContentExtract = () => {
+                    console.log('🔍 Using aggressive content extraction');
+                    const allElements = document.querySelectorAll('div, p, article, section, main, [role=main]');
+                    let bestElement = null;
+                    let maxTextLength = 0;
+                    let contentElements = [];
+
+                    for (const el of allElements) {
+                        const text = (el.textContent || el.innerText || '').trim();
+                        if (text.length > 100 && text.length > maxTextLength) {
+                            const childDivs = el.querySelectorAll('div').length;
+                            const childPs = el.querySelectorAll('p').length;
+                            const totalChildren = el.children.length;
+                            
+                            // Look for elements with substantial content structure
+                            if (childDivs + childPs > 2 || totalChildren > 3 || text.length > 500) {
+                                bestElement = el;
+                                maxTextLength = text.length;
+                                contentElements.push({
+                                    element: el,
+                                    textLength: text.length,
+                                    tag: el.tagName,
+                                    class: el.className,
+                                    id: el.id
+                                });
+                            }
+                        }
+                    }
+
+                    console.log('🔍 Content candidates found:', contentElements.slice(0, 5));
+
+                    if (bestElement) {
+                        const title = document.title || 
+                                    bestElement.querySelector('h1,h2,h3')?.textContent || 
+                                    document.querySelector('h1,h2,h3')?.textContent || 
+                                    'Extracted Content';
+                        console.log('🔍 Selected best element:', {
+                            tag: bestElement.tagName,
+                            class: bestElement.className,
+                            textLength: maxTextLength
+                        });
+                        return {
+                            title: title.trim(),
+                            content: bestElement.innerHTML,
+                            textContent: bestElement.textContent || bestElement.innerText || ''
+                        };
+                    }
+
+                    // Final fallback to body if nothing substantial found
+                    const fullBodyText = (document.body.textContent || document.body.innerText || '').trim();
+                    if (fullBodyText.length > 100) {
+                        console.log('🔍 Using full body as fallback', { textLength: fullBodyText.length });
+                        return {
+                            title: document.title || 'Full Page Content',
+                            content: document.body.innerHTML,
+                            textContent: fullBodyText
+                        };
+                    }
+
+                    throw new Error('Could not find any substantial content on this page. Page may be empty or content may be loading.');
+                };
+
                 // Check if this is a Google Site
                 const isGoogleSite = window.location.hostname.includes('sites.google.com') || 
                                    document.querySelector('.sites-header-cell-buffer') || 
                                    document.querySelector('[data-is-preview-mode]') ||
                                    document.querySelector('.sites-layout') ||
-                                   document.querySelector('.TeI8t');
+                                   document.querySelector('.TeI8t') ||
+                                   document.title.includes('Google Sites');
 
                 let article;
                 
                 if (isGoogleSite) {
-                    // Google Sites specific extraction with multiple selectors
+                    console.log('🔍 Detected Google Site, using Google Sites extraction');
+                    // Google Sites specific extraction with comprehensive selectors
                     const selectors = [
-                        '.jZfhZe',
-                        '.VEXWte', 
-                        '[data-is-preview-mode] .VEXWte',
-                        '[role=main]', 
-                        'main',
-                        '.sites-layout__main',
-                        '.sites-canvas-main',
-                        '.sites-page-content',
-                        '.TeI8t',
-                        '.XuV9uc'
+                        '.jZfhZe', '.VEXWte', '[data-is-preview-mode] .VEXWte',
+                        '[role=main]', 'main', '.sites-layout__main',
+                        '.sites-canvas-main', '.sites-page-content', '.TeI8t',
+                        '.XuV9uc', '.sites-embed-content-body', '.sites-page-wrapper',
+                        '.sites-page-main', '.DM7qOc', '.TQc1id', '.CwaK9',
+                        '.Fj6HLe div', '.oKdM2c', '.GJVK5c'
                     ];
                     
                     let main = null;
+                    let foundSelector = '';
+                    
                     for (const selector of selectors) {
                         main = document.querySelector(selector);
                         if (main) {
-                            console.log('Found Google Sites content with selector:', selector);
-                            break;
+                            const text = (main.textContent || main.innerText || '').trim();
+                            if (text.length > 50) {
+                                foundSelector = selector;
+                                console.log('🔍 Found Google Sites content with selector:', selector, 'Text length:', text.length);
+                                break;
+                            } else {
+                                console.log('🔍 Selector found but insufficient content:', selector, 'Text length:', text.length);
+                                main = null;
+                            }
                         }
                     }
                     
                     if (!main) {
-                        main = document.body;
+                        console.log('🔍 No specific Google Sites selectors worked, trying aggressive extraction');
+                        article = aggressiveContentExtract();
+                    } else {
+                        const title = document.title || 
+                                    document.querySelector('h1,h2,h3,.zfr3Q')?.textContent || 
+                                    'Google Site';
+                        article = {
+                            title: title.trim(),
+                            content: main.innerHTML,
+                            textContent: main.textContent || main.innerText || ''
+                        };
                     }
-                    
-                    const title = document.title || document.querySelector('h1,h2,h3,.zfr3Q')?.textContent || 'Google Site';
-                    
-                    article = {
-                        title: title.trim(),
-                        content: main.innerHTML,
-                        textContent: main.textContent || main.innerText || ''
-                    };
                 } else if (typeof window.Readability !== 'undefined') {
-                    // Try Readability first
+                    // Try Readability first for non-Google sites
                     try {
                         const documentClone = document.cloneNode(true);
                         const reader = new Readability(documentClone);
@@ -1001,25 +1073,13 @@
                             throw new Error('Readability returned insufficient content');
                         }
                     } catch (e) {
-                        console.warn('Readability failed, using fallback:', e);
-                        // Fallback extraction
-                        const content = document.body || document.documentElement;
-                        const title = document.title || document.querySelector('h1,h2,h3')?.textContent || 'Untitled';
-                        article = {
-                            title: title.trim(),
-                            content: content.innerHTML,
-                            textContent: content.textContent || content.innerText || ''
-                        };
+                        console.warn('🔍 Readability failed, using aggressive extraction:', e);
+                        article = aggressiveContentExtract();
                     }
                 } else {
-                    // Fallback extraction when Readability is not available
-                    const content = document.body || document.documentElement;
-                    const title = document.title || document.querySelector('h1,h2,h3')?.textContent || 'Untitled';
-                    article = {
-                        title: title.trim(),
-                        content: content.innerHTML,
-                        textContent: content.textContent || content.innerText || ''
-                    };
+                    // Use aggressive extraction when Readability is not available
+                    console.log('🔍 Readability not available, using aggressive extraction');
+                    article = aggressiveContentExtract();
                 }
 
                 if (article && article.content && article.textContent && article.textContent.trim().length > 20) {
@@ -1050,7 +1110,7 @@
             } catch (error) {
                 const errorMsg = error?.message || error?.toString() || 'Unknown error occurred';
                 showStatus(`❌ Test failed: ${errorMsg}`, 'error');
-                console.error('Test error:', error);
+                console.error('🔍 Test error:', error);
             }
         }
 
