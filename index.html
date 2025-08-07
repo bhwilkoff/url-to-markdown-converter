@@ -500,6 +500,9 @@
                     <button class="btn-white" onclick="testBookmarklet()">
                         🧪 Test on This Page
                     </button>
+                    <button class="btn-white" onclick="manualCheckForData()">
+                        🔄 Check for Extracted Data
+                    </button>
                 </div>
             </div>
         </div>
@@ -921,6 +924,35 @@
             } catch (error) {
                 console.error('Processing error:', error);
                 showStatus(`❌ Error processing content: ${error.message}`, 'error');
+            }
+        }
+
+        function manualCheckForData() {
+            console.log('🔍 Manual check for bookmarklet data triggered');
+            showStatus('🔄 Manually checking for bookmarklet data...', 'loading');
+            
+            const dataFound = checkForBookmarkletData();
+            if (!dataFound) {
+                // List what's in storage for debugging
+                const localStorageKeys = Object.keys(localStorage);
+                const sessionStorageKeys = Object.keys(sessionStorage);
+                
+                console.log('🔍 Available localStorage keys:', localStorageKeys);
+                console.log('🔍 Available sessionStorage keys:', sessionStorageKeys);
+                
+                const dataKeys = localStorageKeys.filter(key => key.includes('urlToMarkdown'));
+                if (dataKeys.length > 0) {
+                    showStatus('🔍 Found potential data keys: ' + dataKeys.join(', ') + '. Trying to process...', 'loading');
+                    // Try the first available key
+                    const data = localStorage.getItem(dataKeys[0]);
+                    if (data) {
+                        localStorage.setItem('urlToMarkdownData', data);
+                        setTimeout(() => checkForBookmarkletData(), 100);
+                        return;
+                    }
+                }
+                
+                showStatus('❌ No bookmarklet data found. Make sure you clicked the bookmarklet on the source page first.', 'error');
             }
         }
 
