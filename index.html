@@ -388,6 +388,17 @@
             margin-bottom: 10px;
         }
 
+        .debug-info {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -430,7 +441,7 @@
         <div class="feature-grid">
             <div class="feature-card">
                 <div class="feature-title">🔐 Authenticated Access</div>
-                <div class="feature-desc">NEW! Use our bookmarklet to extract content from login-protected pages while you're logged in</div>
+                <div class="feature-desc">Use the bookmarklet to extract content from login-protected pages while you're logged in</div>
             </div>
             <div class="feature-card">
                 <div class="feature-title">🌐 Smart Content Extraction</div>
@@ -443,76 +454,20 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="setup">⚙️ Setup & Deploy</div>
-            <div class="tab" data-tab="bookmarklet">🔐 Bookmarklet (Best for Auth)</div>
+            <div class="tab active" data-tab="bookmarklet">🔐 Bookmarklet (Best for Auth)</div>
             <div class="tab" data-tab="direct">🌐 Direct URL</div>
             <div class="tab" data-tab="manual">📄 Manual HTML</div>
         </div>
 
-        <!-- Setup Tab -->
-        <div class="tab-content active" id="setup-tab">
-            <div class="input-section">
-                <h3>🚀 GitHub Pages Deployment Setup</h3>
-                <p style="margin-bottom: 20px; color: #718096;">Before using the bookmarklet, you need to deploy this tool to GitHub Pages. Follow these steps:</p>
-                
-                <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                    <h4 style="color: #2d3748; margin-bottom: 15px;">📋 Deployment Steps:</h4>
-                    <ol style="color: #4a5568; line-height: 1.8; margin-left: 20px;">
-                        <li><strong>Create GitHub Repository:</strong> Create a new repo (e.g., <code>url-to-markdown-converter</code>)</li>
-                        <li><strong>Upload HTML File:</strong> Save this page as <code>index.html</code> and upload to your repo</li>
-                        <li><strong>Enable GitHub Pages:</strong> Go to Settings → Pages → Deploy from branch → <code>main</code> → <code>/ (root)</code></li>
-                        <li><strong>Get Your URL:</strong> Your tool will be at <code>https://yourusername.github.io/repository-name/</code></li>
-                        <li><strong>Configure Bookmarklet:</strong> Enter your GitHub Pages URL below</li>
-                    </ol>
-                </div>
-
-                <div class="input-group">
-                    <label for="githubPagesUrl">🔗 Your GitHub Pages URL</label>
-                    <input type="url" id="githubPagesUrl" placeholder="https://yourusername.github.io/url-to-markdown-converter/" />
-                    <p style="color: #718096; font-size: 14px; margin-top: 5px;">Enter the complete URL where you deployed this tool</p>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-primary" onclick="generateCustomBookmarklet()">
-                        🔧 Generate Custom Bookmarklet
-                    </button>
-                    <button class="btn-secondary" onclick="testLocalMode()">
-                        🧪 Test Local Mode
-                    </button>
-                    <button class="btn-secondary" onclick="copyCustomBookmarklet()" id="copyCustomBtn" style="display: none;">
-                        📋 Copy Custom Bookmarklet
-                    </button>
-                </div>
-
-                <div id="customBookmarkletOutput" class="hidden" style="margin-top: 20px; padding: 20px; background: #f0f9ff; border-radius: 12px; border: 2px solid #0ea5e9;">
-                    <h4 style="color: #0c4a6e; margin-bottom: 15px;">✅ Your Custom Bookmarklet:</h4>
-                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <a href="#" id="customBookmarkletLink" class="bookmarklet-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white !important;">📄➜📝 Extract to Markdown</a>
-                    </div>
-                    <p style="color: #0c4a6e; font-size: 14px;">✅ <strong>Drag this bookmarklet to your bookmarks bar!</strong> It's configured for your specific GitHub Pages URL.</p>
-                </div>
-
-                <div class="cors-info">
-                    <h4>💡 Quick Start for Testing</h4>
-                    <p><strong>Option 1:</strong> Use "Test Local Mode" to try the tool immediately on this page</p>
-                    <p><strong>Option 2:</strong> Deploy to GitHub Pages for the full experience with cross-site bookmarklet</p>
-                    <p><strong>Need help?</strong> Check the <a href="https://docs.github.com/en/pages/getting-started-with-github-pages" target="_blank" style="color: #3182ce;">GitHub Pages documentation</a></p>
-                </div>
-            </div>
-        </div>
-
         <!-- Bookmarklet Tab -->
-        <div class="tab-content" id="bookmarklet-tab">
+        <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section bookmarklet-section">
                 <h3>🔐 Extract from Authenticated Pages</h3>
-                <p style="margin-bottom: 15px; opacity: 0.9;">⚠️ <strong>Setup Required:</strong> Go to the "Setup & Deploy" tab first to configure your bookmarklet.</p>
-                <p style="margin-bottom: 20px; opacity: 0.9;">Once configured, this bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, and more.</p>
+                <p style="margin-bottom: 20px; opacity: 0.9;">This bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, Google Sites, and more.</p>
                 
                 <div class="bookmarklet-drag-area">
-                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Configure in Setup tab first:</p>
-                    <div style="background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
-                        <p style="color: rgba(255,255,255,0.8); font-size: 16px;">Your custom bookmarklet will appear here after setup</p>
-                    </div>
+                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){return;}window.urlToMarkdownBookmarklet=true;const debug=(msg,obj)=>{console.log('🔍 Bookmarklet Debug:',msg,obj||'');};debug('Starting extraction on:',window.location.href);const fallbackExtract=()=>{debug('Using fallback extraction');const content=document.body||document.documentElement;const title=document.title||document.querySelector('h1,h2,h3')?.textContent||'Untitled';const textContent=content.textContent||content.innerText||'';debug('Fallback extracted:',{titleLength:title.length,contentLength:textContent.length});if(textContent.trim().length<50){throw new Error('Page appears to have no readable content (found only '+textContent.trim().length+' characters)');}return{title:title.trim(),content:content.innerHTML,textContent:textContent.trim()}};const googleSitesExtract=()=>{debug('Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const selector of selectors){main=document.querySelector(selector);if(main){debug('Found Google Sites content with selector:',selector);break;}}if(!main){debug('No specific Google Sites selectors found, using body');main=document.body;}const title=document.title||document.querySelector('h1,h2,h3,.zfr3Q')?.textContent||'Google Site';const textContent=main.textContent||main.innerText||'';debug('Google Sites extracted:',{titleLength:title.length,contentLength:textContent.length,selector:main.tagName});return{title:title.trim(),content:main.innerHTML,textContent:textContent.trim()}};const extractContent=()=>{try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.querySelector('.TeI8t');debug('Page type detection:',{isGoogleSite,hostname:window.location.hostname});let article;if(isGoogleSite){article=googleSitesExtract();}else{debug('Trying Readability extraction');if(typeof window.Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new window.Readability(documentClone);const readabilityResult=reader.parse();if(readabilityResult&&readabilityResult.content&&readabilityResult.textContent.trim().length>50){debug('Readability successful');article=readabilityResult;}else{debug('Readability returned insufficient content, using fallback');article=fallbackExtract();}}catch(e){debug('Readability failed:',e.message);article=fallbackExtract();}}else{debug('Readability not available, using fallback');article=fallbackExtract();}}if(!article||!article.content||!article.textContent||article.textContent.trim().length<20){debug('Insufficient content extracted:',{hasArticle:!!article,hasContent:!!(article&&article.content),hasTextContent:!!(article&&article.textContent),textLength:article&&article.textContent?article.textContent.trim().length:0});throw new Error('Could not find sufficient content on this page. Found only '+(article&&article.textContent?article.textContent.trim().length:0)+' characters. Try refreshing the page or check if the content is loaded.');}const extractedData={title:article.title||document.title||'Untitled',content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic',debug:{originalTextLength:article.textContent.length,isGoogleSite,hostname:window.location.hostname}};debug('Successfully extracted data:',{titleLength:extractedData.title.length,textLength:extractedData.textContent.length,pageType:extractedData.pageType});localStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));const toolUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';const currentUrl=window.location.href;debug('Opening tool at:',toolUrl);if(currentUrl.includes('bhwilkoff.github.io/url-to-markdown-converter')){debug('Same site, reloading');window.location.reload();}else{debug('Opening new window');const newWindow=window.open(toolUrl,'_blank');if(!newWindow){alert('Content extracted! Please visit https://bhwilkoff.github.io/url-to-markdown-converter/ to see the results. The content has been saved and will load automatically.');}}return article;}catch(error){debug('Extraction failed:',error);const errorMsg=error?.message||error?.toString()||'Unknown error occurred';alert('Extraction failed: '+errorMsg);console.error('🔍 Bookmarklet error details:',{error,url:window.location.href,title:document.title,bodyLength:document.body?.innerHTML?.length||0,googleSiteElements:document.querySelectorAll('.jZfhZe, .VEXWte, .TeI8t').length});return null;}};extractContent();})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -531,6 +486,7 @@
                             <li><strong>For Google Sites:</strong> Make sure you're viewing the published site, not editing mode</li>
                             <li><strong>For restricted sites:</strong> Some sites block content extraction - try copying the HTML manually in the Manual HTML tab</li>
                             <li><strong>For dynamic content:</strong> Wait for the page to fully load before clicking the bookmarklet</li>
+                            <li><strong>Debug info:</strong> Check the browser console (F12) for detailed extraction logs</li>
                         </ul>
                     </div>
                     
@@ -538,8 +494,11 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn-white" onclick="document.querySelector('[data-tab=setup]').click()">
-                        ⚙️ Go to Setup & Deploy
+                    <button class="btn-white" onclick="copyBookmarkletCode()">
+                        📋 Copy Bookmarklet Code
+                    </button>
+                    <button class="btn-white" onclick="testBookmarklet()">
+                        🧪 Test on This Page
                     </button>
                 </div>
             </div>
@@ -692,100 +651,10 @@
             }
         });
 
-        // Initialize bookmarklet with correct URL
+        // Check for bookmarklet data on page load
         window.addEventListener('load', function() {
             checkForBookmarkletData();
-            
-            // Auto-detect current URL for bookmarklet generation
-            const currentUrl = window.location.href;
-            if (currentUrl.includes('github.io') || currentUrl.includes('localhost')) {
-                const cleanUrl = currentUrl.replace(/\/[^\/]*\.html?$/, '/').replace(/\/$/, '') + '/';
-                document.getElementById('githubPagesUrl').value = cleanUrl;
-            }
         });
-
-        function generateCustomBookmarklet() {
-            const urlInput = document.getElementById('githubPagesUrl');
-            const url = urlInput.value.trim();
-            
-            if (!url) {
-                showStatus('❌ Please enter your GitHub Pages URL first', 'error');
-                return;
-            }
-
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                showStatus('❌ Please enter a valid URL starting with http:// or https://', 'error');
-                return;
-            }
-
-            // Clean up URL
-            const cleanUrl = url.replace(/\/+$/, '') + '/';
-            
-            // Generate the bookmarklet code with the custom URL
-            const bookmarkletCode = `javascript:(function(){if(window.urlToMarkdownBookmarklet){return;}window.urlToMarkdownBookmarklet=true;const fallbackExtract=()=>{const content=document.body||document.documentElement;const title=document.title||document.querySelector('h1,h2,h3')?.textContent||'Untitled';const textContent=content.textContent||content.innerText||'';if(textContent.trim().length<50){throw new Error('Page appears to have no readable content');}return{title:title.trim(),content:content.innerHTML,textContent:textContent.trim()}};const googleSitesExtract=()=>{const main=document.querySelector('[data-is-preview-mode] .VEXWte, .VEXWte, [role=main], main, .jZfhZe')||document.body;const title=document.title||document.querySelector('h1,h2,h3,.zfr3Q')?.textContent||'Google Site';return{title:title.trim(),content:main.innerHTML,textContent:main.textContent||main.innerText||''};};const extractContent=()=>{try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]');let article;if(isGoogleSite){article=googleSitesExtract();}else if(typeof window.Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new window.Readability(documentClone);const readabilityResult=reader.parse();if(readabilityResult&&readabilityResult.content&&readabilityResult.textContent.trim().length>50){article=readabilityResult;}else{article=fallbackExtract();}}catch(e){console.warn('Readability failed:',e);article=fallbackExtract();}}else{article=fallbackExtract();}if(!article||!article.content||!article.textContent||article.textContent.trim().length<20){throw new Error('Could not find sufficient content on this page. Try selecting specific content first.');}const extractedData={title:article.title||document.title||'Untitled',content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic'};localStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));const currentUrl=window.location.href;if(currentUrl.includes('url-to-markdown-converter')){window.location.reload();}else{const newWindow=window.open('${cleanUrl}','_blank');if(!newWindow){alert('Content extracted! Please visit your URL to Markdown converter tool to see the results. The content has been saved and will load automatically when you visit the tool.');}}return article;}catch(error){const errorMsg=error?.message||error?.toString()||'Unknown error occurred';alert('Extraction failed: '+errorMsg+'. Try refreshing the page or selecting specific content first.');console.error('Bookmarklet error:',error,{url:window.location.href,title:document.title,bodyLength:document.body?.innerHTML?.length||0});return null;}};extractContent();})();`;
-            
-            // Update the custom bookmarklet link
-            const customLink = document.getElementById('customBookmarkletLink');
-            customLink.href = bookmarkletCode;
-            
-            // Show the output
-            document.getElementById('customBookmarkletOutput').classList.remove('hidden');
-            document.getElementById('copyCustomBtn').style.display = 'inline-flex';
-            
-            showStatus('✅ Custom bookmarklet generated! Drag it to your bookmarks bar.', 'success');
-        }
-
-        function copyCustomBookmarklet() {
-            const customLink = document.getElementById('customBookmarkletLink');
-            const bookmarkletCode = customLink.href;
-            
-            navigator.clipboard.writeText(bookmarkletCode).then(() => {
-                showStatus('✅ Custom bookmarklet code copied to clipboard!', 'success');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = bookmarkletCode;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showStatus('✅ Custom bookmarklet code copied to clipboard!', 'success');
-            });
-        }
-
-        function testLocalMode() {
-            // Test the bookmarklet functionality on the current page
-            try {
-                const content = document.body || document.documentElement;
-                const title = document.title || 'Local Test Page';
-                
-                const testData = {
-                    title: 'TEST: ' + title,
-                    content: content.innerHTML,
-                    textContent: content.textContent || content.innerText || '',
-                    url: window.location.href,
-                    timestamp: Date.now(),
-                    source: 'local-test',
-                    pageType: 'test'
-                };
-
-                localStorage.setItem('urlToMarkdownData', JSON.stringify(testData));
-                showStatus('✅ Local test successful! Processing content...', 'success');
-                
-                setTimeout(() => {
-                    checkForBookmarkletData();
-                    // Switch to the output if successful
-                    setTimeout(() => {
-                        if (!document.getElementById('outputSection').classList.contains('hidden')) {
-                            document.querySelector('[data-tab="manual"]').click(); // Switch to a visible tab
-                        }
-                    }, 1000);
-                }, 1000);
-                
-            } catch (error) {
-                showStatus(`❌ Local test failed: ${error.message}`, 'error');
-            }
-        }
 
         function checkForBookmarkletData() {
             const bookmarkletData = localStorage.getItem('urlToMarkdownData');
@@ -799,6 +668,12 @@
                     // Show success message
                     showStatus('✅ Content extracted via bookmarklet! Processing...', 'bookmarklet');
                     
+                    // Show debug info if available
+                    if (data.debug) {
+                        console.log('🔍 Bookmarklet data received:', data.debug);
+                        showDebugInfo(data.debug);
+                    }
+                    
                     // Process the extracted content
                     setTimeout(() => {
                         processBookmarkletData(data);
@@ -807,8 +682,23 @@
                 } catch (error) {
                     console.error('Error processing bookmarklet data:', error);
                     localStorage.removeItem('urlToMarkdownData');
+                    showStatus('❌ Error processing bookmarklet data: ' + error.message, 'error');
                 }
             }
+        }
+
+        function showDebugInfo(debugData) {
+            const statusDiv = document.getElementById('statusDiv');
+            const debugHtml = `
+                <div class="debug-info">
+                    <strong>🔍 Debug Information:</strong><br>
+                    Page Type: ${debugData.pageType || 'unknown'}<br>
+                    Is Google Site: ${debugData.isGoogleSite || 'unknown'}<br>
+                    Hostname: ${debugData.hostname || 'unknown'}<br>
+                    Text Length: ${debugData.originalTextLength || 'unknown'} characters
+                </div>
+            `;
+            statusDiv.innerHTML += debugHtml;
         }
 
         async function processBookmarkletData(data) {
@@ -869,7 +759,8 @@
 
         async function showStatus(message, type = 'loading') {
             const statusDiv = document.getElementById('statusDiv');
-            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            const existingContent = statusDiv.innerHTML;
+            statusDiv.innerHTML = existingContent + `<div class="status ${type}">${message}</div>`;
             statusDiv.scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1033,11 +924,134 @@
             }
         }
 
-
+        function copyBookmarkletCode() {
+            const bookmarkletLink = document.getElementById('bookmarkletLink');
+            const bookmarkletCode = bookmarkletLink.href;
+            
+            navigator.clipboard.writeText(bookmarkletCode).then(() => {
+                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = bookmarkletCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
+            });
+        }
 
         function testBookmarklet() {
-            // Redirect to the new test function
-            testLocalMode();
+            try {
+                // Check if this is a Google Site
+                const isGoogleSite = window.location.hostname.includes('sites.google.com') || 
+                                   document.querySelector('.sites-header-cell-buffer') || 
+                                   document.querySelector('[data-is-preview-mode]') ||
+                                   document.querySelector('.sites-layout') ||
+                                   document.querySelector('.TeI8t');
+
+                let article;
+                
+                if (isGoogleSite) {
+                    // Google Sites specific extraction with multiple selectors
+                    const selectors = [
+                        '.jZfhZe',
+                        '.VEXWte', 
+                        '[data-is-preview-mode] .VEXWte',
+                        '[role=main]', 
+                        'main',
+                        '.sites-layout__main',
+                        '.sites-canvas-main',
+                        '.sites-page-content',
+                        '.TeI8t',
+                        '.XuV9uc'
+                    ];
+                    
+                    let main = null;
+                    for (const selector of selectors) {
+                        main = document.querySelector(selector);
+                        if (main) {
+                            console.log('Found Google Sites content with selector:', selector);
+                            break;
+                        }
+                    }
+                    
+                    if (!main) {
+                        main = document.body;
+                    }
+                    
+                    const title = document.title || document.querySelector('h1,h2,h3,.zfr3Q')?.textContent || 'Google Site';
+                    
+                    article = {
+                        title: title.trim(),
+                        content: main.innerHTML,
+                        textContent: main.textContent || main.innerText || ''
+                    };
+                } else if (typeof window.Readability !== 'undefined') {
+                    // Try Readability first
+                    try {
+                        const documentClone = document.cloneNode(true);
+                        const reader = new Readability(documentClone);
+                        const readabilityResult = reader.parse();
+                        
+                        if (readabilityResult && readabilityResult.content && readabilityResult.textContent.trim().length > 50) {
+                            article = readabilityResult;
+                        } else {
+                            throw new Error('Readability returned insufficient content');
+                        }
+                    } catch (e) {
+                        console.warn('Readability failed, using fallback:', e);
+                        // Fallback extraction
+                        const content = document.body || document.documentElement;
+                        const title = document.title || document.querySelector('h1,h2,h3')?.textContent || 'Untitled';
+                        article = {
+                            title: title.trim(),
+                            content: content.innerHTML,
+                            textContent: content.textContent || content.innerText || ''
+                        };
+                    }
+                } else {
+                    // Fallback extraction when Readability is not available
+                    const content = document.body || document.documentElement;
+                    const title = document.title || document.querySelector('h1,h2,h3')?.textContent || 'Untitled';
+                    article = {
+                        title: title.trim(),
+                        content: content.innerHTML,
+                        textContent: content.textContent || content.innerText || ''
+                    };
+                }
+
+                if (article && article.content && article.textContent && article.textContent.trim().length > 20) {
+                    const testData = {
+                        title: 'TEST: ' + article.title,
+                        content: article.content,
+                        textContent: article.textContent,
+                        url: window.location.href,
+                        timestamp: Date.now(),
+                        source: 'test',
+                        pageType: isGoogleSite ? 'google-site' : 'generic',
+                        debug: {
+                            originalTextLength: article.textContent.length,
+                            isGoogleSite,
+                            hostname: window.location.hostname
+                        }
+                    };
+
+                    localStorage.setItem('urlToMarkdownData', JSON.stringify(testData));
+                    showStatus('✅ Test successful! Processing content...', 'success');
+                    
+                    setTimeout(() => {
+                        checkForBookmarkletData();
+                    }, 1000);
+                } else {
+                    showStatus('❌ Test failed: Could not extract sufficient content', 'error');
+                }
+            } catch (error) {
+                const errorMsg = error?.message || error?.toString() || 'Unknown error occurred';
+                showStatus(`❌ Test failed: ${errorMsg}`, 'error');
+                console.error('Test error:', error);
+            }
         }
 
         async function copyToClipboard() {
