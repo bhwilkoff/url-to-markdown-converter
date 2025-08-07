@@ -467,7 +467,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;const debug=(msg,obj)=>{console.log('🔍 Bookmarklet:',msg,obj||'');};debug('Starting extraction on:',window.location.href);const aggressiveContentExtract=()=>{debug('Using aggressive content extraction');const allElements=document.querySelectorAll('div, p, article, section, main, [role=main]');let bestElement=null;let maxTextLength=0;let contentElements=[];for(const el of allElements){const text=(el.textContent||el.innerText||'').trim();if(text.length>100&&text.length>maxTextLength){const childDivs=el.querySelectorAll('div').length;const childPs=el.querySelectorAll('p').length;const totalChildren=el.children.length;if(childDivs+childPs>2||totalChildren>3||text.length>500){bestElement=el;maxTextLength=text.length;contentElements.push({textLength:text.length,tag:el.tagName,className:el.className});}}}debug('Content candidates:',contentElements.slice(0,3));if(bestElement){const title=document.title||bestElement.querySelector('h1,h2,h3')?.textContent||document.querySelector('h1,h2,h3')?.textContent||'Extracted Content';debug('Selected element:',{tag:bestElement.tagName,textLength:maxTextLength});return{title:title.trim(),content:bestElement.innerHTML,textContent:bestElement.textContent||bestElement.innerText||''};}const fullBodyText=(document.body.textContent||document.body.innerText||'').trim();if(fullBodyText.length>100){debug('Using body fallback',{textLength:fullBodyText.length});return{title:document.title||'Full Page Content',content:document.body.innerHTML,textContent:fullBodyText};}throw new Error('No substantial content found (page may be empty)');};const googleSitesExtract=()=>{debug('Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc','.sites-embed-content-body','.sites-page-wrapper','.sites-page-main','.DM7qOc','.TQc1id','.CwaK9','.Fj6HLe div','.oKdM2c','.GJVK5c'];let main=null;let foundSelector='';for(const selector of selectors){main=document.querySelector(selector);if(main){const text=(main.textContent||main.innerText||'').trim();if(text.length>50){foundSelector=selector;debug('Found content:',{selector,textLength:text.length});break;}else{main=null;}}}if(!main){debug('No Google selectors worked, trying aggressive');return aggressiveContentExtract();}const title=document.title||document.querySelector('h1,h2,h3,.zfr3Q')?.textContent||'Google Site';return{title:title.trim(),content:main.innerHTML,textContent:(main.textContent||main.innerText||'').trim()}};const fallbackExtract=()=>{debug('Fallback extraction');try{return aggressiveContentExtract();}catch(e){debug('Aggressive failed, using body');const content=document.body||document.documentElement;const title=document.title||'Untitled';const textContent=content.textContent||content.innerText||'';if(textContent.trim().length<50){throw new Error('Page has no readable content');}return{title:title.trim(),content:content.innerHTML,textContent:textContent.trim()};}};try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.querySelector('.TeI8t')||document.title.includes('Google Sites');debug('Page type:',{isGoogleSite,hostname:window.location.hostname});let article;if(isGoogleSite){article=googleSitesExtract();}else if(typeof window.Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new window.Readability(documentClone);const result=reader.parse();if(result&&result.content&&result.textContent.trim().length>50){debug('Readability success');article=result;}else{debug('Readability insufficient, using fallback');article=fallbackExtract();}}catch(e){debug('Readability failed:',e.message);article=fallbackExtract();}}else{debug('No Readability, using fallback');article=fallbackExtract();}if(!article||!article.content||!article.textContent||article.textContent.trim().length<20){throw new Error('Insufficient content extracted: '+((article&&article.textContent)?article.textContent.trim().length:0)+' characters');}const extractedData={title:article.title||document.title||'Untitled',content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic'};debug('Extraction successful:',{titleLength:extractedData.title.length,textLength:extractedData.textContent.length,pageType:extractedData.pageType});debug('Storing data in localStorage...');try{localStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));debug('localStorage storage successful');}catch(storageError){debug('localStorage failed:',storageError);try{sessionStorage.setItem('urlToMarkdownData',JSON.stringify(extractedData));debug('sessionStorage fallback successful');}catch(sessionError){debug('All storage methods failed:',sessionError);alert('Storage failed: '+sessionError.message);return;}}const toolUrl='https://bhwilkoff.github.io/url-to-markdown-converter/?from=bookmarklet&t='+Date.now();debug('Opening tool:',toolUrl);if(window.location.href.includes('bhwilkoff.github.io/url-to-markdown-converter')){debug('Same site, navigating');window.location.href=toolUrl;}else{debug('Opening new tab');const newWindow=window.open(toolUrl,'_blank');if(!newWindow){debug('Popup blocked, redirecting');const proceed=confirm('Content extracted! Click OK to go to the converter tool.');if(proceed){window.location.href=toolUrl;}}else{debug('New tab opened');newWindow.focus();}}}catch(error){debug('Extraction error:',error);alert('Extraction failed: '+error.message);console.error('Full error:',error);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 Bookmarklet starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');console.log('🔍 Storing in localStorage...');localStorage.setItem('urlToMarkdownData',JSON.stringify(data));console.log('🔍 Storage successful');const toolUrl='https://bhwilkoff.github.io/url-to-markdown-converter/?from=bookmarklet&t='+Date.now();console.log('🔍 Opening:',toolUrl);if(window.location.href.includes('bhwilkoff.github.io')){window.location.href=toolUrl;}else{const win=window.open(toolUrl,'_blank');if(!win){alert('Content extracted! Please allow popups or manually visit the converter tool.');}}alert('Content extracted ('+data.textContent.length+' chars)! Opening converter...');}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+' - Check console for details');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -936,6 +936,11 @@
             console.log('🔍 Manual check for bookmarklet data triggered');
             showStatus('🔄 Manually checking for bookmarklet data...', 'loading');
             
+            // Check URL parameters for clues
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromBookmarklet = urlParams.get('from') === 'bookmarklet';
+            const timestamp = urlParams.get('t');
+            
             // First, let's see what's actually in storage
             const localStorageContents = {};
             const sessionStorageContents = {};
@@ -943,29 +948,61 @@
             // Get all localStorage contents
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                localStorageContents[key] = localStorage.getItem(key);
+                try {
+                    localStorageContents[key] = localStorage.getItem(key);
+                } catch (e) {
+                    localStorageContents[key] = `Error reading: ${e.message}`;
+                }
             }
             
             // Get all sessionStorage contents
             for (let i = 0; i < sessionStorage.length; i++) {
                 const key = sessionStorage.key(i);
-                sessionStorageContents[key] = sessionStorage.getItem(key);
+                try {
+                    sessionStorageContents[key] = sessionStorage.getItem(key);
+                } catch (e) {
+                    sessionStorageContents[key] = `Error reading: ${e.message}`;
+                }
             }
             
             console.log('🔍 Complete localStorage contents:', localStorageContents);
             console.log('🔍 Complete sessionStorage contents:', sessionStorageContents);
             
-            // Show storage contents in the UI for debugging
+            // Show comprehensive debug info
             const storageDebugHtml = `
                 <div class="debug-info" style="margin-top: 15px;">
-                    <strong>🔍 Storage Debug Information:</strong><br>
+                    <strong>🔍 Comprehensive Debug Information:</strong><br>
+                    <strong>From Bookmarklet:</strong> ${fromBookmarklet ? 'Yes' : 'No'}<br>
+                    <strong>Timestamp:</strong> ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : 'None'}<br>
                     <strong>localStorage keys:</strong> ${Object.keys(localStorageContents).join(', ') || 'empty'}<br>
                     <strong>sessionStorage keys:</strong> ${Object.keys(sessionStorageContents).join(', ') || 'empty'}<br>
                     <strong>URL:</strong> ${window.location.href}<br>
-                    <strong>Domain:</strong> ${window.location.hostname}
+                    <strong>Domain:</strong> ${window.location.hostname}<br>
+                    <strong>Storage Support:</strong> localStorage: ${typeof(Storage) !== "undefined" ? 'Yes' : 'No'}<br>
+                    <strong>Time Since Timestamp:</strong> ${timestamp ? Math.round((Date.now() - parseInt(timestamp)) / 1000) + ' seconds ago' : 'N/A'}
                 </div>
             `;
             document.getElementById('statusDiv').innerHTML += storageDebugHtml;
+            
+            // If we came from bookmarklet but have no data, there was likely an extraction error
+            if (fromBookmarklet && Object.keys(localStorageContents).length === 0 && Object.keys(sessionStorageContents).length === 0) {
+                const troubleshootingHtml = `
+                    <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
+                        <strong>⚠️ Troubleshooting: Bookmarklet ran but no data found</strong><br><br>
+                        <strong>Possible causes:</strong><br>
+                        1. <strong>Content extraction failed</strong> - The page might have unusual structure<br>
+                        2. <strong>Storage was blocked</strong> - Browser security settings or incognito mode<br>
+                        3. <strong>Page not fully loaded</strong> - Try waiting longer before clicking bookmarklet<br>
+                        4. <strong>Script execution blocked</strong> - Some sites block external scripts<br><br>
+                        <strong>Next steps:</strong><br>
+                        1. Check browser console (F12) for error messages on the source page<br>
+                        2. Try refreshing the source page and waiting for it to fully load<br>
+                        3. If it's a Google Site, make sure you're viewing the published site, not edit mode<br>
+                        4. For complex sites, try using the Manual HTML tab instead
+                    </div>
+                `;
+                document.getElementById('statusDiv').innerHTML += troubleshootingHtml;
+            }
             
             const dataFound = checkForBookmarkletData();
             if (!dataFound) {
@@ -974,7 +1011,9 @@
                 const potentialKeys = allKeys.filter(key => 
                     key.includes('urlToMarkdown') || 
                     key.includes('bookmark') || 
-                    key.includes('extract')
+                    key.includes('extract') ||
+                    key.includes('content') ||
+                    key.includes('data')
                 );
                 
                 if (potentialKeys.length > 0) {
@@ -983,7 +1022,7 @@
                     // Try each potential key
                     for (const key of potentialKeys) {
                         const data = localStorage.getItem(key) || sessionStorage.getItem(key);
-                        if (data) {
+                        if (data && data.length > 50) { // Only try substantial data
                             try {
                                 const parsed = JSON.parse(data);
                                 if (parsed.content || parsed.textContent) {
@@ -993,12 +1032,17 @@
                                     return;
                                 }
                             } catch (e) {
-                                console.log('🔍 Key', key, 'does not contain valid JSON');
+                                console.log('🔍 Key', key, 'does not contain valid JSON:', e.message);
                             }
                         }
                     }
+                    showStatus('❌ Found potential keys but none contained valid content data.', 'error');
                 } else {
-                    showStatus('❌ No bookmarklet data found anywhere in storage. Please click the bookmarklet on the source page first, then come back to this tool.', 'error');
+                    if (fromBookmarklet) {
+                        showStatus('❌ Bookmarklet executed but failed to extract or store content. Check the troubleshooting guide above.', 'error');
+                    } else {
+                        showStatus('❌ No bookmarklet data found. Please click the bookmarklet on the source page first, then come back to this tool.', 'error');
+                    }
                 }
             }
         }
