@@ -975,6 +975,24 @@
         }
 
         function testBookmarklet() {
+            const bookmarkletLink = document.getElementById('bookmarkletLink');
+            const bookmarkletCode = bookmarkletLink.href;
+            
+            navigator.clipboard.writeText(bookmarkletCode).then(() => {
+                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = bookmarkletCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
+            });
+        }
+
+        function testBookmarklet() {
             try {
                 // Enhanced content extraction logic matching the bookmarklet
                 const aggressiveContentExtract = () => {
