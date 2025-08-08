@@ -596,6 +596,9 @@
             }
         });
 
+        // Remove problematic elements before conversion
+        turndownService.remove(['script', 'style', 'noscript', 'iframe', 'object', 'embed']);
+
         // Add GFM extensions
         turndownService.addRule('strikethrough', {
             filter: ['del', 's', 'strike'],
@@ -709,6 +712,15 @@
                 const pageTypeText = data.pageType === 'google-site' ? ' (Google Site)' : '';
                 showStatus(`🔄 Converting content to Markdown${pageTypeText}...`, 'loading');
 
+                // Clean the HTML content before processing
+                let cleanContent = data.content
+                    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove script tags
+                    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove style tags
+                    .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '') // Remove noscript tags
+                    .replace(/\\"/g, '"') // Fix escaped quotes in HTML
+                    .replace(/\\'/g, "'") // Fix escaped single quotes
+                    .replace(/\\\//g, '/'); // Fix escaped slashes
+
                 // Convert to Markdown
                 let markdown = '';
                 
@@ -728,16 +740,23 @@
                 }
 
                 // Convert content
-                const contentMarkdown = turndownService.turndown(data.content);
+                const contentMarkdown = turndownService.turndown(cleanContent);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown - remove literal \n and \\n characters and excessive newlines
+                // Clean up the markdown - remove escaped characters and fix formatting
                 markdown = markdown
+                    .replace(/\\"/g, '"') // Remove escaped quotes
+                    .replace(/\\'/g, "'") // Remove escaped single quotes
+                    .replace(/\\\\/g, '\\') // Fix double-escaped backslashes
                     .replace(/\\n/g, '') // Remove literal \n
-                    .replace(/\\\\n/g, '') // Remove literal \\n  
+                    .replace(/\\r/g, '') // Remove literal \r
+                    .replace(/\\t/g, ' ') // Replace literal \t with space
+                    .replace(/\\\//g, '/') // Remove escaped forward slashes
+                    .replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => String.fromCharCode(parseInt(unicode, 16))) // Convert unicode escapes
                     .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
                     .replace(/^\s+/gm, '') // Remove leading whitespace
                     .replace(/\s+$/gm, '') // Remove trailing whitespace
+                    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
                     .trim();
 
                 extractedContent = markdown;
@@ -903,13 +922,20 @@
                 const contentMarkdown = turndownService.turndown(article.content);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown - remove literal \n and \\n characters and excessive newlines
+                // Clean up the markdown - remove escaped characters and fix formatting
                 markdown = markdown
+                    .replace(/\\"/g, '"') // Remove escaped quotes
+                    .replace(/\\'/g, "'") // Remove escaped single quotes
+                    .replace(/\\\\/g, '\\') // Fix double-escaped backslashes
                     .replace(/\\n/g, '') // Remove literal \n
-                    .replace(/\\\\n/g, '') // Remove literal \\n  
+                    .replace(/\\r/g, '') // Remove literal \r
+                    .replace(/\\t/g, ' ') // Replace literal \t with space
+                    .replace(/\\\//g, '/') // Remove escaped forward slashes
+                    .replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => String.fromCharCode(parseInt(unicode, 16))) // Convert unicode escapes
                     .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
                     .replace(/^\s+/gm, '') // Remove leading whitespace
                     .replace(/\s+$/gm, '') // Remove trailing whitespace
+                    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
                     .trim();
 
                 extractedContent = markdown;
