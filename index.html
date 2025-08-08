@@ -413,12 +413,12 @@
                 <div class="feature-desc">Use the bookmarklet to extract content from login-protected pages while you're logged in. Works on desktop and mobile Safari!</div>
             </div>
             <div class="feature-card">
-                <div class="feature-title">🌐 Smart Content Extraction</div>
-                <div class="feature-desc">Uses Mozilla's Readability to extract main content while filtering out ads, navigation, and clutter</div>
+                <div class="feature-title">🧠 Smart Content Extraction</div>
+                <div class="feature-desc">Uses Mozilla's Readability algorithm plus enhanced filtering to extract only the main content while removing ads, navigation, social widgets, and clutter</div>
             </div>
             <div class="feature-card">
-                <div class="feature-title">📝 GitHub-Compatible Markdown</div>
-                <div class="feature-desc">Generates clean Markdown with tables, task lists, and all GitHub Flavored Markdown features</div>
+                <div class="feature-title">📝 Clean Markdown Output</div>
+                <div class="feature-desc">Generates focused, readable Markdown with intelligent link filtering, image alt-text conversion, and removal of UI elements</div>
             </div>
         </div>
 
@@ -436,7 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!'+String.fromCharCode(10)+String.fromCharCode(10)+'Click OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.'+String.fromCharCode(10)+String.fromCharCode(10)+'Extracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{if(typeof Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new Readability(documentClone,{classesToPreserve:['highlight','important'],keepClasses:false});const result=reader.parse();if(result&&result.content&&result.textContent.trim().length>100){article=result;}else{throw new Error('Readability insufficient');}}catch(e){const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!'+String.fromCharCode(10)+String.fromCharCode(10)+'Click OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.'+String.fromCharCode(10)+String.fromCharCode(10)+'Extracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -574,7 +574,100 @@
             });
         });
 
-        // Initialize turndown with GFM extensions
+        // Enhanced content extraction and cleanup
+        function cleanAndExtractContent(htmlContent, title = '') {
+            // Create a temporary DOM for cleaning
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            
+            // Remove unwanted elements that add noise
+            const unwantedSelectors = [
+                'script', 'style', 'noscript', 'iframe', 'object', 'embed',
+                'nav', 'header', 'footer', 'aside',
+                '.navigation', '.nav', '.menu', '.sidebar', '.widget',
+                '.advertisement', '.ads', '.ad', '.banner',
+                '.social', '.share', '.sharing', '.social-media',
+                '.comments', '.comment', '.comment-section',
+                '.related', '.related-articles', '.recommended',
+                '.newsletter', '.subscribe', '.subscription',
+                '.popup', '.modal', '.overlay',
+                '.breadcrumb', '.breadcrumbs',
+                '.tag', '.tags', '.categories',
+                '.author-info', '.byline', '.bio',
+                '.prev-next', '.pagination',
+                '[role="complementary"]', '[role="banner"]', '[role="navigation"]',
+                '.skip-link', '.screen-reader-text',
+                // News site specific
+                '.breaking-news', '.trending', '.most-read',
+                '.weather', '.stock-ticker', '.live-blog',
+                // Social media embeds
+                '.twitter-tweet', '.instagram-media', '.fb-post',
+                // Video/audio that won't convert well
+                '.video-player', '.audio-player', '.embed-video'
+            ];
+            
+            unwantedSelectors.forEach(selector => {
+                tempDiv.querySelectorAll(selector).forEach(el => el.remove());
+            });
+            
+            // Remove elements with common unwanted attributes
+            tempDiv.querySelectorAll('[class*="ad-"], [class*="ads-"], [id*="ad-"], [id*="ads-"]').forEach(el => el.remove());
+            tempDiv.querySelectorAll('[class*="social"], [class*="share"], [class*="comment"]').forEach(el => el.remove());
+            
+            // Clean up images - convert to alt text or remove
+            tempDiv.querySelectorAll('img').forEach(img => {
+                const alt = img.getAttribute('alt');
+                const title = img.getAttribute('title');
+                const src = img.getAttribute('src');
+                
+                if (alt && alt.trim() && alt.length > 5) {
+                    // Replace with alt text if meaningful
+                    const altSpan = document.createElement('span');
+                    altSpan.textContent = `[Image: ${alt.trim()}]`;
+                    img.replaceWith(altSpan);
+                } else if (title && title.trim() && title.length > 5) {
+                    // Use title if no alt
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `[Image: ${title.trim()}]`;
+                    img.replaceWith(titleSpan);
+                } else if (src && src.includes('logo')) {
+                    // Keep logo references
+                    const logoSpan = document.createElement('span');
+                    logoSpan.textContent = '[Logo]';
+                    img.replaceWith(logoSpan);
+                } else {
+                    // Remove decorative images
+                    img.remove();
+                }
+            });
+            
+            // Remove empty paragraphs and divs
+            tempDiv.querySelectorAll('p, div, span').forEach(el => {
+                if (!el.textContent.trim()) {
+                    el.remove();
+                }
+            });
+            
+            // Remove excessive links that are likely navigation
+            const links = tempDiv.querySelectorAll('a');
+            links.forEach(link => {
+                const text = link.textContent.trim();
+                const href = link.getAttribute('href');
+                
+                // Remove if likely navigation/UI element
+                if (text.length < 4 || 
+                    /^(home|back|next|prev|more|login|signup|subscribe|follow|share|like|tweet|facebook|twitter|instagram|youtube|linkedin)$/i.test(text) ||
+                    text.match(/^\d+$/) || // Just numbers
+                    !href || href === '#' || href.startsWith('javascript:')) {
+                    // Replace with just the text content
+                    link.replaceWith(document.createTextNode(text));
+                }
+            });
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Initialize enhanced turndown with better content focus
         const turndownService = new TurndownService({
             headingStyle: 'atx',
             codeBlockStyle: 'fenced',
@@ -597,7 +690,33 @@
         });
 
         // Remove problematic elements before conversion
-        turndownService.remove(['script', 'style', 'noscript', 'iframe', 'object', 'embed']);
+        turndownService.remove([
+            'script', 'style', 'noscript', 'iframe', 'object', 'embed',
+            'nav', 'header', 'footer', 'aside'
+        ]);
+
+        // Enhanced link handling - only keep meaningful links
+        turndownService.addRule('meaningfulLinks', {
+            filter: 'a',
+            replacement: function(content, node) {
+                const href = node.getAttribute('href');
+                const text = content.trim();
+                
+                // Skip if no meaningful content or href
+                if (!text || !href || href === '#' || href.startsWith('javascript:')) {
+                    return text;
+                }
+                
+                // Skip if likely UI/navigation element
+                if (text.length < 4 || 
+                    /^(home|back|next|prev|more|login|signup|subscribe|follow|share|like|tweet|facebook|twitter|instagram|youtube|linkedin|read more|continue reading|click here)$/i.test(text)) {
+                    return text;
+                }
+                
+                // Keep meaningful links
+                return `[${text}](${href})`;
+            }
+        });
 
         // Add GFM extensions
         turndownService.addRule('strikethrough', {
@@ -616,25 +735,71 @@
             }
         });
 
-        turndownService.addRule('table', {
+        turndownService.addRule('cleanTable', {
             filter: 'table',
             replacement: function (content, node) {
                 const rows = Array.from(node.querySelectorAll('tr'));
+                if (rows.length === 0) return '';
+                
                 let markdown = '\n';
                 
                 rows.forEach((row, index) => {
                     const cells = Array.from(row.querySelectorAll('td, th'));
-                    const rowContent = cells.map(cell => cell.textContent.trim()).join(' | ');
-                    markdown += '| ' + rowContent + ' |\n';
+                    if (cells.length === 0) return;
                     
-                    if (index === 0 && row.querySelector('th')) {
-                        markdown += '|' + cells.map(() => ' --- ').join('|') + '|\n';
+                    const rowContent = cells.map(cell => {
+                        return cell.textContent.trim().replace(/\|/g, '\\|'); // Escape pipes
+                    }).join(' | ');
+                    
+                    if (rowContent.trim()) {
+                        markdown += '| ' + rowContent + ' |\n';
+                        
+                        if (index === 0 && row.querySelector('th')) {
+                            markdown += '|' + cells.map(() => ' --- ').join('|') + '|\n';
+                        }
                     }
                 });
                 
                 return markdown + '\n';
             }
         });
+
+        // Clean markdown post-processing
+        function cleanMarkdown(markdown) {
+            return markdown
+                // Fix escaped characters
+                .replace(/\\"/g, '"')
+                .replace(/\\'/g, "'")
+                .replace(/\\\\/g, '\\')
+                .replace(/\\n/g, '')
+                .replace(/\\r/g, '')
+                .replace(/\\t/g, ' ')
+                .replace(/\\\//g, '/')
+                .replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => String.fromCharCode(parseInt(unicode, 16)))
+                
+                // Remove excessive whitespace and newlines
+                .replace(/\n{4,}/g, '\n\n\n') // Max 3 consecutive newlines
+                .replace(/[ \t]+/g, ' ') // Multiple spaces to single
+                .replace(/^\s+/gm, '') // Leading whitespace
+                .replace(/\s+$/gm, '') // Trailing whitespace
+                
+                // Clean up common issues
+                .replace(/\[\s*\]/g, '') // Empty links
+                .replace(/\*\*\s*\*\*/g, '') // Empty bold
+                .replace(/__\s*__/g, '') // Empty bold
+                .replace(/\*\s*\*/g, '') // Empty italic
+                .replace(/_\s*_/g, '') // Empty italic
+                .replace(/~~\s*~~/g, '') // Empty strikethrough
+                
+                // Fix spacing around punctuation
+                .replace(/\s+([.!?])/g, '$1')
+                .replace(/([.!?])\s*\n/g, '$1\n')
+                
+                // Remove standalone punctuation lines
+                .replace(/^\s*[.,-]+\s*$/gm, '')
+                
+                .trim();
+        }
 
         // Check for bookmarklet data on page load
         window.addEventListener('load', function() {
@@ -712,14 +877,8 @@
                 const pageTypeText = data.pageType === 'google-site' ? ' (Google Site)' : '';
                 showStatus(`🔄 Converting content to Markdown${pageTypeText}...`, 'loading');
 
-                // Clean the HTML content before processing
-                let cleanContent = data.content
-                    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove script tags
-                    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove style tags
-                    .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '') // Remove noscript tags
-                    .replace(/\\"/g, '"') // Fix escaped quotes in HTML
-                    .replace(/\\'/g, "'") // Fix escaped single quotes
-                    .replace(/\\\//g, '/'); // Fix escaped slashes
+                // Enhanced content cleaning and extraction
+                const cleanContent = cleanAndExtractContent(data.content, data.title);
 
                 // Convert to Markdown
                 let markdown = '';
@@ -739,25 +898,12 @@
                     markdown += `\n\n`;
                 }
 
-                // Convert content
+                // Convert content using enhanced turndown
                 const contentMarkdown = turndownService.turndown(cleanContent);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown - remove escaped characters and fix formatting
-                markdown = markdown
-                    .replace(/\\"/g, '"') // Remove escaped quotes
-                    .replace(/\\'/g, "'") // Remove escaped single quotes
-                    .replace(/\\\\/g, '\\') // Fix double-escaped backslashes
-                    .replace(/\\n/g, '') // Remove literal \n
-                    .replace(/\\r/g, '') // Remove literal \r
-                    .replace(/\\t/g, ' ') // Replace literal \t with space
-                    .replace(/\\\//g, '/') // Remove escaped forward slashes
-                    .replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => String.fromCharCode(parseInt(unicode, 16))) // Convert unicode escapes
-                    .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
-                    .replace(/^\s+/gm, '') // Remove leading whitespace
-                    .replace(/\s+$/gm, '') // Remove trailing whitespace
-                    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-                    .trim();
+                // Apply final markdown cleanup
+                markdown = cleanMarkdown(markdown);
 
                 extractedContent = markdown;
                 
@@ -766,8 +912,8 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 
                 const successMessage = data.pageType === 'google-site' ? 
-                    `✅ Successfully converted Google Site content! Generated ${markdown.length} characters of Markdown.` :
-                    `✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`;
+                    `✅ Successfully converted Google Site content! Generated ${markdown.length} characters of clean Markdown.` :
+                    `✅ Successfully converted! Generated ${markdown.length} characters of clean Markdown.`;
                 
                 showStatus(successMessage, 'success');
                 
@@ -882,20 +1028,57 @@
                     throw new Error('Could not parse HTML content');
                 }
 
-                showStatus('🔄 Extracting main content...', 'loading');
+                showStatus('🔄 Extracting main content with enhanced algorithms...', 'loading');
 
-                // Try to use Readability for content extraction
+                // Enhanced content extraction using Readability when possible
                 let article;
                 try {
                     const readabilityDoc = doc.cloneNode(true);
-                    const reader = new Readability(readabilityDoc);
+                    const reader = new Readability(readabilityDoc, {
+                        classesToPreserve: ['highlight', 'important'],
+                        keepClasses: false,
+                        charThreshold: 500 // Require substantial content
+                    });
                     article = reader.parse();
+                    
+                    if (!article || !article.content || article.textContent.trim().length < 100) {
+                        throw new Error('Readability extraction insufficient');
+                    }
+                    
+                    console.log('✅ Used Readability for content extraction');
                 } catch (readabilityError) {
+                    console.log('Readability failed, using fallback extraction');
+                    
+                    // Fallback to manual content selection
+                    const contentSelectors = [
+                        'article',
+                        '[role="main"]',
+                        'main',
+                        '.content',
+                        '.post-content',
+                        '.entry-content',
+                        '.article-content',
+                        '.story-body',
+                        '.post-body'
+                    ];
+                    
+                    let contentElement = null;
+                    for (const selector of contentSelectors) {
+                        contentElement = doc.querySelector(selector);
+                        if (contentElement && contentElement.textContent.trim().length > 100) {
+                            break;
+                        }
+                    }
+                    
+                    if (!contentElement) {
+                        contentElement = doc.body;
+                    }
+                    
                     article = {
                         title: doc.title || 'Untitled',
-                        content: doc.body.innerHTML,
-                        textContent: doc.body.textContent,
-                        length: doc.body.textContent.length
+                        content: contentElement.innerHTML,
+                        textContent: contentElement.textContent,
+                        length: contentElement.textContent.length
                     };
                 }
 
@@ -903,7 +1086,10 @@
                     throw new Error('Could not extract content from the page');
                 }
 
-                showStatus('🔄 Converting to Markdown...', 'loading');
+                showStatus('🔄 Converting to clean Markdown...', 'loading');
+
+                // Enhanced content cleaning and extraction
+                const cleanContent = cleanAndExtractContent(article.content, article.title);
 
                 // Convert to Markdown
                 let markdown = '';
@@ -918,25 +1104,12 @@
                     markdown += `> Source: [${originalUrl}](${originalUrl})\n\n`;
                 }
 
-                // Convert content
-                const contentMarkdown = turndownService.turndown(article.content);
+                // Convert content using enhanced turndown
+                const contentMarkdown = turndownService.turndown(cleanContent);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown - remove escaped characters and fix formatting
-                markdown = markdown
-                    .replace(/\\"/g, '"') // Remove escaped quotes
-                    .replace(/\\'/g, "'") // Remove escaped single quotes
-                    .replace(/\\\\/g, '\\') // Fix double-escaped backslashes
-                    .replace(/\\n/g, '') // Remove literal \n
-                    .replace(/\\r/g, '') // Remove literal \r
-                    .replace(/\\t/g, ' ') // Replace literal \t with space
-                    .replace(/\\\//g, '/') // Remove escaped forward slashes
-                    .replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => String.fromCharCode(parseInt(unicode, 16))) // Convert unicode escapes
-                    .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
-                    .replace(/^\s+/gm, '') // Remove leading whitespace
-                    .replace(/\s+$/gm, '') // Remove trailing whitespace
-                    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-                    .trim();
+                // Apply final markdown cleanup
+                markdown = cleanMarkdown(markdown);
 
                 extractedContent = markdown;
                 
@@ -944,7 +1117,7 @@
                 document.getElementById('markdownOutput').value = markdown;
                 document.getElementById('outputSection').classList.remove('hidden');
                 
-                showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`, 'success');
+                showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of clean, focused Markdown.`, 'success');
                 
                 // Scroll to output
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
