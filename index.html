@@ -436,7 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.indexOf('sites.google.com')>-1||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.indexOf('Google Sites')>-1;var article;if(isGoogleSite){var primarySelectors=['.DM7pN','.jZfhZe','.VEXWte','.TeI8t','.XuV9uc','[jsname=F57UId]','.r8s4j-wQNmvb'];var fallbackSelectors=['[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.content'];var contentElement=null;var sourceType='unknown';for(var i=0;i<primarySelectors.length;i++){var sel=primarySelectors[i];var elements=document.querySelectorAll(sel);for(var j=0;j<elements.length;j++){var el=elements[j];if(el&&el.textContent&&el.textContent.trim().length>100){var textRatio=el.textContent.length/(el.innerHTML.length||1);if(textRatio>0.1){contentElement=el;sourceType='primary-'+sel.replace(/[^a-zA-Z]/g,'');break;}}if(contentElement)break;}}if(!contentElement){for(var k=0;k<fallbackSelectors.length;k++){var sel2=fallbackSelectors[k];contentElement=document.querySelector(sel2);if(contentElement&&contentElement.textContent&&contentElement.textContent.trim().length>50){sourceType='fallback-'+sel2.replace(/[^a-zA-Z]/g,'');break;}contentElement=null;}}if(!contentElement){contentElement=document.body;sourceType='body-filtered';}var content=contentElement.innerHTML;if(sourceType.indexOf('body')>-1||contentElement===document.body){var tempDiv=document.createElement('div');tempDiv.innerHTML=content;var removeSelectors=['.BbxBP','nav','.JzO0Vc','header','footer','.sites-header-cell-buffer','.sites-footer','[role=navigation]','.whsOnd','.zHQkBf','[type=search]','.U26fgb','.VTBa7b','.xjKiLb','.dZA9kd','.ynRLnc','.LqzjUe','.EmVfjc','.SKShhf','.xu46lf','.ir3uv','.X6jHbb','.GOJTSe','.HBnAAc','.VfPpkd-LgbsSe','.QZ3zWd>div:first-child','.M63kCb','.N63NQ','.rrJNTc','.bKy5e','script','style','noscript'];for(var m=0;m<removeSelectors.length;m++){try{var elements2=tempDiv.querySelectorAll(removeSelectors[m]);for(var n=0;n<elements2.length;n++){elements2[n].remove();}}catch(err){}}content=tempDiv.innerHTML;if(!content||content.trim().length<50){content=contentElement.innerHTML;sourceType+='(fallback-original)';}}article={title:document.title||'Google Site',content:content,textContent:contentElement.textContent||contentElement.innerText||'',sourceType:sourceType};}else{if(typeof Readability!=='undefined'){try{var documentClone=document.cloneNode(true);var reader=new Readability(documentClone,{classesToPreserve:['highlight','important'],keepClasses:false});var result=reader.parse();if(result&&result.content&&result.textContent.trim().length>100){article=result;article.sourceType='readability';}else{throw new Error('Readability insufficient');}}catch(e){var content3=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content3.innerHTML,textContent:content3.textContent||content3.innerText||'',sourceType:'fallback-generic'};}}else{var content4=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content4.innerHTML,textContent:content4.textContent||content4.innerText||'',sourceType:'basic-generic'};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}var data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic',sourceType:article.sourceType||'unknown'};var chars=data.textContent.length;var dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(function(){var proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!\\n\\nClick OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(err){alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.\\n\\nExtracted '+chars+' characters.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.indexOf('sites.google.com')>-1||document.querySelector('.sites-layout')||document.title.indexOf('Google Sites')>-1;var article;if(isGoogleSite){var selectors=['.jZfhZe','.VEXWte','.TeI8t','.XuV9uc','[role=main]','main','.sites-layout__main','.content'];var contentElement=null;for(var i=0;i<selectors.length;i++){var el=document.querySelector(selectors[i]);if(el&&el.textContent&&el.textContent.trim().length>30){contentElement=el;break;}}if(!contentElement)contentElement=document.body;var content=contentElement.innerHTML;var tempDiv=document.createElement('div');tempDiv.innerHTML=content;var removeSelectors=['nav','header','footer','.sites-header-cell-buffer','[role=navigation]','[type=search]','script','style'];for(var j=0;j<removeSelectors.length;j++){try{var elements=tempDiv.querySelectorAll(removeSelectors[j]);for(var k=0;k<elements.length;k++){elements[k].remove();}}catch(err){}}article={title:document.title||'Google Site',content:tempDiv.innerHTML,textContent:contentElement.textContent||''};}else{if(typeof Readability!=='undefined'){try{var reader=new Readability(document.cloneNode(true));var result=reader.parse();if(result&&result.content){article=result;}else{throw new Error('Readability failed');}}catch(e){var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}else{var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found');}var data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};var chars=data.textContent.length;var dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(function(){if(confirm('Content extracted ('+chars+' chars) and copied!\\n\\nOpen converter?')){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(){alert('Clipboard failed. Use Manual HTML tab.\\nExtracted '+chars+' characters.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -580,37 +580,29 @@
             tempDiv.innerHTML = htmlContent;
             
             if (isGoogleSite) {
-                console.log('🧹 Applying enhanced Google Sites content filtering');
-                // Enhanced removal selectors based on Google Site export analysis
+                console.log('🧹 Applying smart Google Sites content filtering');
+                
+                // CONSERVATIVE approach - only remove obvious navigation/UI elements
+                // Preserve content-bearing elements like .zfr3Q, .TYR86d, .eD0Rn, .C9DxTc
                 const googleSitesUnwantedSelectors = [
-                    // Navigation and header elements
-                    '.BbxBP', 'nav', '.JzO0Vc', 'header', 'footer',
+                    // Only remove clearly navigational elements
+                    'nav', 'header', 'footer',
                     '.sites-header-cell-buffer', '.sites-footer',
-                    '[role="navigation"]', '[aria-label*="navigation"]', '[aria-label*="menu"]', '[aria-label*="search"]',
-                    '[jsname="ihoMLd"]', '[jsname="WA9qLc"]', '[jscontroller="RQOkef"]',
+                    '[role="navigation"]', '[role="banner"]', '[role="complementary"]',
                     
-                    // Search functionality
-                    '.whsOnd', '.zHQkBf', '[type="search"]', '[aria-label="Search this site"]',
-                    '.EmVfjc', '.SKShhf', '[data-loadingmessage]', '[jsname="aZ2wEe"]', '[jsname="Hxlbvc"]',
+                    // Search functionality (but not all input types)
+                    '[type="search"]', '[aria-label="Search this site"]',
+                    '.search-input', '.search-button',
                     
-                    // Site action buttons and UI elements
-                    '.U26fgb', '.VTBa7b', '.xjKiLb', '.dZA9kd', '.ynRLnc', '.LqzjUe',
-                    '[jsname="Bg3gkf"]', '[jsname="psdQ5e"]', '[aria-label="Site actions"]', '[aria-label="Back to site"]',
+                    // Site-wide UI (but not content containers)
+                    '[aria-label="Skip to main content"]', '[aria-label="Skip to navigation"]',
+                    '[aria-label="Site actions"]', '[aria-label="Back to site"]',
                     
-                    // Loading and skeleton elements
-                    '.xu46lf', '.ir3uv', '.X6jHbb', '.GOJTSe', '.HBnAAc',
-                    
-                    // Skip links and accessibility helpers
-                    '.VfPpkd-LgbsSe', '[aria-label="Skip to main content"]', '[aria-label="Skip to navigation"]',
-                    
-                    // Layout containers that are usually empty or navigational
-                    '.QZ3zWd>div:first-child', '.M63kCb', '.N63NQ', '[jsname="tiN4bf"]',
-                    
-                    // Styles and scripts
-                    'script', 'style[nonce]', 'noscript', '.rrJNTc', '.bKy5e'
+                    // Scripts and styles only
+                    'script', 'style', 'noscript'
                 ];
                 
-                // Remove unwanted elements
+                // Remove only clearly unwanted elements
                 googleSitesUnwantedSelectors.forEach(selector => {
                     try {
                         const elements = tempDiv.querySelectorAll(selector);
@@ -620,22 +612,30 @@
                     }
                 });
                 
-                // Preserve more images and links for Google Sites as they're usually content
+                // PRESERVE Google Sites content structure completely
+                // Don't touch content-bearing classes like:
+                // .zfr3Q, .TYR86d, .eD0Rn (list items)
+                // .CDt4Ke (paragraphs)  
+                // .C9DxTc (text spans)
+                // .n8H08c, .UVNKR (lists)
+                
+                // Only handle images more conservatively
                 tempDiv.querySelectorAll('img').forEach(img => {
                     const alt = img.getAttribute('alt');
                     const src = img.getAttribute('src');
                     
-                    // Only convert to alt text if it's truly descriptive
-                    if (alt && alt.trim() && alt.length > 10 && !alt.toLowerCase().includes('image')) {
+                    // Be very conservative - only replace clearly decorative images
+                    if (src && (src.includes('logo') || src.includes('icon') || src.includes('bullet'))) {
+                        const logoSpan = document.createElement('span');
+                        logoSpan.textContent = alt && alt.trim() ? `[${alt.trim()}]` : '[Icon]';
+                        img.replaceWith(logoSpan);
+                    } else if (alt && alt.trim() && alt.length > 15) {
+                        // Only replace with alt text if it's genuinely descriptive
                         const altSpan = document.createElement('span');
                         altSpan.textContent = `[Image: ${alt.trim()}]`;
                         img.replaceWith(altSpan);
-                    } else if (src && (src.includes('logo') || src.includes('icon'))) {
-                        const logoSpan = document.createElement('span');
-                        logoSpan.textContent = '[Logo]';
-                        img.replaceWith(logoSpan);
                     }
-                    // Otherwise keep the image as-is for Google Sites
+                    // Otherwise keep the image tag - let Turndown handle it
                 });
                 
                 return tempDiv.innerHTML;
@@ -786,6 +786,24 @@
                 
                 // Keep meaningful links
                 return `[${text}](${href})`;
+            }
+        });
+
+        // Special rule to preserve Google Sites content structure
+        turndownService.addRule('preserveGoogleSitesContent', {
+            filter: function (node) {
+                // Preserve content in common Google Sites classes
+                return node.classList && (
+                    node.classList.contains('zfr3Q') || // List items
+                    node.classList.contains('CDt4Ke') || // Paragraphs
+                    node.classList.contains('C9DxTc') || // Text spans
+                    node.classList.contains('n8H08c') || // Lists
+                    node.classList.contains('UVNKR')     // Lists
+                );
+            },
+            replacement: function (content, node) {
+                // Just return the content without the wrapper, let other rules handle formatting
+                return content;
             }
         });
 
@@ -1113,7 +1131,7 @@
                     if (isGoogleSite) {
                         console.log('🎯 Google Site detected - using enhanced extraction');
                         
-                        // Enhanced Google Sites extraction logic
+                        // Enhanced Google Sites extraction logic with better content preservation
                         const primarySelectors = [
                             '.DM7pN', '.jZfhZe', '.VEXWte', '.TeI8t', '.XuV9uc',
                             '[data-is-preview-mode] .VEXWte', '[jsname="F57UId"]', '.r8s4j-wQNmvb'
@@ -1131,10 +1149,10 @@
                         for (const sel of primarySelectors) {
                             const elements = doc.querySelectorAll(sel);
                             for (const el of elements) {
-                                if (el && el.textContent && el.textContent.trim().length > 100) {
-                                    // Check text-to-HTML ratio to avoid navigation-heavy sections
+                                if (el && el.textContent && el.textContent.trim().length > 50) {
+                                    // LOWERED text ratio requirement and content threshold for better content capture
                                     const textRatio = el.textContent.length / (el.innerHTML.length || 1);
-                                    if (textRatio > 0.1) {
+                                    if (textRatio > 0.05) { // Reduced from 0.1 to 0.05
                                         contentElement = el;
                                         sourceType = 'primary-' + sel.replace(/[^a-zA-Z]/g, '');
                                         break;
@@ -1149,7 +1167,7 @@
                             console.log('⚠️ Primary selectors failed, trying fallback selectors');
                             for (const sel of fallbackSelectors) {
                                 contentElement = doc.querySelector(sel);
-                                if (contentElement && contentElement.textContent && contentElement.textContent.trim().length > 50) {
+                                if (contentElement && contentElement.textContent && contentElement.textContent.trim().length > 30) { // Lowered from 50
                                     sourceType = 'fallback-' + sel.replace(/[^a-zA-Z]/g, '');
                                     break;
                                 }
@@ -1157,11 +1175,11 @@
                             }
                         }
                         
-                        // Last resort: use body with aggressive filtering
+                        // Last resort: use body but with MINIMAL filtering
                         if (!contentElement) {
-                            console.log('⚠️ Fallback selectors failed, using body with aggressive filtering');
+                            console.log('⚠️ Fallback selectors failed, using body with minimal filtering');
                             contentElement = doc.body;
-                            sourceType = 'body-filtered';
+                            sourceType = 'body-minimal';
                         }
                         
                         article = {
@@ -1171,7 +1189,24 @@
                             sourceType: sourceType
                         };
                         
-                        console.log(`✅ Extracted content using: ${sourceType}, ${article.content.length} HTML chars, ${article.textContent.length} text chars`);
+                        console.log(`✅ Google Sites extraction complete:`);
+                        console.log(`- Method: ${sourceType}`);
+                        console.log(`- HTML length: ${article.content.length} chars`);
+                        console.log(`- Text length: ${article.textContent.length} chars`);
+                        console.log(`- Content preview: "${article.textContent.substring(0, 200)}..."`);
+                        
+                        // Check if we got reasonable content
+                        if (article.textContent.length < 100) {
+                            console.warn('⚠️ Low content extracted, trying body fallback');
+                            const bodyContent = doc.body.innerHTML;
+                            const bodyText = doc.body.textContent || doc.body.innerText || '';
+                            if (bodyText.length > article.textContent.length) {
+                                article.content = bodyContent;
+                                article.textContent = bodyText;
+                                article.sourceType = sourceType + '-body-fallback';
+                                console.log(`✅ Body fallback provided more content: ${bodyText.length} chars`);
+                            }
+                        }
                     } else {
                         // Use Readability for non-Google Sites
                         if (typeof Readability !== 'undefined') {
