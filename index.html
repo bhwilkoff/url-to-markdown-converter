@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL to Markdown Converter</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdom/20.0.3/jsdom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/readability/0.4.4/Readability.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.2/turndown.min.js"></script>
     <style>
@@ -321,12 +320,6 @@
             border: 1px solid #fc8181;
         }
 
-        .status.bookmarklet {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -373,30 +366,6 @@
             color: #744210;
             font-size: 14px;
             margin-bottom: 8px;
-        }
-
-        .bookmarklet-detected {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .bookmarklet-detected h3 {
-            margin-bottom: 10px;
-        }
-
-        .debug-info {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 12px;
-            color: #4a5568;
         }
 
         @media (max-width: 768px) {
@@ -467,8 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 Clipboard Bookmarklet v7 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v7-clipboard',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const chars=data.textContent.length;const dataStr=JSON.stringify(data);console.log('🔍 Copying to clipboard...');navigator.clipboard.writeText(dataStr).then(()=>{console.log('✅ Copied to clipboard successfully');const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!\\n\\nClick OK to open converter - it will automatically paste and process your content.');if(proceed){console.log('🔍 Opening converter...');const converterUrl='https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars+'&t='+Date.now();window.open(converterUrl,'_blank');console.log('✅ Converter opened!');}}).catch(err=>{console.log('❌ Clipboard failed:',err);alert('Clipboard access failed. Your browser may not support this feature.\\n\\nExtracted '+chars+' characters.\\nPlease use the Manual HTML tab in the converter and paste manually.');})}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v7</a>
-                    <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;"><strong>🔄 New:</strong> Simple clipboard-based transfer - copies content to clipboard, then auto-pastes in converter. Most reliable method!</p>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!\\n\\nClick OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.\\n\\nExtracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -477,27 +445,10 @@
                         <li><strong>Drag the button above</strong> to your browser's bookmarks bar</li>
                         <li><strong>Visit any webpage</strong> (public or requiring login)</li>
                         <li><strong>Click the bookmarklet</strong> in your bookmarks bar</li>
-                        <li><strong>Content automatically opens</strong> in this tool for markdown conversion</li>
+                        <li><strong>Content automatically processes</strong> in the converter</li>
                     </ol>
                     
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                        <h4 style="margin-bottom: 10px; color: white;">🔧 Troubleshooting for Google Sites & Complex Pages:</h4>
-                        <ul style="color: rgba(255,255,255,0.9); margin-left: 20px;">
-                            <li><strong>If you get an error:</strong> Try refreshing the page first, then click the bookmarklet again</li>
-                            <li><strong>For Google Sites:</strong> Make sure you're viewing the published site, not editing mode</li>
-                            <li><strong>For restricted sites:</strong> Some sites block content extraction - try copying the HTML manually in the Manual HTML tab</li>
-                            <li><strong>For dynamic content:</strong> Wait for the page to fully load before clicking the bookmarklet</li>
-                            <li><strong>Debug info:</strong> Check the browser console (F12) for detailed extraction logs</li>
-                        </ul>
-                    </div>
-                    
-                    <p style="margin-top: 15px; opacity: 0.9;"><strong>💡 Pro tip:</strong> This works on LinkedIn, Facebook, private dashboards, internal tools, Notion pages, Google Sites, and any other authenticated content!</p>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-white" onclick="showManualInstructions()">
-                        📖 Need Help?
-                    </button>
+                    <p style="margin-top: 15px; opacity: 0.9;"><strong>💡 Works on:</strong> LinkedIn, Facebook, private dashboards, internal tools, Notion pages, Google Sites, and any other authenticated content!</p>
                 </div>
             </div>
         </div>
@@ -536,6 +487,9 @@
                     <div class="button-group">
                         <button class="btn-secondary" onclick="convertFromHTML()">
                             🔄 Convert HTML
+                        </button>
+                        <button class="btn-secondary" onclick="clearHTML()">
+                            🗑️ Clear
                         </button>
                     </div>
                 </div>
@@ -651,335 +605,56 @@
 
         // Check for bookmarklet data on page load
         window.addEventListener('load', function() {
-            // Add small delay to ensure DOM is ready
             setTimeout(() => {
-                // Check for postMessage method first
-                if (checkForPostMessageMethod()) {
-                    return; // PostMessage setup active
-                }
-                
-                // Check for form POST data
-                if (checkForFormPostData()) {
-                    return; // Form data found and processed
-                }
-                
-                // Then check storage methods
-                checkForBookmarkletData();
+                checkForClipboardMethod();
             }, 100);
         });
 
-        // Set up postMessage listener for bookmarklet data  
-        function checkForPostMessageMethod() {
+        // Check for clipboard method
+        function checkForClipboardMethod() {
             const urlParams = new URLSearchParams(window.location.search);
             const method = urlParams.get('method');
             
-            if (method === 'postmessage') {
-                console.log('🔍 PostMessage method detected, setting up improved listener');
+            if (method === 'clipboard') {
                 const expectedChars = urlParams.get('chars');
-                showStatus(`🔄 Waiting for data transfer (expecting ${expectedChars} characters)...`, 'loading');
+                showStatus(`🔄 Processing clipboard content (${expectedChars} characters)...`, 'loading');
                 
-                let dataReceived = false;
-                let lastAttempt = 0;
-                
-                // Set up postMessage listener
-                window.addEventListener('message', function(event) {
-                    // Security check - only accept messages from GitHub Pages
-                    if (event.origin !== 'https://bhwilkoff.github.io' && 
-                        event.origin !== 'http://localhost' && 
-                        event.origin !== window.location.origin) {
-                        console.log('🔍 Rejected message from:', event.origin);
-                        return;
-                    }
-                    
-                    if (event.data && event.data.type === 'BOOKMARKLET_DATA' && !dataReceived) {
-                        dataReceived = true;
-                        console.log('🔍 Received bookmarklet data via postMessage');
-                        console.log('🔍 Data size:', event.data.data.textContent.length, 'characters');
-                        console.log('🔍 Received after attempt:', event.data.attempt || 'unknown');
+                setTimeout(async () => {
+                    try {
+                        const clipboardText = await navigator.clipboard.readText();
                         
-                        showStatus('✅ Data received via postMessage! Processing...', 'success');
-                        
-                        setTimeout(() => {
-                            processBookmarkletData(event.data.data);
-                        }, 500);
-                    } else if (event.data && event.data.attempt && !dataReceived) {
-                        // Update progress indicator
-                        lastAttempt = event.data.attempt;
-                        if (lastAttempt % 10 === 0) { // Update every 10 attempts
-                            showStatus(`🔄 Data transfer in progress... (attempt ${lastAttempt}/100)`, 'loading');
+                        if (clipboardText && clipboardText.length > 100) {
+                            // Try to parse as JSON (bookmarklet data)
+                            try {
+                                const parsed = JSON.parse(clipboardText);
+                                if (parsed.content && parsed.textContent && parsed.source && parsed.source.includes('bookmarklet')) {
+                                    showStatus('✅ Content auto-processed from clipboard!', 'success');
+                                    setTimeout(() => {
+                                        processBookmarkletData(parsed);
+                                    }, 500);
+                                    return;
+                                }
+                            } catch (e) {
+                                // Not JSON, treat as raw HTML
+                                document.getElementById('htmlInput').value = clipboardText;
+                                document.querySelector('[data-tab="manual"]').click();
+                                showStatus('✅ Content pasted into Manual HTML tab! Click "Convert HTML" to process.', 'success');
+                                return;
+                            }
                         }
-                    }
-                });
-                
-                // Send ready signal back to opener immediately and repeatedly
-                const sendReadySignal = () => {
-                    if (window.opener && !window.opener.closed) {
-                        try {
-                            window.opener.postMessage({type: 'CONVERTER_READY'}, 'https://bhwilkoff.github.io');
-                            console.log('🔍 Sent ready signal to opener');
-                        } catch (e) {
-                            console.log('🔍 Could not send ready signal:', e);
-                        }
-                    }
-                };
-                
-                // Send ready signal immediately and then every 500ms for first 10 seconds
-                sendReadySignal();
-                const readyInterval = setInterval(sendReadySignal, 500);
-                setTimeout(() => clearInterval(readyInterval), 10000);
-                
-                // Extended timeout - 35 seconds (100 attempts at 300ms + buffer)
-                setTimeout(() => {
-                    if (!dataReceived) {
-                        showStatus('❌ Data transfer timed out after 35 seconds. Please try again.', 'error');
                         
-                        const timeoutHtml = `
-                            <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
-                                <strong>⏱️ PostMessage Transfer Timeout</strong><br><br>
-                                The transfer didn't complete after 100 attempts (${lastAttempt} attempts made).<br><br>
-                                <strong>What likely happened:</strong><br>
-                                1. <strong>Browser blocked cross-tab communication</strong> - Some browsers restrict postMessage<br>
-                                2. <strong>Source tab was closed/refreshed</strong> - Keep the original page open<br>
-                                3. <strong>Network/browser issue</strong> - Try refreshing and running bookmarklet again<br><br>
-                                <strong>Solutions:</strong><br>
-                                • <strong>Try again</strong> - Click the bookmarklet once more on the source page<br>
-                                • <strong>Different browser</strong> - Chrome/Firefox may work better<br>
-                                • <strong>Manual method</strong> - Use the Manual HTML tab to copy/paste the page source<br>
-                                • <strong>Check console</strong> - Press F12 on source page for any error messages
-                            </div>
-                        `;
-                        document.getElementById('statusDiv').innerHTML += timeoutHtml;
+                        throw new Error('No substantial content found in clipboard');
+                        
+                    } catch (error) {
+                        showStatus('❌ Could not read from clipboard. Please paste manually in the Manual HTML tab.', 'error');
+                        document.querySelector('[data-tab="manual"]').click();
                     }
-                }, 35000);
+                }, 1000);
                 
                 return true;
             }
             
             return false;
-        }
-        function checkForFormPostData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const method = urlParams.get('method');
-            
-            // Check if this is a form POST
-            if (method === 'form-post' || document.body.innerHTML.includes('extractedContent')) {
-                try {
-                    // Try to get data from URL parameters (fallback)
-                    const formData = {
-                        title: urlParams.get('extractedTitle') || 'Extracted Content',
-                        content: urlParams.get('extractedContent') || '',
-                        textContent: urlParams.get('extractedText') || '',
-                        url: urlParams.get('sourceUrl') || window.location.href,
-                        timestamp: parseInt(urlParams.get('extractedTimestamp')) || Date.now(),
-                        source: urlParams.get('source') || 'bookmarklet-form',
-                        pageType: urlParams.get('pageType') || 'generic'
-                    };
-                    
-                    // Check if we have content
-                    if (formData.content && formData.content.length > 50) {
-                        console.log('🔍 Found form POST data in URL parameters');
-                        showStatus('✅ Content received via secure form POST! Processing...', 'success');
-                        
-                        setTimeout(() => {
-                            processBookmarkletData(formData);
-                        }, 500);
-                        
-                        return true;
-                    }
-                    
-                    // If no URL parameters, show help message
-                    if (method === 'form-post') {
-                        console.log('🔍 Form POST detected but no data in URL parameters');
-                        showStatus('🔄 Form POST detected. If content doesn\'t appear automatically, try the extraction again.', 'loading');
-                        
-                        // Add instructions for user
-                        const instructionsHtml = `
-                            <div class="debug-info" style="margin-top: 15px; background: #e3f2fd; border-color: #2196f3;">
-                                <strong>📝 Form POST Method Active</strong><br><br>
-                                The bookmarklet used a secure form submission method to transfer your content. If the content doesn't appear automatically:<br><br>
-                                <strong>1. Wait a moment</strong> - Form processing may take a few seconds<br>
-                                <strong>2. Check other tabs</strong> - Content might have opened in a different tab<br>
-                                <strong>3. Try again</strong> - Click the bookmarklet on your source page again<br>
-                                <strong>4. Manual fallback</strong> - Use the Manual HTML tab if needed<br><br>
-                                <em>This method bypasses browser storage limitations and should work reliably.</em>
-                            </div>
-                        `;
-                        document.getElementById('statusDiv').innerHTML += instructionsHtml;
-                        
-                        return true;
-                    }
-                    
-                } catch (error) {
-                    console.error('Error processing form POST data:', error);
-                    showStatus('❌ Error processing form data: ' + error.message, 'error');
-                }
-            }
-            
-            return false;
-        }
-        function checkForPostMessageMethod() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const method = urlParams.get('method');
-            
-            if (method === 'postmessage') {
-                console.log('🔍 PostMessage method detected, setting up listener');
-                showStatus('🔄 Waiting for data transfer from bookmarklet...', 'loading');
-                
-                let dataReceived = false;
-                
-                // Set up postMessage listener
-                window.addEventListener('message', function(event) {
-                    // Security check - only accept messages from GitHub Pages
-                    if (event.origin !== 'https://bhwilkoff.github.io' && 
-                        event.origin !== 'http://localhost' && 
-                        event.origin !== window.location.origin) {
-                        console.log('🔍 Rejected message from:', event.origin);
-                        return;
-                    }
-                    
-                    if (event.data && event.data.type === 'BOOKMARKLET_DATA' && !dataReceived) {
-                        dataReceived = true;
-                        console.log('🔍 Received bookmarklet data via postMessage');
-                        console.log('🔍 Data size:', event.data.data.textContent.length, 'characters');
-                        
-                        showStatus('✅ Data received via secure postMessage! Processing...', 'success');
-                        
-                        setTimeout(() => {
-                            processBookmarkletData(event.data.data);
-                        }, 500);
-                    }
-                });
-                
-                // Send ready signal back to opener
-                if (window.opener) {
-                    try {
-                        window.opener.postMessage({type: 'CONVERTER_READY'}, '*');
-                        console.log('🔍 Sent ready signal to opener');
-                    } catch (e) {
-                        console.log('🔍 Could not send ready signal:', e);
-                    }
-                }
-                
-                // Timeout after 30 seconds
-                setTimeout(() => {
-                    if (!dataReceived) {
-                        showStatus('❌ Data transfer timed out. Please try the bookmarklet again or use Manual HTML method.', 'error');
-                        
-                        const timeoutHtml = `
-                            <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
-                                <strong>⏱️ PostMessage Transfer Timeout</strong><br><br>
-                                The secure data transfer didn't complete within 30 seconds. This can happen if:<br><br>
-                                <strong>1. Browser security blocked the transfer</strong> - Try allowing popups<br>
-                                <strong>2. Source window was closed</strong> - Keep the original page open<br>
-                                <strong>3. Network/timing issue</strong> - Try the bookmarklet again<br><br>
-                                <strong>Alternative:</strong> Use the Manual HTML tab to copy/paste the page source directly.
-                            </div>
-                        `;
-                        document.getElementById('statusDiv').innerHTML += timeoutHtml;
-                    }
-                }, 30000);
-                
-                return true;
-            }
-            
-            return false;
-        }
-
-        function checkForBookmarkletData() {
-            // Check multiple storage locations with backup keys
-            let bookmarkletData = localStorage.getItem('urlToMarkdownData');
-            let dataSource = 'localStorage';
-            
-            // Check backup localStorage key
-            if (!bookmarkletData) {
-                bookmarkletData = localStorage.getItem('urlToMarkdownBackup');
-                dataSource = 'localStorage-backup';
-            }
-            
-            // If localStorage is empty, check sessionStorage
-            if (!bookmarkletData) {
-                bookmarkletData = sessionStorage.getItem('urlToMarkdownData');
-                dataSource = 'sessionStorage';
-            }
-            
-            // Check backup sessionStorage key
-            if (!bookmarkletData) {
-                bookmarkletData = sessionStorage.getItem('urlToMarkdownBackup');
-                dataSource = 'sessionStorage-backup';
-            }
-            
-            // If both storage methods are empty, check URL parameters
-            if (!bookmarkletData) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const encodedData = urlParams.get('data');
-                if (encodedData) {
-                    try {
-                        // Try new encoding method first (unescape + encodeURIComponent + btoa)
-                        bookmarkletData = decodeURIComponent(escape(atob(encodedData)));
-                        dataSource = 'URL parameters (new format)';
-                        console.log('🔍 Found data in URL parameters (new format)');
-                    } catch (e) {
-                        try {
-                            // Fallback to simple base64
-                            bookmarkletData = atob(encodedData);
-                            dataSource = 'URL parameters (legacy format)';
-                            console.log('🔍 Found data in URL parameters (legacy format)');
-                        } catch (e2) {
-                            console.log('🔍 Failed to decode URL data:', e2);
-                        }
-                    }
-                }
-            }
-            
-            if (bookmarkletData) {
-                try {
-                    const data = JSON.parse(bookmarkletData);
-                    
-                    // Clear the data from all sources to prevent re-processing
-                    localStorage.removeItem('urlToMarkdownData');
-                    localStorage.removeItem('urlToMarkdownBackup');
-                    sessionStorage.removeItem('urlToMarkdownData');
-                    sessionStorage.removeItem('urlToMarkdownBackup');
-                    
-                    // Show success message with data source
-                    showStatus(`✅ Content extracted via bookmarklet (from ${dataSource})! Processing...`, 'bookmarklet');
-                    
-                    // Show debug info if available
-                    if (data.debug) {
-                        console.log('🔍 Bookmarklet data received:', data.debug);
-                        showDebugInfo(data.debug);
-                    }
-                    
-                    // Process the extracted content
-                    setTimeout(() => {
-                        processBookmarkletData(data);
-                    }, 500);
-                    
-                    return true;
-                } catch (error) {
-                    console.error('Error processing bookmarklet data:', error);
-                    localStorage.removeItem('urlToMarkdownData');
-                    localStorage.removeItem('urlToMarkdownBackup');
-                    sessionStorage.removeItem('urlToMarkdownData');
-                    sessionStorage.removeItem('urlToMarkdownBackup');
-                    showStatus('❌ Error processing bookmarklet data: ' + error.message, 'error');
-                }
-            }
-            return false;
-        }
-
-        function showDebugInfo(debugData) {
-            const statusDiv = document.getElementById('statusDiv');
-            const debugHtml = `
-                <div class="debug-info">
-                    <strong>🔍 Debug Information:</strong><br>
-                    Page Type: ${debugData.pageType || 'unknown'}<br>
-                    Is Google Site: ${debugData.isGoogleSite || 'unknown'}<br>
-                    Hostname: ${debugData.hostname || 'unknown'}<br>
-                    Text Length: ${debugData.originalTextLength || 'unknown'} characters
-                </div>
-            `;
-            statusDiv.innerHTML += debugHtml;
         }
 
         async function processBookmarkletData(data) {
@@ -987,7 +662,7 @@
                 originalUrl = data.url;
                 
                 const pageTypeText = data.pageType === 'google-site' ? ' (Google Site)' : '';
-                await showStatus(`🔄 Converting bookmarklet content to Markdown${pageTypeText}...`, 'loading');
+                showStatus(`🔄 Converting content to Markdown${pageTypeText}...`, 'loading');
 
                 // Convert to Markdown
                 let markdown = '';
@@ -1025,27 +700,24 @@
                 
                 const successMessage = data.pageType === 'google-site' ? 
                     `✅ Successfully converted Google Site content! Generated ${markdown.length} characters of Markdown.` :
-                    `✅ Successfully converted via bookmarklet! Generated ${markdown.length} characters of Markdown from authenticated page.`;
+                    `✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`;
                 
-                await showStatus(successMessage, 'success');
+                showStatus(successMessage, 'success');
                 
                 // Scroll to output
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 
             } catch (error) {
-                console.error('Bookmarklet processing error:', error);
-                showStatus(`❌ Error processing bookmarklet content: ${error.message}. If this persists, try the Manual HTML tab instead.`, 'error');
+                showStatus(`❌ Error processing content: ${error.message}`, 'error');
             }
         }
 
-        async function showStatus(message, type = 'loading') {
+        function showStatus(message, type = 'loading') {
             const statusDiv = document.getElementById('statusDiv');
-            const existingContent = statusDiv.innerHTML;
-            statusDiv.innerHTML = existingContent + `<div class="status ${type}">${message}</div>`;
-            statusDiv.scrollIntoView({ behavior: 'smooth' });
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
         }
 
-        async function clearStatus() {
+        function clearStatus() {
             document.getElementById('statusDiv').innerHTML = '';
         }
 
@@ -1079,7 +751,7 @@
             }
 
             originalUrl = url;
-            await showStatus('🔄 Fetching webpage...', 'loading');
+            showStatus('🔄 Fetching webpage...', 'loading');
 
             try {
                 // Try direct fetch first
@@ -1096,11 +768,9 @@
                 await processHTML(html, url);
 
             } catch (error) {
-                console.error('Direct fetch failed:', error);
-                
                 // Try CORS proxy as fallback
                 try {
-                    await showStatus('🔄 Trying alternative method...', 'loading');
+                    showStatus('🔄 Trying alternative method...', 'loading');
                     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
                     const response = await fetch(proxyUrl);
                     
@@ -1112,8 +782,7 @@
                     await processHTML(html, url);
 
                 } catch (proxyError) {
-                    console.error('Proxy fetch failed:', proxyError);
-                    showStatus(`❌ Could not fetch URL. For authenticated content, please use the Bookmarklet tab! Error: ${error.message}`, 'error');
+                    showStatus(`❌ Could not fetch URL. For authenticated content, please use the Bookmarklet tab!`, 'error');
                 }
             }
         }
@@ -1126,8 +795,13 @@
                 return;
             }
 
-            await showStatus('🔄 Processing HTML...', 'loading');
+            showStatus('🔄 Processing HTML...', 'loading');
             await processHTML(html, 'Manual HTML Input');
+        }
+
+        function clearHTML() {
+            document.getElementById('htmlInput').value = '';
+            clearStatus();
         }
 
         async function processHTML(html, source) {
@@ -1141,7 +815,7 @@
                     throw new Error('Could not parse HTML content');
                 }
 
-                await showStatus('🔄 Extracting main content...', 'loading');
+                showStatus('🔄 Extracting main content...', 'loading');
 
                 // Try to use Readability for content extraction
                 let article;
@@ -1150,7 +824,6 @@
                     const reader = new Readability(readabilityDoc);
                     article = reader.parse();
                 } catch (readabilityError) {
-                    console.warn('Readability failed, using full body:', readabilityError);
                     article = {
                         title: doc.title || 'Untitled',
                         content: doc.body.innerHTML,
@@ -1163,7 +836,7 @@
                     throw new Error('Could not extract content from the page');
                 }
 
-                await showStatus('🔄 Converting to Markdown...', 'loading');
+                showStatus('🔄 Converting to Markdown...', 'loading');
 
                 // Convert to Markdown
                 let markdown = '';
@@ -1194,531 +867,13 @@
                 document.getElementById('markdownOutput').value = markdown;
                 document.getElementById('outputSection').classList.remove('hidden');
                 
-                await showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`, 'success');
+                showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`, 'success');
                 
                 // Scroll to output
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 
             } catch (error) {
-                console.error('Processing error:', error);
                 showStatus(`❌ Error processing content: ${error.message}`, 'error');
-            }
-        }
-
-        function manualCheckForData() {
-            console.log('🔍 Manual check for bookmarklet data triggered');
-            showStatus('🔄 Manually checking for bookmarklet data...', 'loading');
-            
-            // Check URL parameters for clues
-            const urlParams = new URLSearchParams(window.location.search);
-            const fromBookmarklet = urlParams.get('from') === 'bookmarklet';
-            const method = urlParams.get('method');
-            const timestamp = urlParams.get('t');
-            const encodedData = urlParams.get('data');
-            const storageMethod = urlParams.get('storage');
-            const expectedChars = urlParams.get('chars');
-            
-            // First, let's see what's actually in storage
-            
-            // First, let's see what's actually in storage
-            const localStorageContents = {};
-            const sessionStorageContents = {};
-            
-            // Get all localStorage contents
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                try {
-                    localStorageContents[key] = localStorage.getItem(key);
-                } catch (e) {
-                    localStorageContents[key] = `Error reading: ${e.message}`;
-                }
-            }
-            
-            // Get all sessionStorage contents
-            for (let i = 0; i < sessionStorage.length; i++) {
-                const key = sessionStorage.key(i);
-                try {
-                    sessionStorageContents[key] = sessionStorage.getItem(key);
-                } catch (e) {
-                    sessionStorageContents[key] = `Error reading: ${e.message}`;
-                }
-            }
-            
-            console.log('🔍 Complete localStorage contents:', localStorageContents);
-            console.log('🔍 Complete sessionStorage contents:', sessionStorageContents);
-            
-            // Show comprehensive debug info
-            const storageDebugHtml = `
-                <div class="debug-info" style="margin-top: 15px;">
-                    <strong>🔍 Comprehensive Debug Information:</strong><br>
-                    <strong>From Bookmarklet:</strong> ${fromBookmarklet ? 'Yes' : 'No'}<br>
-                    <strong>Transfer Method:</strong> ${method || storageMethod || 'Unknown'}<br>
-                    <strong>Expected Content:</strong> ${expectedChars ? expectedChars + ' characters' : 'Unknown'}<br>
-                    <strong>Timestamp:</strong> ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : 'None'}<br>
-                    <strong>URL Data Present:</strong> ${encodedData ? 'Yes (' + encodedData.length + ' chars)' : 'No'}<br>
-                    <strong>localStorage keys:</strong> ${Object.keys(localStorageContents).join(', ') || 'empty'}<br>
-                    <strong>sessionStorage keys:</strong> ${Object.keys(sessionStorageContents).join(', ') || 'empty'}<br>
-                    <strong>URL:</strong> ${window.location.href}<br>
-                    <strong>Domain:</strong> ${window.location.hostname}<br>
-                    <strong>Storage Support:</strong> localStorage: ${typeof(Storage) !== "undefined" ? 'Yes' : 'No'}<br>
-                    <strong>Time Since Timestamp:</strong> ${timestamp ? Math.round((Date.now() - parseInt(timestamp)) / 1000) + ' seconds ago' : 'N/A'}
-                </div>
-            `;
-            document.getElementById('statusDiv').innerHTML += storageDebugHtml;
-            
-            // Try to process URL data if present
-            if (encodedData) {
-                try {
-                    console.log('🔍 Attempting to decode URL data...');
-                    const decoded = decodeURIComponent(escape(atob(encodedData)));
-                    const data = JSON.parse(decoded);
-                    if (data.content || data.textContent) {
-                        showStatus('🔍 Found data in URL parameters! Processing...', 'loading');
-                        localStorage.setItem('urlToMarkdownData', decoded);
-                        setTimeout(() => checkForBookmarkletData(), 100);
-                        return;
-                    }
-                } catch (e) {
-                    console.log('🔍 Failed to decode URL data with new method, trying simple atob:', e);
-                    try {
-                        const decoded = atob(encodedData);
-                        const data = JSON.parse(decoded);
-                        if (data.content || data.textContent) {
-                            showStatus('🔍 Found data in URL parameters (legacy format)! Processing...', 'loading');
-                            localStorage.setItem('urlToMarkdownData', decoded);
-                            setTimeout(() => checkForBookmarkletData(), 100);
-                            return;
-                        }
-                    } catch (e2) {
-                        console.log('🔍 Both decoding methods failed:', e2);
-                        showStatus('❌ URL data found but failed to decode: ' + e2.message, 'error');
-                    }
-                }
-            }
-            
-            // If we came from bookmarklet but have no data, provide specific troubleshooting
-            if ((fromBookmarklet || method) && Object.keys(localStorageContents).length === 0 && Object.keys(sessionStorageContents).length === 0 && !encodedData) {
-                let troubleshootingHtml = '';
-                
-                if (method === 'clipboard') {
-                    troubleshootingHtml = `
-                        <div class="debug-info" style="margin-top: 15px; background: #e3f2fd; border-color: #2196f3;">
-                            <strong>📋 Clipboard Transfer Active</strong><br><br>
-                            The bookmarklet copied your content to the clipboard and opened this converter.<br><br>
-                            <strong>If auto-paste didn't work:</strong><br>
-                            • Go to the "Manual HTML" tab<br>
-                            • Press Ctrl+V (or Cmd+V) to paste manually<br>
-                            • Click "Convert HTML" to process<br><br>
-                            <strong>Your content should be:</strong> ${expectedChars ? expectedChars + ' characters' : 'Unknown size'}
-                        </div>
-                    `;
-                } else if (method === 'postmessage') {
-                    troubleshootingHtml = `
-                        <div class="debug-info" style="margin-top: 15px; background: #e3f2fd; border-color: #2196f3;">
-                            <strong>📡 PostMessage Transfer Issues</strong><br><br>
-                            The bookmarklet is using secure postMessage transfer, but no data was received yet.<br><br>
-                            <strong>This is normal if:</strong><br>
-                            • The transfer is still in progress (wait a moment)<br>
-                            • The source window is still loading<br><br>
-                            <strong>If it fails:</strong><br>
-                            • Make sure popups are allowed<br>
-                            • Keep the source page open during transfer<br>
-                            • Try the bookmarklet again if it times out
-                        </div>
-                    `;
-                } else {
-                    troubleshootingHtml = `
-                        <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
-                            <strong>⚠️ Data Transfer Issue Detected</strong><br><br>
-                            The bookmarklet successfully extracted ${expectedChars ? expectedChars + ' characters' : 'content'} using ${method || storageMethod || 'unknown method'}, but the data didn't arrive at the converter.<br><br>
-                            <strong>Possible causes & solutions:</strong><br>
-                            1. <strong>Browser security/privacy settings</strong> - Try a different browser or disable strict privacy mode<br>
-                            2. <strong>Incognito/private mode</strong> - Switch to regular browsing mode<br>
-                            3. <strong>Browser extension interference</strong> - Try disabling ad blockers or privacy extensions temporarily<br>
-                            4. <strong>Timing issues</strong> - Try the extraction again<br><br>
-                            <strong>Immediate workarounds:</strong><br>
-                            • Try the extraction again - sometimes it works on second attempt<br>
-                            • Use the Manual HTML tab to copy/paste the page source<br>
-                            • Try a different browser (Chrome, Firefox, Safari, Edge)
-                        </div>
-                    `;
-                }
-                
-                document.getElementById('statusDiv').innerHTML += troubleshootingHtml;
-                
-                if (method === 'clipboard') {
-                    showStatus('🔄 Clipboard transfer active. Check instructions above if auto-paste didn\'t work.', 'loading');
-                } else if (method === 'postmessage') {
-                    showStatus('🔄 PostMessage transfer active. Waiting for data...', 'loading');
-                } else {
-                    showStatus('❌ Data transfer succeeded but content not received. Check troubleshooting guide above.', 'error');
-                }
-            }
-            
-            const dataFound = checkForBookmarkletData();
-            if (!dataFound) {
-                // Look for any keys that might contain our data
-                const allKeys = [...Object.keys(localStorageContents), ...Object.keys(sessionStorageContents)];
-                const potentialKeys = allKeys.filter(key => 
-                    key.includes('urlToMarkdown') || 
-                    key.includes('bookmark') || 
-                    key.includes('extract') ||
-                    key.includes('content') ||
-                    key.includes('data')
-                );
-                
-                if (potentialKeys.length > 0) {
-                    showStatus('🔍 Found potential data keys: ' + potentialKeys.join(', ') + '. Trying to process...', 'loading');
-                    
-                    // Try each potential key
-                    for (const key of potentialKeys) {
-                        const data = localStorage.getItem(key) || sessionStorage.getItem(key);
-                        if (data && data.length > 50) { // Only try substantial data
-                            try {
-                                const parsed = JSON.parse(data);
-                                if (parsed.content || parsed.textContent) {
-                                    console.log('🔍 Found valid data in key:', key);
-                                    localStorage.setItem('urlToMarkdownData', data);
-                                    setTimeout(() => checkForBookmarkletData(), 100);
-                                    return;
-                                }
-                            } catch (e) {
-                                console.log('🔍 Key', key, 'does not contain valid JSON:', e.message);
-                            }
-                        }
-                    }
-                    showStatus('❌ Found potential keys but none contained valid content data.', 'error');
-                } else {
-                    if (fromBookmarklet) {
-                        showStatus('❌ Bookmarklet executed but failed to extract or store content. Check the troubleshooting guide above.', 'error');
-                    } else {
-                        showStatus('❌ No bookmarklet data found. Please click the bookmarklet on the source page first, then come back to this tool.', 'error');
-                    }
-                }
-            }
-        }
-
-        function tryDifferentExtraction() {
-            showStatus('🔄 Attempting alternative data recovery...', 'loading');
-            
-            // Try to check multiple storage locations
-            const allStorageKeys = ['urlToMarkdownData', 'urlToMarkdownBackup', 'bookmarkletData', 'extractedContent'];
-            
-            for (const storageType of ['localStorage', 'sessionStorage']) {
-                for (const key of allStorageKeys) {
-                    try {
-                        const storage = storageType === 'localStorage' ? localStorage : sessionStorage;
-                        const data = storage.getItem(key);
-                        if (data && data.length > 100) {
-                            console.log(`🔍 Found data in ${storageType}.${key}`);
-                            try {
-                                const parsed = JSON.parse(data);
-                                if (parsed.content || parsed.textContent) {
-                                    showStatus(`✅ Found backup data in ${storageType}.${key}! Processing...`, 'success');
-                                    
-                                    // Clean up found data
-                                    storage.removeItem(key);
-                                    
-                                    processBookmarkletData(parsed);
-                                    return;
-                                }
-                            } catch (e) {
-                                console.log(`🔍 Data in ${key} is not valid JSON`);
-                            }
-                        }
-                    } catch (e) {
-                        console.log(`🔍 Error checking ${storageType}.${key}:`, e);
-                    }
-                }
-            }
-            
-            // Check URL parameters as well
-            const urlParams = new URLSearchParams(window.location.search);
-            const encodedData = urlParams.get('data');
-            if (encodedData) {
-                try {
-                    const decoded = decodeURIComponent(escape(atob(encodedData)));
-                    const parsed = JSON.parse(decoded);
-                    if (parsed.content || parsed.textContent) {
-                        showStatus('✅ Found data in URL parameters! Processing...', 'success');
-                        processBookmarkletData(parsed);
-                        return;
-                    }
-                } catch (e) {
-                    console.log('🔍 Failed to decode URL data:', e);
-                }
-            }
-            
-            showStatus('❌ No backup data found. Please try the Manual HTML method or run the bookmarklet again.', 'error');
-        }
-
-        function showManualInstructions() {
-            const instructionsHtml = `
-                <div class="debug-info" style="margin-top: 15px; background: #e8f5e8; border-color: #4caf50;">
-                    <strong>📖 Manual Data Recovery Instructions</strong><br><br>
-                    Since automatic data transfer failed, here's how to extract content manually:<br><br>
-                    <strong>Method 1 - Page Source:</strong><br>
-                    1. Go back to the page you want to convert<br>
-                    2. Right-click → "View Page Source" (or press Ctrl+U / Cmd+U)<br>
-                    3. Copy ALL the HTML code (Ctrl+A, then Ctrl+C)<br>
-                    4. Return here and paste it in the "Manual HTML" tab<br><br>
-                    <strong>Method 2 - Try Different Browser:</strong><br>
-                    • Chrome, Firefox, Edge, or Safari may handle storage differently<br>
-                    • Try the bookmarklet in a different browser<br><br>
-                    <strong>Method 3 - Direct URL (if public):</strong><br>
-                    • If the page doesn't require login, use the "Direct URL" tab<br>
-                    • Copy the page URL and paste it there
-                </div>
-            `;
-            document.getElementById('statusDiv').innerHTML += instructionsHtml;
-        }
-
-        function testStorage() {
-            console.log('🔍 Testing storage system...');
-            showStatus('🔄 Testing storage system...', 'loading');
-            
-            try {
-                // Test localStorage
-                const testData = {
-                    title: 'Storage Test',
-                    content: '<p>This is a test of the storage system</p>',
-                    textContent: 'This is a test of the storage system',
-                    url: window.location.href,
-                    timestamp: Date.now(),
-                    source: 'storage-test'
-                };
-                
-                const testDataString = JSON.stringify(testData);
-                
-                // Test basic localStorage
-                localStorage.setItem('storageTest', testDataString);
-                const retrieved = localStorage.getItem('storageTest');
-                
-                if (retrieved === testDataString) {
-                    console.log('✅ localStorage test passed');
-                    
-                    // Test our specific key
-                    localStorage.setItem('urlToMarkdownData', testDataString);
-                    const specificRetrieved = localStorage.getItem('urlToMarkdownData');
-                    
-                    if (specificRetrieved === testDataString) {
-                        console.log('✅ urlToMarkdownData key test passed');
-                        
-                        // Now test the detection system
-                        showStatus('✅ Storage system working! Testing detection...', 'success');
-                        
-                        setTimeout(() => {
-                            const detected = checkForBookmarkletData();
-                            if (detected) {
-                                showStatus('✅ Storage and detection system fully working!', 'success');
-                            } else {
-                                showStatus('❌ Storage works but detection failed', 'error');
-                            }
-                        }, 500);
-                        
-                    } else {
-                        showStatus('❌ urlToMarkdownData key storage failed', 'error');
-                    }
-                } else {
-                    showStatus('❌ Basic localStorage test failed', 'error');
-                }
-                
-                // Clean up test data
-                localStorage.removeItem('storageTest');
-                
-            } catch (error) {
-                console.error('🔍 Storage test error:', error);
-                showStatus('❌ Storage test failed: ' + error.message, 'error');
-            }
-        }
-
-        function copyBookmarkletCode() {
-            const bookmarkletLink = document.getElementById('bookmarkletLink');
-            const bookmarkletCode = bookmarkletLink.href;
-            
-            navigator.clipboard.writeText(bookmarkletCode).then(() => {
-                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = bookmarkletCode;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showStatus('✅ Bookmarklet code copied to clipboard!', 'success');
-            });
-        }
-
-        function testBookmarklet() {
-            try {
-                // Enhanced content extraction logic matching the bookmarklet
-                const aggressiveContentExtract = () => {
-                    console.log('🔍 Using aggressive content extraction');
-                    const allElements = document.querySelectorAll('div, p, article, section, main, [role=main]');
-                    let bestElement = null;
-                    let maxTextLength = 0;
-                    let contentElements = [];
-
-                    for (const el of allElements) {
-                        const text = (el.textContent || el.innerText || '').trim();
-                        if (text.length > 100 && text.length > maxTextLength) {
-                            const childDivs = el.querySelectorAll('div').length;
-                            const childPs = el.querySelectorAll('p').length;
-                            const totalChildren = el.children.length;
-                            
-                            // Look for elements with substantial content structure
-                            if (childDivs + childPs > 2 || totalChildren > 3 || text.length > 500) {
-                                bestElement = el;
-                                maxTextLength = text.length;
-                                contentElements.push({
-                                    element: el,
-                                    textLength: text.length,
-                                    tag: el.tagName,
-                                    class: el.className,
-                                    id: el.id
-                                });
-                            }
-                        }
-                    }
-
-                    console.log('🔍 Content candidates found:', contentElements.slice(0, 5));
-
-                    if (bestElement) {
-                        const title = document.title || 
-                                    bestElement.querySelector('h1,h2,h3')?.textContent || 
-                                    document.querySelector('h1,h2,h3')?.textContent || 
-                                    'Extracted Content';
-                        console.log('🔍 Selected best element:', {
-                            tag: bestElement.tagName,
-                            class: bestElement.className,
-                            textLength: maxTextLength
-                        });
-                        return {
-                            title: title.trim(),
-                            content: bestElement.innerHTML,
-                            textContent: bestElement.textContent || bestElement.innerText || ''
-                        };
-                    }
-
-                    // Final fallback to body if nothing substantial found
-                    const fullBodyText = (document.body.textContent || document.body.innerText || '').trim();
-                    if (fullBodyText.length > 100) {
-                        console.log('🔍 Using full body as fallback', { textLength: fullBodyText.length });
-                        return {
-                            title: document.title || 'Full Page Content',
-                            content: document.body.innerHTML,
-                            textContent: fullBodyText
-                        };
-                    }
-
-                    throw new Error('Could not find any substantial content on this page. Page may be empty or content may be loading.');
-                };
-
-                // Check if this is a Google Site
-                const isGoogleSite = window.location.hostname.includes('sites.google.com') || 
-                                   document.querySelector('.sites-header-cell-buffer') || 
-                                   document.querySelector('[data-is-preview-mode]') ||
-                                   document.querySelector('.sites-layout') ||
-                                   document.querySelector('.TeI8t') ||
-                                   document.title.includes('Google Sites');
-
-                let article;
-                
-                if (isGoogleSite) {
-                    console.log('🔍 Detected Google Site, using Google Sites extraction');
-                    // Google Sites specific extraction with comprehensive selectors
-                    const selectors = [
-                        '.jZfhZe', '.VEXWte', '[data-is-preview-mode] .VEXWte',
-                        '[role=main]', 'main', '.sites-layout__main',
-                        '.sites-canvas-main', '.sites-page-content', '.TeI8t',
-                        '.XuV9uc', '.sites-embed-content-body', '.sites-page-wrapper',
-                        '.sites-page-main', '.DM7qOc', '.TQc1id', '.CwaK9',
-                        '.Fj6HLe div', '.oKdM2c', '.GJVK5c'
-                    ];
-                    
-                    let main = null;
-                    let foundSelector = '';
-                    
-                    for (const selector of selectors) {
-                        main = document.querySelector(selector);
-                        if (main) {
-                            const text = (main.textContent || main.innerText || '').trim();
-                            if (text.length > 50) {
-                                foundSelector = selector;
-                                console.log('🔍 Found Google Sites content with selector:', selector, 'Text length:', text.length);
-                                break;
-                            } else {
-                                console.log('🔍 Selector found but insufficient content:', selector, 'Text length:', text.length);
-                                main = null;
-                            }
-                        }
-                    }
-                    
-                    if (!main) {
-                        console.log('🔍 No specific Google Sites selectors worked, trying aggressive extraction');
-                        article = aggressiveContentExtract();
-                    } else {
-                        const title = document.title || 
-                                    document.querySelector('h1,h2,h3,.zfr3Q')?.textContent || 
-                                    'Google Site';
-                        article = {
-                            title: title.trim(),
-                            content: main.innerHTML,
-                            textContent: main.textContent || main.innerText || ''
-                        };
-                    }
-                } else if (typeof window.Readability !== 'undefined') {
-                    // Try Readability first for non-Google sites
-                    try {
-                        const documentClone = document.cloneNode(true);
-                        const reader = new Readability(documentClone);
-                        const readabilityResult = reader.parse();
-                        
-                        if (readabilityResult && readabilityResult.content && readabilityResult.textContent.trim().length > 50) {
-                            article = readabilityResult;
-                        } else {
-                            throw new Error('Readability returned insufficient content');
-                        }
-                    } catch (e) {
-                        console.warn('🔍 Readability failed, using aggressive extraction:', e);
-                        article = aggressiveContentExtract();
-                    }
-                } else {
-                    // Use aggressive extraction when Readability is not available
-                    console.log('🔍 Readability not available, using aggressive extraction');
-                    article = aggressiveContentExtract();
-                }
-
-                if (article && article.content && article.textContent && article.textContent.trim().length > 20) {
-                    const testData = {
-                        title: 'TEST: ' + article.title,
-                        content: article.content,
-                        textContent: article.textContent,
-                        url: window.location.href,
-                        timestamp: Date.now(),
-                        source: 'test',
-                        pageType: isGoogleSite ? 'google-site' : 'generic',
-                        debug: {
-                            originalTextLength: article.textContent.length,
-                            isGoogleSite,
-                            hostname: window.location.hostname
-                        }
-                    };
-
-                    localStorage.setItem('urlToMarkdownData', JSON.stringify(testData));
-                    showStatus('✅ Test successful! Processing content...', 'success');
-                    
-                    setTimeout(() => {
-                        checkForBookmarkletData();
-                    }, 1000);
-                } else {
-                    showStatus('❌ Test failed: Could not extract sufficient content', 'error');
-                }
-            } catch (error) {
-                const errorMsg = error?.message || error?.toString() || 'Unknown error occurred';
-                showStatus(`❌ Test failed: ${errorMsg}`, 'error');
-                console.error('🔍 Test error:', error);
             }
         }
 
@@ -1788,11 +943,11 @@
         // Auto-clear status after 5 seconds for success messages
         let statusTimeout;
         const originalShowStatus = showStatus;
-        showStatus = async function(message, type = 'loading') {
+        showStatus = function(message, type = 'loading') {
             clearTimeout(statusTimeout);
-            await originalShowStatus(message, type);
+            originalShowStatus(message, type);
             
-            if (type === 'success' || type === 'bookmarklet') {
+            if (type === 'success') {
                 statusTimeout = setTimeout(clearStatus, 5000);
             }
         };
