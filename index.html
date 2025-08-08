@@ -617,7 +617,7 @@
             
             if (method === 'clipboard') {
                 const expectedChars = urlParams.get('chars');
-                showStatus(`🔄 Processing clipboard content (${expectedChars} characters)...`, 'loading');
+                showStatus(`🔄 Attempting to auto-paste ${expectedChars} characters from clipboard...`, 'loading');
                 
                 setTimeout(async () => {
                     try {
@@ -635,19 +635,34 @@
                                     return;
                                 }
                             } catch (e) {
-                                // Not JSON, treat as raw HTML
+                                // Not JSON, treat as raw HTML and paste it
                                 document.getElementById('htmlInput').value = clipboardText;
                                 document.querySelector('[data-tab="manual"]').click();
-                                showStatus('✅ Content pasted into Manual HTML tab! Click "Convert HTML" to process.', 'success');
+                                showStatus('✅ Content auto-pasted! Click "Convert HTML" to process.', 'success');
                                 return;
                             }
                         }
                         
-                        throw new Error('No substantial content found in clipboard');
+                        // If we get here, clipboard was empty or too small
+                        throw new Error('Clipboard was empty or too small');
                         
                     } catch (error) {
-                        showStatus('❌ Could not read from clipboard. Please paste manually in the Manual HTML tab.', 'error');
+                        // Auto-read failed, switch to manual tab and provide instructions
                         document.querySelector('[data-tab="manual"]').click();
+                        document.getElementById('htmlInput').focus();
+                        
+                        showStatus('📋 Content copied to clipboard! Press Ctrl+V (or Cmd+V) to paste it below, then click "Convert HTML".', 'loading');
+                        
+                        // Add a helper to detect when user pastes
+                        const htmlInput = document.getElementById('htmlInput');
+                        htmlInput.addEventListener('paste', function handlePaste() {
+                            setTimeout(() => {
+                                if (htmlInput.value.length > 100) {
+                                    showStatus('✅ Content pasted! Click "Convert HTML" to process.', 'success');
+                                    htmlInput.removeEventListener('paste', handlePaste);
+                                }
+                            }, 100);
+                        }, { once: true });
                     }
                 }, 1000);
                 
