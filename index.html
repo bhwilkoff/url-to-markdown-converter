@@ -436,7 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.indexOf('sites.google.com')>-1||document.querySelector('.sites-layout')||document.title.indexOf('Google Sites')>-1;var article;if(isGoogleSite){var selectors=['.jZfhZe','.VEXWte','.TeI8t','.XuV9uc','[role=main]','main','.sites-layout__main','.content'];var contentElement=null;for(var i=0;i<selectors.length;i++){var el=document.querySelector(selectors[i]);if(el&&el.textContent&&el.textContent.trim().length>30){contentElement=el;break;}}if(!contentElement)contentElement=document.body;var content=contentElement.innerHTML;var tempDiv=document.createElement('div');tempDiv.innerHTML=content;var removeSelectors=['nav','header','footer','.sites-header-cell-buffer','[role=navigation]','[type=search]','script','style'];for(var j=0;j<removeSelectors.length;j++){try{var elements=tempDiv.querySelectorAll(removeSelectors[j]);for(var k=0;k<elements.length;k++){elements[k].remove();}}catch(err){}}article={title:document.title||'Google Site',content:tempDiv.innerHTML,textContent:contentElement.textContent||''};}else{if(typeof Readability!=='undefined'){try{var reader=new Readability(document.cloneNode(true));var result=reader.parse();if(result&&result.content){article=result;}else{throw new Error('Readability failed');}}catch(e){var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}else{var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found');}var data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};var chars=data.textContent.length;var dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(function(){if(confirm('Content extracted ('+chars+' chars) and copied!\\n\\nOpen converter?')){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(){alert('Clipboard failed. Use Manual HTML tab.\\nExtracted '+chars+' characters.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.indexOf('sites.google.com')>-1||document.querySelector('.sites-layout')||document.title.indexOf('Google Sites')>-1;var article;if(isGoogleSite){var allDivs=Array.from(document.querySelectorAll('div'));var scored=allDivs.map(function(div){var text=(div.textContent||'').trim();var html=div.innerHTML||'';var links=div.querySelectorAll('a').length;var textLen=text.length;var linkDensity=links/(textLen||1)*1000;var score=0;if(textLen>100)score+=Math.min(textLen/100,8);if(textLen/(html.length||1)>0.3)score+=4;if(div.querySelectorAll('li,p').length>2)score+=3;if(linkDensity>50)score-=5;if(links>textLen/20)score-=3;if(div.closest('nav')||div.getAttribute('role')==='navigation')score-=10;return{el:div,score:score,len:textLen};}).sort(function(a,b){return b.score-a.score;});var best=scored.find(function(c){return c.score>0&&c.len>50;});var contentElement=best?best.el:document.body;var content=contentElement.innerHTML;var tempDiv=document.createElement('div');tempDiv.innerHTML=content;var removeSelectors=['nav','header','footer','script','style','[role=navigation]','[type=search]'];for(var i=0;i<removeSelectors.length;i++){try{var elements=tempDiv.querySelectorAll(removeSelectors[i]);for(var j=0;j<elements.length;j++){elements[j].remove();}}catch(err){}}var divs=tempDiv.querySelectorAll('div');for(var k=0;k<divs.length;k++){var div=divs[k];var text=(div.textContent||'').trim();var links=div.querySelectorAll('a');if(links.length>5&&text.length<200){var avgLen=0;for(var l=0;l<links.length;l++){avgLen+=links[l].textContent.trim().length;}avgLen/=links.length;if(avgLen<20&&links.length>text.length/50){div.remove();}}}article={title:document.title||'Google Site',content:tempDiv.innerHTML,textContent:contentElement.textContent||''};}else{if(typeof Readability!=='undefined'){try{var reader=new Readability(document.cloneNode(true));var result=reader.parse();if(result&&result.content){article=result;}else{throw new Error('Readability failed');}}catch(e){var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}else{var fallback=document.querySelector('article')||document.querySelector('main')||document.body;article={title:document.title,content:fallback.innerHTML,textContent:fallback.textContent||''};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found');}var data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};var chars=data.textContent.length;var dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(function(){if(confirm('Content extracted ('+chars+' chars) and copied!\\n\\nOpen converter?')){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(){alert('Clipboard failed. Use Manual HTML tab.\\nExtracted '+chars+' characters.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -574,6 +574,139 @@
             });
         });
 
+        // Smart Google Sites content extraction using heuristics instead of hardcoded classes
+        function findMainContentInGoogleSites(doc) {
+            console.log('🎯 Using smart heuristic-based Google Sites extraction');
+            
+            // Step 1: Find all potential content containers
+            const allDivs = Array.from(doc.querySelectorAll('div'));
+            
+            // Step 2: Score each container based on content quality heuristics
+            const scoredContainers = allDivs.map(container => {
+                const textContent = container.textContent || '';
+                const innerHTML = container.innerHTML || '';
+                const childElements = container.children.length;
+                
+                // Calculate various content quality metrics
+                const textLength = textContent.trim().length;
+                const linkCount = container.querySelectorAll('a').length;
+                const listCount = container.querySelectorAll('li').length;
+                const paragraphCount = container.querySelectorAll('p').length;
+                const spanCount = container.querySelectorAll('span').length;
+                
+                // Calculate ratios for analysis
+                const textToHtmlRatio = textLength / (innerHTML.length || 1);
+                const linkDensity = linkCount / (textLength || 1) * 1000; // Links per 1000 chars
+                const contentElementsCount = listCount + paragraphCount + spanCount;
+                
+                // Heuristic scoring (higher = better content)
+                let score = 0;
+                
+                // Positive indicators (good content signals)
+                if (textLength > 100) score += Math.min(textLength / 100, 10); // More text is better, cap at 10
+                if (textToHtmlRatio > 0.3) score += 5; // High text-to-markup ratio
+                if (contentElementsCount > 3) score += 3; // Contains structured content
+                if (listCount > 2) score += 2; // Lists often contain real content
+                if (paragraphCount > 1) score += 2; // Multiple paragraphs suggest content
+                
+                // Negative indicators (navigation/UI signals)
+                if (linkDensity > 50) score -= 5; // Too many links = likely navigation
+                if (textLength < 50) score -= 3; // Too little text
+                if (linkCount > textLength / 20) score -= 3; // High link ratio
+                
+                // Check for navigation-like content patterns
+                const navWords = ['home', 'menu', 'navigation', 'login', 'search', 'back', 'next', 'skip'];
+                const hasNavWords = navWords.some(word => textContent.toLowerCase().includes(word));
+                if (hasNavWords) score -= 2;
+                
+                // Check for very repetitive link structures (navigation menus)
+                const links = container.querySelectorAll('a');
+                if (links.length > 5) {
+                    const linkTexts = Array.from(links).map(link => link.textContent.trim().toLowerCase());
+                    const avgLinkLength = linkTexts.reduce((sum, text) => sum + text.length, 0) / linkTexts.length;
+                    if (avgLinkLength < 15 && linkTexts.length > 8) score -= 4; // Short repetitive links = navigation
+                }
+                
+                // Prefer containers that are not deeply nested navigation
+                const isInNav = container.closest('nav') || 
+                               container.closest('[role="navigation"]') ||
+                               container.getAttribute('role') === 'navigation';
+                if (isInNav) score -= 10;
+                
+                return {
+                    element: container,
+                    score: score,
+                    textLength: textLength,
+                    debug: {
+                        textToHtmlRatio: textToHtmlRatio.toFixed(3),
+                        linkDensity: linkDensity.toFixed(1),
+                        linkCount: linkCount,
+                        contentElements: contentElementsCount
+                    }
+                };
+            });
+            
+            // Step 3: Sort by score and find the best content container
+            scoredContainers.sort((a, b) => b.score - a.score);
+            
+            // Debug output for the top candidates
+            console.log('🔍 Top content candidates:');
+            scoredContainers.slice(0, 5).forEach((candidate, index) => {
+                console.log(`${index + 1}. Score: ${candidate.score.toFixed(1)}, Length: ${candidate.textLength}, Debug:`, candidate.debug);
+                console.log(`   Preview: "${candidate.element.textContent.substring(0, 150)}..."`);
+            });
+            
+            // Step 4: Select the best container, but ensure it has reasonable content
+            const bestCandidate = scoredContainers.find(candidate => 
+                candidate.score > 0 && candidate.textLength > 50
+            );
+            
+            if (bestCandidate) {
+                console.log(`✅ Selected content container with score ${bestCandidate.score.toFixed(1)}`);
+                return {
+                    element: bestCandidate.element,
+                    sourceType: 'heuristic-analysis',
+                    score: bestCandidate.score
+                };
+            }
+            
+            // Step 5: Fallback to larger content areas if heuristics fail
+            console.log('⚠️ Heuristic analysis failed, trying fallback selectors');
+            const fallbackSelectors = ['[role="main"]', 'main', '.content', 'article'];
+            
+            for (const selector of fallbackSelectors) {
+                const element = doc.querySelector(selector);
+                if (element && element.textContent.trim().length > 100) {
+                    console.log(`✅ Using fallback selector: ${selector}`);
+                    return {
+                        element: element,
+                        sourceType: 'fallback-' + selector.replace(/[^a-zA-Z]/g, ''),
+                        score: 0
+                    };
+                }
+            }
+            
+            // Step 6: Ultimate fallback - find largest text container
+            console.log('⚠️ All selectors failed, using largest text container');
+            const largestContainer = scoredContainers.find(candidate => candidate.textLength > 200);
+            
+            if (largestContainer) {
+                return {
+                    element: largestContainer.element,
+                    sourceType: 'largest-text-container',
+                    score: largestContainer.score
+                };
+            }
+            
+            // Step 7: Last resort - use body but we'll clean it heavily
+            console.log('⚠️ Using body as last resort');
+            return {
+                element: doc.body,
+                sourceType: 'body-last-resort',
+                score: -1
+            };
+        }
+
         // Enhanced Google Sites content extraction and cleanup
         function cleanAndExtractContent(htmlContent, title = '', isGoogleSite = false) {
             const tempDiv = document.createElement('div');
@@ -582,28 +715,19 @@
             if (isGoogleSite) {
                 console.log('🧹 Applying smart Google Sites content filtering');
                 
-                // CONSERVATIVE approach - only remove obvious navigation/UI elements
-                // Preserve content-bearing elements like .zfr3Q, .TYR86d, .eD0Rn, .C9DxTc
-                const googleSitesUnwantedSelectors = [
-                    // Only remove clearly navigational elements
-                    'nav', 'header', 'footer',
-                    '.sites-header-cell-buffer', '.sites-footer',
-                    '[role="navigation"]', '[role="banner"]', '[role="complementary"]',
-                    
-                    // Search functionality (but not all input types)
-                    '[type="search"]', '[aria-label="Search this site"]',
-                    '.search-input', '.search-button',
-                    
-                    // Site-wide UI (but not content containers)
-                    '[aria-label="Skip to main content"]', '[aria-label="Skip to navigation"]',
-                    '[aria-label="Site actions"]', '[aria-label="Back to site"]',
-                    
-                    // Scripts and styles only
-                    'script', 'style', 'noscript'
+                // Minimal removal - only remove clearly non-content elements
+                const unwantedSelectors = [
+                    // Definitely not content
+                    'nav', 'header', 'footer', 'script', 'style', 'noscript',
+                    // Accessibility helpers  
+                    '[aria-label*="Skip to"]', '[aria-label*="skip to"]',
+                    // Search functionality
+                    '[type="search"]', '[role="search"]', '.search', '#search',
+                    // Obvious buttons and controls
+                    'button[aria-label*="menu"]', 'button[aria-label*="Menu"]',
                 ];
                 
-                // Remove only clearly unwanted elements
-                googleSitesUnwantedSelectors.forEach(selector => {
+                unwantedSelectors.forEach(selector => {
                     try {
                         const elements = tempDiv.querySelectorAll(selector);
                         elements.forEach(el => el.remove());
@@ -612,30 +736,42 @@
                     }
                 });
                 
-                // PRESERVE Google Sites content structure completely
-                // Don't touch content-bearing classes like:
-                // .zfr3Q, .TYR86d, .eD0Rn (list items)
-                // .CDt4Ke (paragraphs)  
-                // .C9DxTc (text spans)
-                // .n8H08c, .UVNKR (lists)
+                // Remove navigation-heavy containers using content analysis
+                const allDivs = tempDiv.querySelectorAll('div');
+                allDivs.forEach(div => {
+                    const text = div.textContent || '';
+                    const links = div.querySelectorAll('a');
+                    
+                    // Remove if it's clearly navigation
+                    if (links.length > 5 && text.length < 200) {
+                        const linkTexts = Array.from(links).map(link => link.textContent.trim());
+                        const avgLinkLength = linkTexts.reduce((sum, text) => sum + text.length, 0) / linkTexts.length;
+                        
+                        // This looks like a navigation menu
+                        if (avgLinkLength < 20 && links.length > text.length / 50) {
+                            console.log('🗑️ Removing navigation container:', text.substring(0, 100));
+                            div.remove();
+                        }
+                    }
+                });
                 
-                // Only handle images more conservatively
+                // Very conservative image handling
                 tempDiv.querySelectorAll('img').forEach(img => {
                     const alt = img.getAttribute('alt');
                     const src = img.getAttribute('src');
                     
-                    // Be very conservative - only replace clearly decorative images
+                    // Only replace clearly decorative images
                     if (src && (src.includes('logo') || src.includes('icon') || src.includes('bullet'))) {
-                        const logoSpan = document.createElement('span');
-                        logoSpan.textContent = alt && alt.trim() ? `[${alt.trim()}]` : '[Icon]';
-                        img.replaceWith(logoSpan);
-                    } else if (alt && alt.trim() && alt.length > 15) {
-                        // Only replace with alt text if it's genuinely descriptive
-                        const altSpan = document.createElement('span');
-                        altSpan.textContent = `[Image: ${alt.trim()}]`;
-                        img.replaceWith(altSpan);
+                        const replacement = document.createElement('span');
+                        replacement.textContent = '[Icon]';
+                        img.replaceWith(replacement);
+                    } else if (alt && alt.trim() && alt.length > 20) {
+                        // Only replace if alt text is very descriptive
+                        const replacement = document.createElement('span');
+                        replacement.textContent = `[Image: ${alt.trim()}]`;
+                        img.replaceWith(replacement);
                     }
-                    // Otherwise keep the image tag - let Turndown handle it
+                    // Otherwise keep the image - let Turndown handle it
                 });
                 
                 return tempDiv.innerHTML;
@@ -1129,82 +1265,46 @@
                 let article;
                 try {
                     if (isGoogleSite) {
-                        console.log('🎯 Google Site detected - using enhanced extraction');
+                        console.log('🎯 Google Site detected - using smart heuristic extraction');
                         
-                        // Enhanced Google Sites extraction logic with better content preservation
-                        const primarySelectors = [
-                            '.DM7pN', '.jZfhZe', '.VEXWte', '.TeI8t', '.XuV9uc',
-                            '[data-is-preview-mode] .VEXWte', '[jsname="F57UId"]', '.r8s4j-wQNmvb'
-                        ];
-                        
-                        const fallbackSelectors = [
-                            '[role=main]', 'main', '.sites-layout__main', '.sites-canvas-main',
-                            '.sites-page-content', '[data-content-area]', '.content'
-                        ];
-                        
-                        let contentElement = null;
-                        let sourceType = 'unknown';
-                        
-                        // Try primary selectors first
-                        for (const sel of primarySelectors) {
-                            const elements = doc.querySelectorAll(sel);
-                            for (const el of elements) {
-                                if (el && el.textContent && el.textContent.trim().length > 50) {
-                                    // LOWERED text ratio requirement and content threshold for better content capture
-                                    const textRatio = el.textContent.length / (el.innerHTML.length || 1);
-                                    if (textRatio > 0.05) { // Reduced from 0.1 to 0.05
-                                        contentElement = el;
-                                        sourceType = 'primary-' + sel.replace(/[^a-zA-Z]/g, '');
-                                        break;
-                                    }
-                                }
-                            }
-                            if (contentElement) break;
-                        }
-                        
-                        // Fallback to standard selectors
-                        if (!contentElement) {
-                            console.log('⚠️ Primary selectors failed, trying fallback selectors');
-                            for (const sel of fallbackSelectors) {
-                                contentElement = doc.querySelector(sel);
-                                if (contentElement && contentElement.textContent && contentElement.textContent.trim().length > 30) { // Lowered from 50
-                                    sourceType = 'fallback-' + sel.replace(/[^a-zA-Z]/g, '');
-                                    break;
-                                }
-                                contentElement = null;
-                            }
-                        }
-                        
-                        // Last resort: use body but with MINIMAL filtering
-                        if (!contentElement) {
-                            console.log('⚠️ Fallback selectors failed, using body with minimal filtering');
-                            contentElement = doc.body;
-                            sourceType = 'body-minimal';
-                        }
+                        const result = findMainContentInGoogleSites(doc);
                         
                         article = {
                             title: doc.title || 'Google Site',
-                            content: contentElement.innerHTML,
-                            textContent: contentElement.textContent || contentElement.innerText || '',
-                            sourceType: sourceType
+                            content: result.element.innerHTML,
+                            textContent: result.element.textContent || result.element.innerText || '',
+                            sourceType: result.sourceType
                         };
                         
-                        console.log(`✅ Google Sites extraction complete:`);
-                        console.log(`- Method: ${sourceType}`);
+                        console.log(`✅ Smart Google Sites extraction complete:`);
+                        console.log(`- Method: ${result.sourceType}`);
+                        console.log(`- Score: ${result.score.toFixed(1)}`);
                         console.log(`- HTML length: ${article.content.length} chars`);
                         console.log(`- Text length: ${article.textContent.length} chars`);
                         console.log(`- Content preview: "${article.textContent.substring(0, 200)}..."`);
                         
-                        // Check if we got reasonable content
+                        // Sanity check - if we got very little content, try a different approach
                         if (article.textContent.length < 100) {
-                            console.warn('⚠️ Low content extracted, trying body fallback');
-                            const bodyContent = doc.body.innerHTML;
-                            const bodyText = doc.body.textContent || doc.body.innerText || '';
-                            if (bodyText.length > article.textContent.length) {
-                                article.content = bodyContent;
-                                article.textContent = bodyText;
-                                article.sourceType = sourceType + '-body-fallback';
-                                console.log(`✅ Body fallback provided more content: ${bodyText.length} chars`);
+                            console.warn('⚠️ Low content extracted, trying enhanced Readability');
+                            if (typeof Readability !== 'undefined') {
+                                try {
+                                    const documentClone = doc.cloneNode(true);
+                                    const reader = new Readability(documentClone, {
+                                        classesToPreserve: [],
+                                        keepClasses: false,
+                                        charThreshold: 100, // Lower threshold for Google Sites
+                                        debug: true
+                                    });
+                                    const readabilityResult = reader.parse();
+                                    
+                                    if (readabilityResult && readabilityResult.textContent.length > article.textContent.length) {
+                                        console.log(`✅ Readability provided more content: ${readabilityResult.textContent.length} chars`);
+                                        article = readabilityResult;
+                                        article.sourceType = result.sourceType + '-readability-enhanced';
+                                    }
+                                } catch (e) {
+                                    console.warn('Readability enhancement failed:', e.message);
+                                }
                             }
                         }
                     } else {
