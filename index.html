@@ -466,8 +466,9 @@
                 <p style="margin-bottom: 20px; opacity: 0.9;">This bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, Google Sites, and more.</p>
                 
                 <div class="bookmarklet-drag-area">
-                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 Bookmarklet starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const dataStr=JSON.stringify(data);let stored=false;console.log('🔍 Trying localStorage...');try{localStorage.setItem('urlToMarkdownData',dataStr);const test=localStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('🔍 localStorage successful');stored=true;}else{console.log('🔍 localStorage failed verification');}}catch(e){console.log('🔍 localStorage failed:',e);}if(!stored){console.log('🔍 Trying sessionStorage...');try{sessionStorage.setItem('urlToMarkdownData',dataStr);const test=sessionStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('🔍 sessionStorage successful');stored=true;}else{console.log('🔍 sessionStorage failed verification');}}catch(e){console.log('🔍 sessionStorage failed:',e);}}const baseUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';let toolUrl=baseUrl+'?from=bookmarklet&t='+Date.now();if(!stored){console.log('🔍 Storage failed, using URL encoding...');try{const encoded=btoa(dataStr);if(encoded.length<2000){toolUrl+='&data='+encodeURIComponent(encoded);console.log('🔍 Data encoded in URL');}else{console.log('🔍 Data too large for URL, will use manual method');}}catch(e){console.log('🔍 URL encoding failed:',e);}}console.log('🔍 Constructed URL:',toolUrl);if(window.location.hostname==='bhwilkoff.github.io'&&window.location.pathname.includes('url-to-markdown-converter')){console.log('🔍 Same site - navigating directly');window.location.href=toolUrl;}else{console.log('🔍 Different site - opening new window');try{const win=window.open(toolUrl,'_blank','noopener,noreferrer');console.log('🔍 Window object:',win);if(!win||win.closed||typeof win.closed=='undefined'){console.log('🔍 Popup blocked - offering manual navigation');const userChoice=confirm('Content extracted ('+data.textContent.length+' chars)!\\n\\nPopup was blocked. Click OK to navigate to the converter, or Cancel to stay here and manually visit:\\n'+baseUrl);if(userChoice){window.location.href=toolUrl;}}else{console.log('🔍 New window opened successfully');win.focus();alert('Content extracted ('+data.textContent.length+' chars)! Converter opening in new tab.');}}catch(openError){console.log('🔍 Error opening window:',openError);const userChoice=confirm('Content extracted ('+data.textContent.length+' chars)!\\n\\nCould not open new window. Click OK to navigate to the converter:\\n'+baseUrl);if(userChoice){window.location.href=toolUrl;}}}}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+' - Check console for details');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 UPDATED VERSION - Delete old one first, then drag this:</p>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 NEW Bookmarklet v2 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v2',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const dataStr=JSON.stringify(data);let storageMethod='none';console.log('🔍 Trying localStorage...');try{localStorage.setItem('urlToMarkdownData',dataStr);const test=localStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ localStorage successful');storageMethod='localStorage';}}catch(e){console.log('❌ localStorage failed:',e);}if(storageMethod==='none'){console.log('🔍 Trying sessionStorage...');try{sessionStorage.setItem('urlToMarkdownData',dataStr);const test=sessionStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ sessionStorage successful');storageMethod='sessionStorage';}}catch(e){console.log('❌ sessionStorage failed:',e);}}const baseUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';let toolUrl=baseUrl+'?from=bookmarklet&t='+Date.now()+'&storage='+storageMethod;if(storageMethod==='none'){console.log('🔍 Both storage methods failed, encoding in URL...');try{const encoded=btoa(unescape(encodeURIComponent(dataStr)));console.log('🔍 Encoded data length:',encoded.length);if(encoded.length<1500){toolUrl+='&data='+encoded;console.log('✅ Data encoded in URL successfully');storageMethod='url';}else{console.log('❌ Data too large for URL ('+encoded.length+' chars), manual method needed');}}catch(e){console.log('❌ URL encoding failed:',e);}}console.log('🔍 Final URL:',toolUrl.substring(0,200)+'...');console.log('🔍 Storage method used:',storageMethod);const chars=data.textContent.length;if(storageMethod==='none'){alert('Content extracted ('+chars+' chars) but storage failed!\\n\\nPlease copy this content manually or try a different browser.');return;}if(window.location.hostname==='bhwilkoff.github.io'&&window.location.pathname.includes('url-to-markdown-converter')){console.log('🔍 Same site - navigating directly');window.location.href=toolUrl;}else{console.log('🔍 Opening converter...');const result=confirm('Content extracted ('+chars+' chars) via '+storageMethod+'!\\n\\nClick OK to open converter (may take a few seconds to process).');if(result){window.location.href=toolUrl;}}}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v2</a>
+                    <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;"><strong>⚠️ Important:</strong> Delete your old bookmarklet first, then drag this NEW version to your bookmarks bar!</p>
                 </div>
 
                 <div class="instructions">
@@ -682,11 +683,19 @@
                 const encodedData = urlParams.get('data');
                 if (encodedData) {
                     try {
-                        bookmarkletData = atob(encodedData); // Decode base64
-                        dataSource = 'URL parameters';
-                        console.log('🔍 Found data in URL parameters');
+                        // Try new encoding method first (unescape + encodeURIComponent + btoa)
+                        bookmarkletData = decodeURIComponent(escape(atob(encodedData)));
+                        dataSource = 'URL parameters (new format)';
+                        console.log('🔍 Found data in URL parameters (new format)');
                     } catch (e) {
-                        console.log('🔍 Failed to decode URL data:', e);
+                        try {
+                            // Fallback to simple base64
+                            bookmarkletData = atob(encodedData);
+                            dataSource = 'URL parameters (legacy format)';
+                            console.log('🔍 Found data in URL parameters (legacy format)');
+                        } catch (e2) {
+                            console.log('🔍 Failed to decode URL data:', e2);
+                        }
                     }
                 }
             }
@@ -970,6 +979,7 @@
             const fromBookmarklet = urlParams.get('from') === 'bookmarklet';
             const timestamp = urlParams.get('t');
             const encodedData = urlParams.get('data');
+            const storageMethod = urlParams.get('storage');
             
             // First, let's see what's actually in storage
             
@@ -1005,6 +1015,7 @@
                 <div class="debug-info" style="margin-top: 15px;">
                     <strong>🔍 Comprehensive Debug Information:</strong><br>
                     <strong>From Bookmarklet:</strong> ${fromBookmarklet ? 'Yes' : 'No'}<br>
+                    <strong>Storage Method:</strong> ${storageMethod || 'Unknown'}<br>
                     <strong>Timestamp:</strong> ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : 'None'}<br>
                     <strong>URL Data Present:</strong> ${encodedData ? 'Yes (' + encodedData.length + ' chars)' : 'No'}<br>
                     <strong>localStorage keys:</strong> ${Object.keys(localStorageContents).join(', ') || 'empty'}<br>
@@ -1020,7 +1031,8 @@
             // Try to process URL data if present
             if (encodedData) {
                 try {
-                    const decoded = atob(encodedData);
+                    console.log('🔍 Attempting to decode URL data...');
+                    const decoded = decodeURIComponent(escape(atob(encodedData)));
                     const data = JSON.parse(decoded);
                     if (data.content || data.textContent) {
                         showStatus('🔍 Found data in URL parameters! Processing...', 'loading');
@@ -1029,8 +1041,20 @@
                         return;
                     }
                 } catch (e) {
-                    console.log('🔍 Failed to decode URL data:', e);
-                    showStatus('❌ URL data found but failed to decode: ' + e.message, 'error');
+                    console.log('🔍 Failed to decode URL data with new method, trying simple atob:', e);
+                    try {
+                        const decoded = atob(encodedData);
+                        const data = JSON.parse(decoded);
+                        if (data.content || data.textContent) {
+                            showStatus('🔍 Found data in URL parameters (legacy format)! Processing...', 'loading');
+                            localStorage.setItem('urlToMarkdownData', decoded);
+                            setTimeout(() => checkForBookmarkletData(), 100);
+                            return;
+                        }
+                    } catch (e2) {
+                        console.log('🔍 Both decoding methods failed:', e2);
+                        showStatus('❌ URL data found but failed to decode: ' + e2.message, 'error');
+                    }
                 }
             }
             
