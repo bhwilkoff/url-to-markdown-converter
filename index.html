@@ -575,12 +575,45 @@
         });
 
         // Enhanced content extraction and cleanup
-        function cleanAndExtractContent(htmlContent, title = '') {
+        function cleanAndExtractContent(htmlContent, title = '', isGoogleSite = false) {
             // Create a temporary DOM for cleaning
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             
-            // Remove unwanted elements that add noise
+            if (isGoogleSite) {
+                // Minimal cleaning for Google Sites - they're already fairly clean
+                const minimalUnwantedSelectors = [
+                    'script', 'style', 'noscript', 'iframe[src*="doubleclick"]', // Only remove ads/scripts
+                    '.sites-header-cell-buffer', '.sites-footer', // Google Sites specific headers/footers
+                    '[data-test-id*="ad"]', '[class*="advertisement"]' // Any obvious ads
+                ];
+                
+                minimalUnwantedSelectors.forEach(selector => {
+                    tempDiv.querySelectorAll(selector).forEach(el => el.remove());
+                });
+                
+                // For Google Sites, preserve most images and links as they're usually content
+                tempDiv.querySelectorAll('img').forEach(img => {
+                    const alt = img.getAttribute('alt');
+                    const src = img.getAttribute('src');
+                    
+                    // Only convert to alt text if it's truly descriptive
+                    if (alt && alt.trim() && alt.length > 10 && !alt.toLowerCase().includes('image')) {
+                        const altSpan = document.createElement('span');
+                        altSpan.textContent = `[Image: ${alt.trim()}]`;
+                        img.replaceWith(altSpan);
+                    } else if (src && (src.includes('logo') || src.includes('icon'))) {
+                        const logoSpan = document.createElement('span');
+                        logoSpan.textContent = '[Logo]';
+                        img.replaceWith(logoSpan);
+                    }
+                    // Otherwise keep the image as-is for Google Sites
+                });
+                
+                return tempDiv.innerHTML;
+            }
+            
+            // Full aggressive cleaning for other sites (news sites, blogs, etc.)
             const unwantedSelectors = [
                 'script', 'style', 'noscript', 'iframe', 'object', 'embed',
                 'nav', 'header', 'footer', 'aside',
@@ -707,7 +740,17 @@
                     return text;
                 }
                 
-                // Skip if likely UI/navigation element
+                // For Google Sites, be more permissive with links
+                const isGoogleSite = node.closest('[class*="sites-"]') || 
+                                   document.querySelector('.sites-layout') ||
+                                   window.location?.hostname?.includes('sites.google.com');
+                
+                if (isGoogleSite) {
+                    // Keep most links in Google Sites as they're usually content-related
+                    return `[${text}](${href})`;
+                }
+                
+                // For other sites, be more restrictive
                 if (text.length < 4 || 
                     /^(home|back|next|prev|more|login|signup|subscribe|follow|share|like|tweet|facebook|twitter|instagram|youtube|linkedin|read more|continue reading|click here)$/i.test(text)) {
                     return text;
@@ -878,7 +921,8 @@
                 showStatus(`🔄 Converting content to Markdown${pageTypeText}...`, 'loading');
 
                 // Enhanced content cleaning and extraction
-                const cleanContent = cleanAndExtractContent(data.content, data.title);
+                const isGoogleSite = data.pageType === 'google-site';
+                const cleanContent = cleanAndExtractContent(data.content, data.title, isGoogleSite);
 
                 // Convert to Markdown
                 let markdown = '';
@@ -1088,8 +1132,14 @@
 
                 showStatus('🔄 Converting to clean Markdown...', 'loading');
 
+                // Detect if this is a Google Site
+                const isGoogleSite = originalUrl.includes('sites.google.com') || 
+                                   article.content.includes('sites-layout') ||
+                                   article.content.includes('sites-header-cell-buffer') ||
+                                   article.title.includes('Google Sites');
+
                 // Enhanced content cleaning and extraction
-                const cleanContent = cleanAndExtractContent(article.content, article.title);
+                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite);
 
                 // Convert to Markdown
                 let markdown = '';
@@ -1117,7 +1167,7 @@
                 document.getElementById('markdownOutput').value = markdown;
                 document.getElementById('outputSection').classList.remove('hidden');
                 
-                showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of clean, focused Markdown.`, 'success');
+                showStatus(`✅ Successfully converted! Generated ${markdown.length} characters of clean, focused Markdown.${isGoogleSite ? ' (Google Sites content preserved)' : ''}`, 'success');
                 
                 // Scroll to output
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
@@ -1223,7 +1273,9 @@
         function testBookmarklet() {
             try {
                 // Simple extraction for testing
-                const isGoogleSite = window.location.hostname.includes('sites.google.com');
+                const isGoogleSite = window.location.hostname.includes('sites.google.com') ||
+                                   document.querySelector('.sites-layout') ||
+                                   document.querySelector('.sites-header-cell-buffer');
                 let content, textContent, title;
                 
                 if (isGoogleSite) {
@@ -1265,7 +1317,8 @@
                 };
 
                 const chars = data.textContent.length;
-                showStatus(`✅ Test successful! Extracted ${chars} characters. Processing...`, 'success');
+                const siteType = isGoogleSite ? ' (Google Site)' : '';
+                showStatus(`✅ Test successful! Extracted ${chars} characters${siteType}. Processing...`, 'success');
                 
                 setTimeout(() => {
                     processBookmarkletData(data);
