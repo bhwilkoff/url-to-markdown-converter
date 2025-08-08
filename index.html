@@ -467,8 +467,8 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 PostMessage Bookmarklet v4 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v4-postmessage',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const chars=data.textContent.length;const proceed=confirm('Content extracted ('+chars+' chars)!\\n\\nClick OK to open converter with direct data transfer.');if(!proceed)return;console.log('🔍 Opening converter window...');const converterUrl='https://bhwilkoff.github.io/url-to-markdown-converter/?method=postmessage&t='+Date.now();const converterWindow=window.open(converterUrl,'converter','width=1200,height=800,scrollbars=yes,resizable=yes');if(!converterWindow){alert('Popup blocked! Please allow popups for this site and try again.');return;}console.log('🔍 Waiting for converter to load...');let attempts=0;const maxAttempts=50;const sendData=()=>{attempts++;if(attempts>maxAttempts){console.log('❌ Max attempts reached');alert('Converter took too long to load. Please try again.');return;}try{console.log('🔍 Attempt',attempts,'- sending data...');converterWindow.postMessage({type:'BOOKMARKLET_DATA',data:data,source:window.location.href},'https://bhwilkoff.github.io');setTimeout(sendData,200);}catch(e){console.log('❌ PostMessage failed:',e);setTimeout(sendData,200);}};setTimeout(sendData,1000);console.log('🔍 Data transfer initiated!');}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v4</a>
-                    <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;"><strong>🔄 New:</strong> This version uses secure postMessage transfer to bypass browser storage limitations!</p>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 Hybrid Bookmarklet v5 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v5-hybrid',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const chars=data.textContent.length;const proceed=confirm('Content extracted ('+chars+' chars)!\\n\\nClick OK to transfer to converter.');if(!proceed)return;console.log('🔍 Attempting multiple transfer methods...');const dataStr=JSON.stringify(data);let success=false;try{localStorage.setItem('urlToMarkdownTemp',dataStr);const test=localStorage.getItem('urlToMarkdownTemp');if(test===dataStr){console.log('✅ Temp localStorage successful');success=true;}}catch(e){console.log('❌ Temp localStorage failed:',e);}const baseUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';let finalUrl=baseUrl+'?method=hybrid&chars='+chars+'&t='+Date.now();if(!success){console.log('🔍 Storage failed, using URL fallback...');try{const compressed=btoa(unescape(encodeURIComponent(dataStr)));if(compressed.length<1000){finalUrl+='&data='+compressed;console.log('✅ URL encoding successful');success=true;}else{console.log('❌ Data too large for URL');}}catch(e){console.log('❌ URL encoding failed:',e);}}if(!success){console.log('❌ All methods failed');alert('Data extraction successful but transfer methods failed.\\nPlease use the Manual HTML tab to copy/paste content.');return;}console.log('🔍 Opening converter:',finalUrl);window.open(finalUrl,'_blank');console.log('✅ Transfer initiated!');}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v5</a>
+                    <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;"><strong>🔄 New:</strong> This version uses a hybrid approach - tries temp storage first, then URL encoding if needed. Opens in tab, not popup!</p>
                 </div>
 
                 <div class="instructions">
@@ -680,7 +680,74 @@
             }, 100);
         });
 
-        // Check for form POST data from bookmarklet
+        // Set up postMessage listener for bookmarklet data  
+        function checkForPostMessageMethod() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const method = urlParams.get('method');
+            
+            if (method === 'postmessage') {
+                console.log('🔍 PostMessage method detected, setting up listener');
+                showStatus('🔄 Waiting for data transfer from bookmarklet...', 'loading');
+                
+                let dataReceived = false;
+                
+                // Set up postMessage listener
+                window.addEventListener('message', function(event) {
+                    // Security check - only accept messages from GitHub Pages
+                    if (event.origin !== 'https://bhwilkoff.github.io' && 
+                        event.origin !== 'http://localhost' && 
+                        event.origin !== window.location.origin) {
+                        console.log('🔍 Rejected message from:', event.origin);
+                        return;
+                    }
+                    
+                    if (event.data && event.data.type === 'BOOKMARKLET_DATA' && !dataReceived) {
+                        dataReceived = true;
+                        console.log('🔍 Received bookmarklet data via postMessage');
+                        console.log('🔍 Data size:', event.data.data.textContent.length, 'characters');
+                        
+                        showStatus('✅ Data received via secure postMessage! Processing...', 'success');
+                        
+                        setTimeout(() => {
+                            processBookmarkletData(event.data.data);
+                        }, 500);
+                    }
+                });
+                
+                // Send ready signal back to opener
+                if (window.opener) {
+                    try {
+                        window.opener.postMessage({type: 'CONVERTER_READY'}, '*');
+                        console.log('🔍 Sent ready signal to opener');
+                    } catch (e) {
+                        console.log('🔍 Could not send ready signal:', e);
+                    }
+                }
+                
+                // Timeout after 30 seconds
+                setTimeout(() => {
+                    if (!dataReceived) {
+                        showStatus('❌ Data transfer timed out. Please try the bookmarklet again or use Manual HTML method.', 'error');
+                        
+                        const timeoutHtml = `
+                            <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
+                                <strong>⏱️ PostMessage Transfer Timeout</strong><br><br>
+                                The secure data transfer didn't complete within 30 seconds. This can happen if:<br><br>
+                                <strong>1. Browser security blocked the transfer</strong> - Try allowing popups<br>
+                                <strong>2. Source window was closed</strong> - Keep the original page open<br>
+                                <strong>3. Network/timing issue</strong> - Try the bookmarklet again<br><br>
+                                <strong>Alternative:</strong> Use the Manual HTML tab to copy/paste the page source directly.
+                            </div>
+                        `;
+                        document.getElementById('statusDiv').innerHTML += timeoutHtml;
+                    }
+                }, 30000);
+                
+                return true;
+            }
+            
+            return false;
+        }
         function checkForFormPostData() {
             const urlParams = new URLSearchParams(window.location.search);
             const method = urlParams.get('method');
@@ -1142,6 +1209,9 @@
             const storageMethod = urlParams.get('storage');
             const expectedChars = urlParams.get('chars');
             
+            // Check for temp storage if hybrid method
+            const tempData = method === 'hybrid' ? localStorage.getItem('urlToMarkdownTemp') : null;
+            
             // First, let's see what's actually in storage
             
             // First, let's see what's actually in storage
@@ -1180,6 +1250,7 @@
                     <strong>Expected Content:</strong> ${expectedChars ? expectedChars + ' characters' : 'Unknown'}<br>
                     <strong>Timestamp:</strong> ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : 'None'}<br>
                     <strong>URL Data Present:</strong> ${encodedData ? 'Yes (' + encodedData.length + ' chars)' : 'No'}<br>
+                    <strong>Temp Storage:</strong> ${tempData ? 'Yes (' + tempData.length + ' chars)' : 'No'}<br>
                     <strong>localStorage keys:</strong> ${Object.keys(localStorageContents).join(', ') || 'empty'}<br>
                     <strong>sessionStorage keys:</strong> ${Object.keys(sessionStorageContents).join(', ') || 'empty'}<br>
                     <strong>URL:</strong> ${window.location.href}<br>
@@ -1311,8 +1382,8 @@
         function tryDifferentExtraction() {
             showStatus('🔄 Attempting alternative data recovery...', 'loading');
             
-            // Try to check multiple storage locations
-            const allStorageKeys = ['urlToMarkdownData', 'urlToMarkdownBackup', 'bookmarkletData', 'extractedContent'];
+            // Try to check multiple storage locations including temp storage
+            const allStorageKeys = ['urlToMarkdownData', 'urlToMarkdownBackup', 'urlToMarkdownTemp', 'bookmarkletData', 'extractedContent'];
             
             for (const storageType of ['localStorage', 'sessionStorage']) {
                 for (const key of allStorageKeys) {
@@ -1324,7 +1395,11 @@
                             try {
                                 const parsed = JSON.parse(data);
                                 if (parsed.content || parsed.textContent) {
-                                    showStatus(`✅ Found backup data in ${storageType}! Processing...`, 'success');
+                                    showStatus(`✅ Found backup data in ${storageType}.${key}! Processing...`, 'success');
+                                    
+                                    // Clean up found data
+                                    storage.removeItem(key);
+                                    
                                     processBookmarkletData(parsed);
                                     return;
                                 }
@@ -1335,6 +1410,23 @@
                     } catch (e) {
                         console.log(`🔍 Error checking ${storageType}.${key}:`, e);
                     }
+                }
+            }
+            
+            // Check URL parameters as well
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
+            if (encodedData) {
+                try {
+                    const decoded = decodeURIComponent(escape(atob(encodedData)));
+                    const parsed = JSON.parse(decoded);
+                    if (parsed.content || parsed.textContent) {
+                        showStatus('✅ Found data in URL parameters! Processing...', 'success');
+                        processBookmarkletData(parsed);
+                        return;
+                    }
+                } catch (e) {
+                    console.log('🔍 Failed to decode URL data:', e);
                 }
             }
             
