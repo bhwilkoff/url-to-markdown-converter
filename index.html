@@ -436,7 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!\\n\\nClick OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.\\n\\nExtracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!'+String.fromCharCode(10)+String.fromCharCode(10)+'Click OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.'+String.fromCharCode(10)+String.fromCharCode(10)+'Extracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -731,10 +731,13 @@
                 const contentMarkdown = turndownService.turndown(data.content);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown
+                // Clean up the markdown - remove literal \n and \\n characters and excessive newlines
                 markdown = markdown
+                    .replace(/\\n/g, '') // Remove literal \n
+                    .replace(/\\\\n/g, '') // Remove literal \\n  
                     .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
                     .replace(/^\s+/gm, '') // Remove leading whitespace
+                    .replace(/\s+$/gm, '') // Remove trailing whitespace
                     .trim();
 
                 extractedContent = markdown;
@@ -900,10 +903,13 @@
                 const contentMarkdown = turndownService.turndown(article.content);
                 markdown += contentMarkdown;
 
-                // Clean up the markdown
+                // Clean up the markdown - remove literal \n and \\n characters and excessive newlines
                 markdown = markdown
+                    .replace(/\\n/g, '') // Remove literal \n
+                    .replace(/\\\\n/g, '') // Remove literal \\n  
                     .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
                     .replace(/^\s+/gm, '') // Remove leading whitespace
+                    .replace(/\s+$/gm, '') // Remove trailing whitespace
                     .trim();
 
                 extractedContent = markdown;
