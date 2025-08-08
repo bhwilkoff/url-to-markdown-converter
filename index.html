@@ -436,7 +436,7 @@
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');let article;if(isGoogleSite){const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){break;}main=null;}if(!main){main=document.body;}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{if(typeof Readability!=='undefined'){try{const documentClone=document.cloneNode(true);const reader=new Readability(documentClone,{classesToPreserve:['highlight','important'],keepClasses:false});const result=reader.parse();if(result&&result.content&&result.textContent.trim().length>100){article=result;}else{throw new Error('Readability insufficient');}}catch(e){const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}}else{const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic'};const chars=data.textContent.length;const dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(()=>{const proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!'+String.fromCharCode(10)+String.fromCharCode(10)+'Click OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(err=>{alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.'+String.fromCharCode(10)+String.fromCharCode(10)+'Extracted '+chars+' characters.');});}catch(e){alert('Error: '+e.message);}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.indexOf('sites.google.com')>-1||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.indexOf('Google Sites')>-1;var article;if(isGoogleSite){var primarySelectors=['.DM7pN','.jZfhZe','.VEXWte','.TeI8t','.XuV9uc','[jsname=F57UId]','.r8s4j-wQNmvb'];var fallbackSelectors=['[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.content'];var contentElement=null;var sourceType='unknown';for(var i=0;i<primarySelectors.length;i++){var sel=primarySelectors[i];var elements=document.querySelectorAll(sel);for(var j=0;j<elements.length;j++){var el=elements[j];if(el&&el.textContent&&el.textContent.trim().length>100){var textRatio=el.textContent.length/(el.innerHTML.length||1);if(textRatio>0.1){contentElement=el;sourceType='primary-'+sel.replace(/[^a-zA-Z]/g,'');break;}}if(contentElement)break;}}if(!contentElement){for(var k=0;k<fallbackSelectors.length;k++){var sel2=fallbackSelectors[k];contentElement=document.querySelector(sel2);if(contentElement&&contentElement.textContent&&contentElement.textContent.trim().length>50){sourceType='fallback-'+sel2.replace(/[^a-zA-Z]/g,'');break;}contentElement=null;}}if(!contentElement){contentElement=document.body;sourceType='body-filtered';}var content=contentElement.innerHTML;if(sourceType.indexOf('body')>-1||contentElement===document.body){var tempDiv=document.createElement('div');tempDiv.innerHTML=content;var removeSelectors=['.BbxBP','nav','.JzO0Vc','header','footer','.sites-header-cell-buffer','.sites-footer','[role=navigation]','.whsOnd','.zHQkBf','[type=search]','.U26fgb','.VTBa7b','.xjKiLb','.dZA9kd','.ynRLnc','.LqzjUe','.EmVfjc','.SKShhf','.xu46lf','.ir3uv','.X6jHbb','.GOJTSe','.HBnAAc','.VfPpkd-LgbsSe','.QZ3zWd>div:first-child','.M63kCb','.N63NQ','.rrJNTc','.bKy5e','script','style','noscript'];for(var m=0;m<removeSelectors.length;m++){try{var elements2=tempDiv.querySelectorAll(removeSelectors[m]);for(var n=0;n<elements2.length;n++){elements2[n].remove();}}catch(err){}}content=tempDiv.innerHTML;if(!content||content.trim().length<50){content=contentElement.innerHTML;sourceType+='(fallback-original)';}}article={title:document.title||'Google Site',content:content,textContent:contentElement.textContent||contentElement.innerText||'',sourceType:sourceType};}else{if(typeof Readability!=='undefined'){try{var documentClone=document.cloneNode(true);var reader=new Readability(documentClone,{classesToPreserve:['highlight','important'],keepClasses:false});var result=reader.parse();if(result&&result.content&&result.textContent.trim().length>100){article=result;article.sourceType='readability';}else{throw new Error('Readability insufficient');}}catch(e){var content3=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content3.innerHTML,textContent:content3.textContent||content3.innerText||'',sourceType:'fallback-generic'};}}else{var content4=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content4.innerHTML,textContent:content4.textContent||content4.innerText||'',sourceType:'basic-generic'};}}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}var data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-clipboard',pageType:isGoogleSite?'google-site':'generic',sourceType:article.sourceType||'unknown'};var chars=data.textContent.length;var dataStr=JSON.stringify(data);navigator.clipboard.writeText(dataStr).then(function(){var proceed=confirm('Content extracted ('+chars+' chars) and copied to clipboard!\\n\\nClick OK to open converter - it will automatically process your content.');if(proceed){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(err){alert('Clipboard access failed. Please use the Manual HTML tab and paste manually.\\n\\nExtracted '+chars+' characters.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -574,25 +574,53 @@
             });
         });
 
-        // Enhanced content extraction and cleanup
+        // Enhanced Google Sites content extraction and cleanup
         function cleanAndExtractContent(htmlContent, title = '', isGoogleSite = false) {
-            // Create a temporary DOM for cleaning
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             
             if (isGoogleSite) {
-                // Minimal cleaning for Google Sites - they're already fairly clean
-                const minimalUnwantedSelectors = [
-                    'script', 'style', 'noscript', 'iframe[src*="doubleclick"]', // Only remove ads/scripts
-                    '.sites-header-cell-buffer', '.sites-footer', // Google Sites specific headers/footers
-                    '[data-test-id*="ad"]', '[class*="advertisement"]' // Any obvious ads
+                console.log('🧹 Applying enhanced Google Sites content filtering');
+                // Enhanced removal selectors based on Google Site export analysis
+                const googleSitesUnwantedSelectors = [
+                    // Navigation and header elements
+                    '.BbxBP', 'nav', '.JzO0Vc', 'header', 'footer',
+                    '.sites-header-cell-buffer', '.sites-footer',
+                    '[role="navigation"]', '[aria-label*="navigation"]', '[aria-label*="menu"]', '[aria-label*="search"]',
+                    '[jsname="ihoMLd"]', '[jsname="WA9qLc"]', '[jscontroller="RQOkef"]',
+                    
+                    // Search functionality
+                    '.whsOnd', '.zHQkBf', '[type="search"]', '[aria-label="Search this site"]',
+                    '.EmVfjc', '.SKShhf', '[data-loadingmessage]', '[jsname="aZ2wEe"]', '[jsname="Hxlbvc"]',
+                    
+                    // Site action buttons and UI elements
+                    '.U26fgb', '.VTBa7b', '.xjKiLb', '.dZA9kd', '.ynRLnc', '.LqzjUe',
+                    '[jsname="Bg3gkf"]', '[jsname="psdQ5e"]', '[aria-label="Site actions"]', '[aria-label="Back to site"]',
+                    
+                    // Loading and skeleton elements
+                    '.xu46lf', '.ir3uv', '.X6jHbb', '.GOJTSe', '.HBnAAc',
+                    
+                    // Skip links and accessibility helpers
+                    '.VfPpkd-LgbsSe', '[aria-label="Skip to main content"]', '[aria-label="Skip to navigation"]',
+                    
+                    // Layout containers that are usually empty or navigational
+                    '.QZ3zWd>div:first-child', '.M63kCb', '.N63NQ', '[jsname="tiN4bf"]',
+                    
+                    // Styles and scripts
+                    'script', 'style[nonce]', 'noscript', '.rrJNTc', '.bKy5e'
                 ];
                 
-                minimalUnwantedSelectors.forEach(selector => {
-                    tempDiv.querySelectorAll(selector).forEach(el => el.remove());
+                // Remove unwanted elements
+                googleSitesUnwantedSelectors.forEach(selector => {
+                    try {
+                        const elements = tempDiv.querySelectorAll(selector);
+                        elements.forEach(el => el.remove());
+                    } catch (e) {
+                        // Skip invalid selectors
+                    }
                 });
                 
-                // For Google Sites, preserve most images and links as they're usually content
+                // Preserve more images and links for Google Sites as they're usually content
                 tempDiv.querySelectorAll('img').forEach(img => {
                     const alt = img.getAttribute('alt');
                     const src = img.getAttribute('src');
@@ -1074,36 +1102,105 @@
 
                 showStatus('🔄 Extracting main content with enhanced algorithms...', 'loading');
 
-                // Enhanced content extraction using Readability when possible
+                // Detect if this is a Google Site
+                const isGoogleSite = source.includes('sites.google.com') || 
+                                   html.includes('sites-layout') ||
+                                   html.includes('sites-header-cell-buffer') ||
+                                   html.includes('Google Sites');
+
                 let article;
                 try {
-                    const readabilityDoc = doc.cloneNode(true);
-                    const reader = new Readability(readabilityDoc, {
-                        classesToPreserve: ['highlight', 'important'],
-                        keepClasses: false,
-                        charThreshold: 500 // Require substantial content
-                    });
-                    article = reader.parse();
-                    
-                    if (!article || !article.content || article.textContent.trim().length < 100) {
-                        throw new Error('Readability extraction insufficient');
+                    if (isGoogleSite) {
+                        console.log('🎯 Google Site detected - using enhanced extraction');
+                        
+                        // Enhanced Google Sites extraction logic
+                        const primarySelectors = [
+                            '.DM7pN', '.jZfhZe', '.VEXWte', '.TeI8t', '.XuV9uc',
+                            '[data-is-preview-mode] .VEXWte', '[jsname="F57UId"]', '.r8s4j-wQNmvb'
+                        ];
+                        
+                        const fallbackSelectors = [
+                            '[role=main]', 'main', '.sites-layout__main', '.sites-canvas-main',
+                            '.sites-page-content', '[data-content-area]', '.content'
+                        ];
+                        
+                        let contentElement = null;
+                        let sourceType = 'unknown';
+                        
+                        // Try primary selectors first
+                        for (const sel of primarySelectors) {
+                            const elements = doc.querySelectorAll(sel);
+                            for (const el of elements) {
+                                if (el && el.textContent && el.textContent.trim().length > 100) {
+                                    // Check text-to-HTML ratio to avoid navigation-heavy sections
+                                    const textRatio = el.textContent.length / (el.innerHTML.length || 1);
+                                    if (textRatio > 0.1) {
+                                        contentElement = el;
+                                        sourceType = 'primary-' + sel.replace(/[^a-zA-Z]/g, '');
+                                        break;
+                                    }
+                                }
+                            }
+                            if (contentElement) break;
+                        }
+                        
+                        // Fallback to standard selectors
+                        if (!contentElement) {
+                            console.log('⚠️ Primary selectors failed, trying fallback selectors');
+                            for (const sel of fallbackSelectors) {
+                                contentElement = doc.querySelector(sel);
+                                if (contentElement && contentElement.textContent && contentElement.textContent.trim().length > 50) {
+                                    sourceType = 'fallback-' + sel.replace(/[^a-zA-Z]/g, '');
+                                    break;
+                                }
+                                contentElement = null;
+                            }
+                        }
+                        
+                        // Last resort: use body with aggressive filtering
+                        if (!contentElement) {
+                            console.log('⚠️ Fallback selectors failed, using body with aggressive filtering');
+                            contentElement = doc.body;
+                            sourceType = 'body-filtered';
+                        }
+                        
+                        article = {
+                            title: doc.title || 'Google Site',
+                            content: contentElement.innerHTML,
+                            textContent: contentElement.textContent || contentElement.innerText || '',
+                            sourceType: sourceType
+                        };
+                        
+                        console.log(`✅ Extracted content using: ${sourceType}, ${article.content.length} HTML chars, ${article.textContent.length} text chars`);
+                    } else {
+                        // Use Readability for non-Google Sites
+                        if (typeof Readability !== 'undefined') {
+                            const documentClone = doc.cloneNode(true);
+                            const reader = new Readability(documentClone, {
+                                classesToPreserve: ['highlight', 'important'],
+                                keepClasses: false,
+                                charThreshold: 500
+                            });
+                            const result = reader.parse();
+                            
+                            if (result && result.content && result.textContent.trim().length > 100) {
+                                article = result;
+                                article.sourceType = 'readability';
+                                console.log('✅ Used Readability for content extraction');
+                            } else {
+                                throw new Error('Readability extraction insufficient');
+                            }
+                        } else {
+                            throw new Error('Readability not available');
+                        }
                     }
-                    
-                    console.log('✅ Used Readability for content extraction');
-                } catch (readabilityError) {
-                    console.log('Readability failed, using fallback extraction');
+                } catch (error) {
+                    console.log('Extraction failed, using fallback method');
                     
                     // Fallback to manual content selection
                     const contentSelectors = [
-                        'article',
-                        '[role="main"]',
-                        'main',
-                        '.content',
-                        '.post-content',
-                        '.entry-content',
-                        '.article-content',
-                        '.story-body',
-                        '.post-body'
+                        'article', '[role="main"]', 'main', '.content', '.post-content',
+                        '.entry-content', '.article-content', '.story-body', '.post-body'
                     ];
                     
                     let contentElement = null;
@@ -1122,7 +1219,8 @@
                         title: doc.title || 'Untitled',
                         content: contentElement.innerHTML,
                         textContent: contentElement.textContent,
-                        length: contentElement.textContent.length
+                        length: contentElement.textContent.length,
+                        sourceType: 'fallback-generic'
                     };
                 }
 
@@ -1131,12 +1229,6 @@
                 }
 
                 showStatus('🔄 Converting to clean Markdown...', 'loading');
-
-                // Detect if this is a Google Site
-                const isGoogleSite = originalUrl.includes('sites.google.com') || 
-                                   article.content.includes('sites-layout') ||
-                                   article.content.includes('sites-header-cell-buffer') ||
-                                   article.title.includes('Google Sites');
 
                 // Enhanced content cleaning and extraction
                 const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite);
@@ -1259,7 +1351,6 @@
             navigator.clipboard.writeText(bookmarkletCode).then(() => {
                 showStatus('✅ Bookmarklet code copied to clipboard! Now create a bookmark in Safari and replace its URL with this code.', 'success');
             }).catch(() => {
-                // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = bookmarkletCode;
                 document.body.appendChild(textArea);
@@ -1272,14 +1363,13 @@
 
         function testBookmarklet() {
             try {
-                // Simple extraction for testing
                 const isGoogleSite = window.location.hostname.includes('sites.google.com') ||
                                    document.querySelector('.sites-layout') ||
                                    document.querySelector('.sites-header-cell-buffer');
+                
                 let content, textContent, title;
                 
                 if (isGoogleSite) {
-                    // Google Sites extraction logic
                     const selectors = ['.jZfhZe', '.VEXWte', '[role=main]', 'main', '.sites-layout__main', '.sites-canvas-main'];
                     let main = null;
                     for (const sel of selectors) {
@@ -1292,7 +1382,6 @@
                     textContent = main.textContent || main.innerText || '';
                     title = document.title || 'Google Site';
                 } else {
-                    // Regular page extraction
                     const contentEl = document.querySelector('article') || 
                                     document.querySelector('[role=main]') || 
                                     document.querySelector('main') || 
