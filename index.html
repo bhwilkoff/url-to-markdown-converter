@@ -405,12 +405,12 @@
 <body>
     <div class="container">
         <h1>🔄 URL to Markdown Converter</h1>
-        <p class="subtitle">Convert any webpage to clean, formatted Markdown instantly - including authenticated pages!</p>
+        <p class="subtitle">Convert any webpage to clean, formatted Markdown instantly - including authenticated pages! Works on desktop and iPhone Safari.</p>
 
         <div class="feature-grid">
             <div class="feature-card">
                 <div class="feature-title">🔐 Authenticated Access</div>
-                <div class="feature-desc">Use the bookmarklet to extract content from login-protected pages while you're logged in</div>
+                <div class="feature-desc">Use the bookmarklet to extract content from login-protected pages while you're logged in. Works on desktop and mobile Safari!</div>
             </div>
             <div class="feature-card">
                 <div class="feature-title">🌐 Smart Content Extraction</div>
@@ -423,7 +423,7 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="bookmarklet">🔐 Bookmarklet (Best for Auth)</div>
+            <div class="tab active" data-tab="bookmarklet">🔐 Bookmarklet (Desktop & Mobile)</div>
             <div class="tab" data-tab="direct">🌐 Direct URL</div>
             <div class="tab" data-tab="manual">📄 Manual HTML</div>
         </div>
@@ -431,8 +431,8 @@
         <!-- Bookmarklet Tab -->
         <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section bookmarklet-section">
-                <h3>🔐 Extract from Authenticated Pages</h3>
-                <p style="margin-bottom: 20px; opacity: 0.9;">This bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, Google Sites, and more.</p>
+                <h3>🔐 Extract from Authenticated Pages (Desktop & Mobile)</h3>
+                <p style="margin-bottom: 20px; opacity: 0.9;">This bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, Google Sites, and more. Available for desktop browsers and iPhone Safari.</p>
                 
                 <div class="bookmarklet-drag-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
@@ -441,14 +441,44 @@
 
                 <div class="instructions">
                     <h4 style="margin-bottom: 15px; color: white;">📋 How to use:</h4>
-                    <ol style="color: rgba(255,255,255,0.9);">
-                        <li><strong>Drag the button above</strong> to your browser's bookmarks bar</li>
-                        <li><strong>Visit any webpage</strong> (public or requiring login)</li>
-                        <li><strong>Click the bookmarklet</strong> in your bookmarks bar</li>
-                        <li><strong>Content automatically processes</strong> in the converter</li>
-                    </ol>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h5 style="color: white; margin-bottom: 10px;">🖥️ Desktop (Chrome, Firefox, Safari, Edge):</h5>
+                        <ol style="color: rgba(255,255,255,0.9);">
+                            <li><strong>Drag the button above</strong> to your browser's bookmarks bar</li>
+                            <li><strong>Visit any webpage</strong> (public or requiring login)</li>
+                            <li><strong>Click the bookmarklet</strong> in your bookmarks bar</li>
+                            <li><strong>Content automatically processes</strong> in the converter</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h5 style="color: white; margin-bottom: 10px;">📱 iPhone Safari:</h5>
+                        <ol style="color: rgba(255,255,255,0.9);">
+                            <li><strong>Tap the "Copy Bookmarklet Code" button</strong> below to copy the code</li>
+                            <li><strong>Create a bookmark:</strong> Tap the Share button 📤 → "Add Bookmark"</li>
+                            <li><strong>Name it:</strong> "Extract to Markdown" (or any name you prefer)</li>
+                            <li><strong>Save the bookmark</strong> to your Favorites or Bookmarks</li>
+                            <li><strong>Edit the bookmark:</strong> Go to Settings → Safari → Favorites</li>
+                            <li><strong>Find your bookmark</strong> and tap "Edit"</li>
+                            <li><strong>Replace the URL</strong> with the copied bookmarklet code (paste it)</li>
+                            <li><strong>Save</strong> and you're done!</li>
+                        </ol>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 10px; font-style: italic;">
+                            <strong>To use:</strong> Visit any webpage, tap your bookmarks button, and select "Extract to Markdown"
+                        </p>
+                    </div>
                     
                     <p style="margin-top: 15px; opacity: 0.9;"><strong>💡 Works on:</strong> LinkedIn, Facebook, private dashboards, internal tools, Notion pages, Google Sites, and any other authenticated content!</p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-white" onclick="copyBookmarkletCode()">
+                        📋 Copy Bookmarklet Code (for Mobile)
+                    </button>
+                    <button class="btn-white" onclick="testBookmarklet()">
+                        🧪 Test on This Page
+                    </button>
                 </div>
             </div>
         </div>
@@ -966,6 +996,80 @@
                 statusTimeout = setTimeout(clearStatus, 5000);
             }
         };
+
+        function copyBookmarkletCode() {
+            const bookmarkletLink = document.getElementById('bookmarkletLink');
+            const bookmarkletCode = bookmarkletLink.href;
+            
+            navigator.clipboard.writeText(bookmarkletCode).then(() => {
+                showStatus('✅ Bookmarklet code copied to clipboard! Now create a bookmark in Safari and replace its URL with this code.', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = bookmarkletCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showStatus('✅ Bookmarklet code copied to clipboard! Now create a bookmark in Safari and replace its URL with this code.', 'success');
+            });
+        }
+
+        function testBookmarklet() {
+            try {
+                // Simple extraction for testing
+                const isGoogleSite = window.location.hostname.includes('sites.google.com');
+                let content, textContent, title;
+                
+                if (isGoogleSite) {
+                    // Google Sites extraction logic
+                    const selectors = ['.jZfhZe', '.VEXWte', '[role=main]', 'main', '.sites-layout__main', '.sites-canvas-main'];
+                    let main = null;
+                    for (const sel of selectors) {
+                        main = document.querySelector(sel);
+                        if (main && (main.textContent || '').trim().length > 50) break;
+                        main = null;
+                    }
+                    if (!main) main = document.body;
+                    content = main.innerHTML;
+                    textContent = main.textContent || main.innerText || '';
+                    title = document.title || 'Google Site';
+                } else {
+                    // Regular page extraction
+                    const contentEl = document.querySelector('article') || 
+                                    document.querySelector('[role=main]') || 
+                                    document.querySelector('main') || 
+                                    document.body;
+                    content = contentEl.innerHTML;
+                    textContent = contentEl.textContent || contentEl.innerText || '';
+                    title = document.title || 'Test Page';
+                }
+
+                if (!textContent || textContent.trim().length < 20) {
+                    throw new Error('Not enough content found for testing');
+                }
+
+                const data = {
+                    title: title,
+                    content: content,
+                    textContent: textContent,
+                    url: window.location.href,
+                    timestamp: Date.now(),
+                    source: 'bookmarklet-test',
+                    pageType: isGoogleSite ? 'google-site' : 'generic'
+                };
+
+                const chars = data.textContent.length;
+                showStatus(`✅ Test successful! Extracted ${chars} characters. Processing...`, 'success');
+                
+                setTimeout(() => {
+                    processBookmarkletData(data);
+                }, 1000);
+
+            } catch (error) {
+                showStatus(`❌ Test failed: ${error.message}`, 'error');
+            }
+        }
     </script>
 </body>
 </html>
