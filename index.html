@@ -466,9 +466,8 @@
                 <p style="margin-bottom: 20px; opacity: 0.9;">This bookmarklet works on ANY webpage - including those requiring login! Perfect for private dashboards, social media, internal tools, Google Sites, and more.</p>
                 
                 <div class="bookmarklet-drag-area">
-                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 UPDATED VERSION - Delete old one first, then drag this:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 NEW Bookmarklet v2 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v2',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const dataStr=JSON.stringify(data);let storageMethod='none';console.log('🔍 Trying localStorage...');try{localStorage.setItem('urlToMarkdownData',dataStr);const test=localStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ localStorage successful');storageMethod='localStorage';}}catch(e){console.log('❌ localStorage failed:',e);}if(storageMethod==='none'){console.log('🔍 Trying sessionStorage...');try{sessionStorage.setItem('urlToMarkdownData',dataStr);const test=sessionStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ sessionStorage successful');storageMethod='sessionStorage';}}catch(e){console.log('❌ sessionStorage failed:',e);}}const baseUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';let toolUrl=baseUrl+'?from=bookmarklet&t='+Date.now()+'&storage='+storageMethod;if(storageMethod==='none'){console.log('🔍 Both storage methods failed, encoding in URL...');try{const encoded=btoa(unescape(encodeURIComponent(dataStr)));console.log('🔍 Encoded data length:',encoded.length);if(encoded.length<1500){toolUrl+='&data='+encoded;console.log('✅ Data encoded in URL successfully');storageMethod='url';}else{console.log('❌ Data too large for URL ('+encoded.length+' chars), manual method needed');}}catch(e){console.log('❌ URL encoding failed:',e);}}console.log('🔍 Final URL:',toolUrl.substring(0,200)+'...');console.log('🔍 Storage method used:',storageMethod);const chars=data.textContent.length;if(storageMethod==='none'){alert('Content extracted ('+chars+' chars) but storage failed!\\n\\nPlease copy this content manually or try a different browser.');return;}if(window.location.hostname==='bhwilkoff.github.io'&&window.location.pathname.includes('url-to-markdown-converter')){console.log('🔍 Same site - navigating directly');window.location.href=toolUrl;}else{console.log('🔍 Opening converter...');const result=confirm('Content extracted ('+chars+' chars) via '+storageMethod+'!\\n\\nClick OK to open converter (may take a few seconds to process).');if(result){window.location.href=toolUrl;}}}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v2</a>
-                    <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;"><strong>⚠️ Important:</strong> Delete your old bookmarklet first, then drag this NEW version to your bookmarks bar!</p>
+                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this to your bookmarks bar:</p>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Bookmarklet already running!');return;}window.urlToMarkdownBookmarklet=true;try{console.log('🔍 NEW Bookmarklet v2 starting on:',window.location.href);const isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-header-cell-buffer')||document.querySelector('[data-is-preview-mode]')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');console.log('🔍 Is Google Site:',isGoogleSite);let article;if(isGoogleSite){console.log('🔍 Using Google Sites extraction');const selectors=['.jZfhZe','.VEXWte','[data-is-preview-mode] .VEXWte','[role=main]','main','.sites-layout__main','.sites-canvas-main','.sites-page-content','.TeI8t','.XuV9uc'];let main=null;for(const sel of selectors){main=document.querySelector(sel);if(main&&(main.textContent||'').trim().length>50){console.log('🔍 Found content with:',sel);break;}main=null;}if(!main){main=document.body;console.log('🔍 Using body fallback for Google Site');}article={title:document.title||'Google Site',content:main.innerHTML,textContent:main.textContent||main.innerText||''};}else{console.log('🔍 Using standard extraction');const content=document.querySelector('article')||document.querySelector('[role=main]')||document.querySelector('main')||document.body;article={title:document.title||'Extracted Content',content:content.innerHTML,textContent:content.textContent||content.innerText||''};}if(!article.textContent||article.textContent.trim().length<20){throw new Error('No content found ('+article.textContent.trim().length+' chars)');}const data={title:article.title,content:article.content,textContent:article.textContent,url:window.location.href,timestamp:Date.now(),source:'bookmarklet-v2',pageType:isGoogleSite?'google-site':'generic'};console.log('🔍 Extracted:',data.textContent.length,'characters');const dataStr=JSON.stringify(data);let storageMethod='none';console.log('🔍 Trying localStorage...');try{localStorage.setItem('urlToMarkdownData',dataStr);localStorage.setItem('urlToMarkdownBackup',dataStr);const test=localStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ localStorage successful');storageMethod='localStorage';}}catch(e){console.log('❌ localStorage failed:',e);}if(storageMethod==='none'){console.log('🔍 Trying sessionStorage...');try{sessionStorage.setItem('urlToMarkdownData',dataStr);sessionStorage.setItem('urlToMarkdownBackup',dataStr);const test=sessionStorage.getItem('urlToMarkdownData');if(test===dataStr){console.log('✅ sessionStorage successful');storageMethod='sessionStorage';}}catch(e){console.log('❌ sessionStorage failed:',e);}}const baseUrl='https://bhwilkoff.github.io/url-to-markdown-converter/';let toolUrl=baseUrl+'?from=bookmarklet&t='+Date.now()+'&storage='+storageMethod+'&chars='+data.textContent.length;if(storageMethod==='none'){console.log('🔍 Both storage methods failed, encoding in URL...');try{const encoded=btoa(unescape(encodeURIComponent(dataStr)));console.log('🔍 Encoded data length:',encoded.length);if(encoded.length<1500){toolUrl+='&data='+encoded;console.log('✅ Data encoded in URL successfully');storageMethod='url';}else{console.log('❌ Data too large for URL ('+encoded.length+' chars), manual method needed');}}catch(e){console.log('❌ URL encoding failed:',e);}}console.log('🔍 Final URL:',toolUrl.substring(0,200)+'...');console.log('🔍 Storage method used:',storageMethod);const chars=data.textContent.length;if(storageMethod==='none'){alert('Content extracted ('+chars+' chars) but storage failed!\\n\\nPlease use the Manual HTML tab in the converter.');return;}const result=confirm('Content extracted ('+chars+' chars) via '+storageMethod+'!\\n\\nClick OK to open converter (may take a few seconds to process).');if(result){console.log('🔍 Navigating to converter...');window.location.href=toolUrl;}}catch(e){console.error('🔍 Bookmarklet error:',e);alert('Error: '+e.message+'\\nCheck console for details.');}})();" class="bookmarklet-link" id="bookmarkletLink">📄➜📝 Extract to Markdown v2</a>
                 </div>
 
                 <div class="instructions">
@@ -504,8 +503,11 @@
                     <button class="btn-white" onclick="manualCheckForData()">
                         🔄 Check for Extracted Data
                     </button>
-                    <button class="btn-white" onclick="testStorage()">
-                        🧪 Test Storage System
+                    <button class="btn-white" onclick="tryDifferentExtraction()">
+                        🔄 Try Different Method
+                    </button>
+                    <button class="btn-white" onclick="showManualInstructions()">
+                        📖 Manual Instructions
                     </button>
                 </div>
             </div>
@@ -667,14 +669,26 @@
         });
 
         function checkForBookmarkletData() {
-            // First check localStorage
+            // Check multiple storage locations with backup keys
             let bookmarkletData = localStorage.getItem('urlToMarkdownData');
             let dataSource = 'localStorage';
+            
+            // Check backup localStorage key
+            if (!bookmarkletData) {
+                bookmarkletData = localStorage.getItem('urlToMarkdownBackup');
+                dataSource = 'localStorage-backup';
+            }
             
             // If localStorage is empty, check sessionStorage
             if (!bookmarkletData) {
                 bookmarkletData = sessionStorage.getItem('urlToMarkdownData');
                 dataSource = 'sessionStorage';
+            }
+            
+            // Check backup sessionStorage key
+            if (!bookmarkletData) {
+                bookmarkletData = sessionStorage.getItem('urlToMarkdownBackup');
+                dataSource = 'sessionStorage-backup';
             }
             
             // If both storage methods are empty, check URL parameters
@@ -706,7 +720,9 @@
                     
                     // Clear the data from all sources to prevent re-processing
                     localStorage.removeItem('urlToMarkdownData');
+                    localStorage.removeItem('urlToMarkdownBackup');
                     sessionStorage.removeItem('urlToMarkdownData');
+                    sessionStorage.removeItem('urlToMarkdownBackup');
                     
                     // Show success message with data source
                     showStatus(`✅ Content extracted via bookmarklet (from ${dataSource})! Processing...`, 'bookmarklet');
@@ -726,7 +742,9 @@
                 } catch (error) {
                     console.error('Error processing bookmarklet data:', error);
                     localStorage.removeItem('urlToMarkdownData');
+                    localStorage.removeItem('urlToMarkdownBackup');
                     sessionStorage.removeItem('urlToMarkdownData');
+                    sessionStorage.removeItem('urlToMarkdownBackup');
                     showStatus('❌ Error processing bookmarklet data: ' + error.message, 'error');
                 }
             }
@@ -980,6 +998,7 @@
             const timestamp = urlParams.get('t');
             const encodedData = urlParams.get('data');
             const storageMethod = urlParams.get('storage');
+            const expectedChars = urlParams.get('chars');
             
             // First, let's see what's actually in storage
             
@@ -1016,6 +1035,7 @@
                     <strong>🔍 Comprehensive Debug Information:</strong><br>
                     <strong>From Bookmarklet:</strong> ${fromBookmarklet ? 'Yes' : 'No'}<br>
                     <strong>Storage Method:</strong> ${storageMethod || 'Unknown'}<br>
+                    <strong>Expected Content:</strong> ${expectedChars ? expectedChars + ' characters' : 'Unknown'}<br>
                     <strong>Timestamp:</strong> ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : 'None'}<br>
                     <strong>URL Data Present:</strong> ${encodedData ? 'Yes (' + encodedData.length + ' chars)' : 'No'}<br>
                     <strong>localStorage keys:</strong> ${Object.keys(localStorageContents).join(', ') || 'empty'}<br>
@@ -1058,24 +1078,26 @@
                 }
             }
             
-            // If we came from bookmarklet but have no data, there was likely an extraction error
-            if (fromBookmarklet && Object.keys(localStorageContents).length === 0 && Object.keys(sessionStorageContents).length === 0) {
+            // If we came from bookmarklet but have no data, provide specific troubleshooting
+            if (fromBookmarklet && Object.keys(localStorageContents).length === 0 && Object.keys(sessionStorageContents).length === 0 && !encodedData) {
                 const troubleshootingHtml = `
                     <div class="debug-info" style="margin-top: 15px; background: #fff3cd; border-color: #ffeaa7;">
-                        <strong>⚠️ Troubleshooting: Bookmarklet ran but no data found</strong><br><br>
-                        <strong>Possible causes:</strong><br>
-                        1. <strong>Content extraction failed</strong> - The page might have unusual structure<br>
-                        2. <strong>Storage was blocked</strong> - Browser security settings or incognito mode<br>
-                        3. <strong>Page not fully loaded</strong> - Try waiting longer before clicking bookmarklet<br>
-                        4. <strong>Script execution blocked</strong> - Some sites block external scripts<br><br>
-                        <strong>Next steps:</strong><br>
-                        1. Check browser console (F12) for error messages on the source page<br>
-                        2. Try refreshing the source page and waiting for it to fully load<br>
-                        3. If it's a Google Site, make sure you're viewing the published site, not edit mode<br>
-                        4. For complex sites, try using the Manual HTML tab instead
+                        <strong>⚠️ localStorage Persistence Issue Detected</strong><br><br>
+                        The bookmarklet successfully stored ${expectedChars ? expectedChars + ' characters' : 'content'} using ${storageMethod}, but the data disappeared during navigation.<br><br>
+                        <strong>Possible causes & solutions:</strong><br>
+                        1. <strong>Browser security/privacy settings</strong> - Try a different browser or disable strict privacy mode<br>
+                        2. <strong>Incognito/private mode</strong> - Switch to regular browsing mode<br>
+                        3. <strong>Browser extension interference</strong> - Try disabling ad blockers or privacy extensions temporarily<br>
+                        4. <strong>Site isolation</strong> - Some browsers isolate storage even within same domain<br><br>
+                        <strong>Immediate workarounds:</strong><br>
+                        • Try the extraction again - sometimes it works on second attempt<br>
+                        • Use the Manual HTML tab to copy/paste the page source<br>
+                        • Try a different browser (Chrome, Firefox, Safari, Edge)<br>
+                        • Check if your browser has localStorage disabled in settings
                     </div>
                 `;
                 document.getElementById('statusDiv').innerHTML += troubleshootingHtml;
+                showStatus('❌ Data storage succeeded but persistence failed. Check troubleshooting guide above.', 'error');
             }
             
             const dataFound = checkForBookmarkletData();
@@ -1119,6 +1141,60 @@
                     }
                 }
             }
+        }
+
+        function tryDifferentExtraction() {
+            showStatus('🔄 Attempting alternative data recovery...', 'loading');
+            
+            // Try to check multiple storage locations
+            const allStorageKeys = ['urlToMarkdownData', 'urlToMarkdownBackup', 'bookmarkletData', 'extractedContent'];
+            
+            for (const storageType of ['localStorage', 'sessionStorage']) {
+                for (const key of allStorageKeys) {
+                    try {
+                        const storage = storageType === 'localStorage' ? localStorage : sessionStorage;
+                        const data = storage.getItem(key);
+                        if (data && data.length > 100) {
+                            console.log(`🔍 Found data in ${storageType}.${key}`);
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.content || parsed.textContent) {
+                                    showStatus(`✅ Found backup data in ${storageType}! Processing...`, 'success');
+                                    processBookmarkletData(parsed);
+                                    return;
+                                }
+                            } catch (e) {
+                                console.log(`🔍 Data in ${key} is not valid JSON`);
+                            }
+                        }
+                    } catch (e) {
+                        console.log(`🔍 Error checking ${storageType}.${key}:`, e);
+                    }
+                }
+            }
+            
+            showStatus('❌ No backup data found. Please try the Manual HTML method or run the bookmarklet again.', 'error');
+        }
+
+        function showManualInstructions() {
+            const instructionsHtml = `
+                <div class="debug-info" style="margin-top: 15px; background: #e8f5e8; border-color: #4caf50;">
+                    <strong>📖 Manual Data Recovery Instructions</strong><br><br>
+                    Since automatic data transfer failed, here's how to extract content manually:<br><br>
+                    <strong>Method 1 - Page Source:</strong><br>
+                    1. Go back to the page you want to convert<br>
+                    2. Right-click → "View Page Source" (or press Ctrl+U / Cmd+U)<br>
+                    3. Copy ALL the HTML code (Ctrl+A, then Ctrl+C)<br>
+                    4. Return here and paste it in the "Manual HTML" tab<br><br>
+                    <strong>Method 2 - Try Different Browser:</strong><br>
+                    • Chrome, Firefox, Edge, or Safari may handle storage differently<br>
+                    • Try the bookmarklet in a different browser<br><br>
+                    <strong>Method 3 - Direct URL (if public):</strong><br>
+                    • If the page doesn't require login, use the "Direct URL" tab<br>
+                    • Copy the page URL and paste it there
+                </div>
+            `;
+            document.getElementById('statusDiv').innerHTML += instructionsHtml;
         }
 
         function testStorage() {
