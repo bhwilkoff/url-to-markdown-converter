@@ -1143,7 +1143,7 @@
                 }
             });
             
-            console.log('✅ Content extraction complete - extracted tables from data-code attributes and decoded HTML entities');
+            console.log('✅ Content extraction complete - unique tables placed contextually');
             return tempDiv.innerHTML;
         }
 
@@ -1184,20 +1184,34 @@
 
         function cleanMarkdown(markdown) {
             return markdown
-                // Normalize excessive line breaks but preserve table structure
-                .replace(/\n{5,}/g, '\n\n\n')  // Max 3 line breaks instead of unlimited
-                // Remove only truly empty markdown elements
-                .replace(/\*\*\s*\*\*/g, '')  // Empty bold
-                .replace(/\*\s*\*/g, '')      // Empty italic  
-                .replace(/^#+\s*$/gm, '')     // Empty headings
-                // Improve table formatting while preserving complex content
-                .replace(/\|\s*\|\s*\|/g, '| | |')  // Normalize empty table cells
+                // Remove navigation artifacts that made it through HTML cleaning
+                .replace(/\[\s*BACK\s*\]\([^)]+\)/gi, '')
+                .replace(/\[\s*NEXT\s*\]\([^)]+\)/gi, '')
+                .replace(/\*Search this site\*/gi, '')
+                .replace(/\*Embedded Files\*/gi, '')
+                .replace(/\*Skip to main content\*/gi, '')
+                .replace(/\*Skip to navigation\*/gi, '')
+                .replace(/\*Page updated\*/gi, '')
+                .replace(/\*Contact\*/gi, '')
+                .replace(/For any additional questions contact Ben at.*?$/gm, '')
+                .replace(/leave a message on the Telegram Group Chat\./gi, '')
+                // Clean up excessive line breaks while preserving table structure
+                .replace(/\n{5,}/g, '\n\n\n')
+                // Remove empty markdown elements
+                .replace(/\*\*\s*\*\*/g, '')
+                .replace(/\*\s*\*/g, '')
+                .replace(/^#+\s*$/gm, '')
+                // Clean up table formatting
+                .replace(/\|\s*\|\s*\|/g, '| | |')
                 // Handle line breaks within table cells (preserve <br> tags in tables)
-                .replace(/(\|[^|\n]*)<br>([^|\n]*)/g, '$1<br>$2')  // Keep <br> in table cells
-                // Clean up excessive spaces but preserve table structure
-                .replace(/^[ \t]+(?=\|)/gm, '')  // Remove leading spaces before table pipes
-                .replace(/(?<=\|)[ \t]+$/gm, '') // Remove trailing spaces after table pipes
-                // Clean up line endings
+                .replace(/(\|[^|\n]*)<br>([^|\n]*)/g, '$1<br>$2')
+                // Clean up link artifacts
+                .replace(/\[\s*\]\([^)]*edit[^)]*\)/gi, '')
+                // Remove email links that are just artifacts
+                .replace(/\[([^\]]*@[^\]]*)\]\([^)]*\)/g, '$1')
+                // Clean up line endings and excessive whitespace
+                .replace(/^[ \t]+(?=\|)/gm, '')
+                .replace(/(?<=\|)[ \t]+$/gm, '')
                 .replace(/^[\n\r]*|[\n\r]*$/g, '')
                 .trim();
         }
@@ -1270,7 +1284,7 @@
                 
                 const isGoogleSite = data.pageType === 'google-sites' || data.url.includes('sites.google.com');
                 
-                showStatus(`🔄 Converting content with data-code table extraction...`, 'loading');
+                showStatus(`🔄 Converting content with contextual table placement...`, 'loading');
                 
                 // Pass debug data if available
                 const debugData = {
@@ -1291,7 +1305,7 @@
                     markdown += `> **Source:** [${data.url}](${data.url})\n`;
                     markdown += `> **Extracted:** ${new Date(data.timestamp).toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Data-Code Tables)`;
+                        markdown += ` (Google Sites - Contextual Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1310,7 +1324,7 @@
                 const tableCount = (markdown.match(/\|.*\|/g) || []).length;
                 const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
                 
-                const successMessage = `✅ Content converted with data-code table extraction! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
+                const successMessage = `✅ Content converted with contextual table placement! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables positioned correctly.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1498,7 +1512,7 @@
                     throw new Error('Could not parse HTML content');
                 }
                 
-                showStatus('🔍 Processing content with data-code table analysis...', 'loading');
+                showStatus('🔍 Processing content with contextual table placement...', 'loading');
                 
                 const isGoogleSite = source.includes('sites.google.com') || 
                                    html.includes('sites.google.com') ||
@@ -1539,7 +1553,7 @@
                     throw new Error('No meaningful content found');
                 }
                 
-                showStatus('🔄 Converting to Markdown with data-code table processing...', 'loading');
+                showStatus('🔄 Converting to Markdown with contextual table placement...', 'loading');
                 
                 // Create debug data from the full HTML
                 const debugData = {
@@ -1560,7 +1574,7 @@
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Data-Code Tables)`;
+                        markdown += ` (Google Sites - Contextual Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1575,7 +1589,7 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                const successMessage = `✅ Successfully converted with data-code table processing! Generated ${markdown.length} characters of Markdown.`;
+                const successMessage = `✅ Successfully converted with contextual table placement! Generated ${markdown.length} characters of Markdown.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
