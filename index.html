@@ -348,7 +348,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔄 Enhanced URL to Markdown Converter</h1>
+            <h1>📄 Enhanced URL to Markdown Converter</h1>
             <p>Professional content extraction with smart navigation removal and intelligent content detection</p>
         </div>
 
@@ -470,7 +470,7 @@
         <!-- Features Grid -->
         <div class="feature-grid">
             <div class="feature-card">
-                <h4>🔐 Authentication Support</h4>
+                <h4>🔒 Authentication Support</h4>
                 <p>Access login-protected content using the bookmarklet method while logged into your accounts.</p>
             </div>
             <div class="feature-card">
@@ -510,11 +510,47 @@
             linkReferenceStyle: 'full'
         });
 
-        // Enhanced table conversion with improved Google Sites support
+        // Enhanced HTML entity and special character processing
+        function processTableContent(htmlString) {
+            if (!htmlString) return '';
+            
+            // First decode HTML entities that are commonly double-encoded in Google Sites
+            let processed = htmlString
+                // Unicode symbols commonly found in tables
+                .replace(/&amp;#x2751;/g, '❋')
+                .replace(/&#x2751;/g, '❋')
+                .replace(/&amp;#x2022;/g, '•')
+                .replace(/&#x2022;/g, '•')
+                .replace(/&amp;#8226;/g, '•')
+                .replace(/&#8226;/g, '•')
+                // Quote marks
+                .replace(/&amp;quot;/g, '"')
+                .replace(/&quot;/g, '"')
+                .replace(/&amp;#39;/g, "'")
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;apos;/g, "'")
+                .replace(/&apos;/g, "'")
+                // Smart quotes
+                .replace(/â€™/g, "'")
+                .replace(/â€œ/g, '"')
+                .replace(/â€\u009d/g, '"')
+                // Dashes
+                .replace(/â€"/g, '–')
+                .replace(/â€"/g, '—')
+                // Spaces
+                .replace(/&amp;nbsp;/g, ' ')
+                .replace(/&nbsp;/g, ' ')
+                // Ampersands (do this last)
+                .replace(/&amp;/g, '&');
+            
+            return processed;
+        }
+
+        // Enhanced table conversion with improved formatting for complex content
         turndownService.addRule('enhancedTable', {
             filter: 'table',
             replacement: function (content, node) {
-                console.log('🔄 Converting table to Markdown with enhanced processing');
+                console.log('📄 Converting table to Markdown with enhanced complex content processing');
                 const rows = Array.from(node.querySelectorAll('tr'));
                 if (rows.length === 0) return '';
                 
@@ -543,16 +579,78 @@
                     }
                     
                     const rowContent = cells.map(cell => {
-                        let cellText = cell.textContent || cell.innerText || '';
+                        let cellText = '';
                         
-                        // Enhanced cell text processing
+                        // Enhanced content extraction that preserves structure
+                        if (cell.innerHTML) {
+                            // Create a temporary div to process HTML content
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = cell.innerHTML;
+                            
+                            // Convert common HTML entities to proper characters
+                            let processedHTML = cell.innerHTML
+                                .replace(/&amp;#x2751;/g, '❋')
+                                .replace(/&#x2751;/g, '❋')
+                                .replace(/&amp;#x2022;/g, '•')
+                                .replace(/&#x2022;/g, '•')
+                                .replace(/&amp;#8226;/g, '•')
+                                .replace(/&#8226;/g, '•')
+                                .replace(/&amp;nbsp;/g, ' ')
+                                .replace(/&nbsp;/g, ' ')
+                                .replace(/&amp;quot;/g, '"')
+                                .replace(/&quot;/g, '"')
+                                .replace(/&amp;#39;/g, "'")
+                                .replace(/&#39;/g, "'")
+                                .replace(/&amp;apos;/g, "'")
+                                .replace(/&apos;/g, "'");
+                            
+                            tempDiv.innerHTML = processedHTML;
+                            
+                            // Handle line breaks and preserve them as proper breaks
+                            const brElements = tempDiv.querySelectorAll('br');
+                            brElements.forEach(br => {
+                                br.outerHTML = ' <BR> ';
+                            });
+                            
+                            // Process lists within cells
+                            const lists = tempDiv.querySelectorAll('ul, ol');
+                            lists.forEach(list => {
+                                const listItems = list.querySelectorAll('li');
+                                let listText = '';
+                                listItems.forEach((li, index) => {
+                                    const prefix = list.tagName.toLowerCase() === 'ol' ? `${index + 1}. ` : '• ';
+                                    listText += (index > 0 ? ' <BR> ' : '') + prefix + (li.textContent || '').trim();
+                                });
+                                list.outerHTML = listText;
+                            });
+                            
+                            // Get the processed text content
+                            cellText = tempDiv.textContent || tempDiv.innerText || '';
+                        } else {
+                            cellText = cell.textContent || cell.innerText || '';
+                        }
+                        
+                        // Enhanced cell text processing while preserving structure
                         cellText = cellText
                             .trim()
-                            .replace(/\s+/g, ' ')  // Normalize whitespace
-                            .replace(/\|/g, '\\|')  // Escape pipes
-                            .replace(/\n/g, ' ')    // Remove newlines
-                            .replace(/\r/g, ' ')    // Remove carriage returns
-                            .replace(/\t/g, ' ');   // Replace tabs
+                            // Convert our temporary break markers to proper line breaks in markdown
+                            .replace(/ <BR> /g, '<br>')
+                            // Normalize excessive whitespace but preserve intentional breaks
+                            .replace(/\s{3,}/g, ' ')
+                            // Escape pipes but not in a destructive way
+                            .replace(/\|/g, '\\|')
+                            // Clean up any remaining HTML artifacts
+                            .replace(/<[^>]*>/g, '')
+                            // Fix any double-escaped entities that might remain
+                            .replace(/&amp;/g, '&')
+                            // Preserve line break indicators for multi-line content
+                            .replace(/<br>/g, '<br>')
+                            // Handle quotes and apostrophes properly
+                            .replace(/â€™/g, "'")
+                            .replace(/â€œ/g, '"')
+                            .replace(/â€\u009d/g, '"')
+                            .replace(/â€"/g, '–')
+                            .replace(/â€"/g, '—');
                         
                         return cellText || ' ';
                     }).join(' | ');
@@ -641,52 +739,6 @@
             }
         });
 
-        // Better table handling
-        turndownService.addRule('improvedTable', {
-            filter: 'table',
-            replacement: function (content, node) {
-                const rows = Array.from(node.querySelectorAll('tr'));
-                if (rows.length === 0) return '';
-                
-                let markdown = '\n\n';
-                let hasHeader = false;
-                let maxColumns = 0;
-                
-                // Determine max columns
-                rows.forEach(row => {
-                    const cells = Array.from(row.querySelectorAll('td, th'));
-                    maxColumns = Math.max(maxColumns, cells.length);
-                });
-                
-                if (maxColumns === 0) return '';
-                
-                rows.forEach((row, rowIndex) => {
-                    const cells = Array.from(row.querySelectorAll('td, th'));
-                    const isHeaderRow = cells.some(cell => cell.tagName.toLowerCase() === 'th') || 
-                                       (rowIndex === 0 && !hasHeader);
-                    
-                    // Pad to max columns
-                    while (cells.length < maxColumns) {
-                        cells.push({ textContent: '' });
-                    }
-                    
-                    const rowContent = cells.map(cell => {
-                        let cellText = cell.textContent?.trim() || '';
-                        return cellText.replace(/\|/g, '\\|') || ' ';
-                    }).join(' | ');
-                    
-                    markdown += `| ${rowContent} |\n`;
-                    
-                    if (isHeaderRow && !hasHeader) {
-                        markdown += `|${Array(maxColumns).fill(' --- ').join('|')}|\n`;
-                        hasHeader = true;
-                    }
-                });
-                
-                return markdown + '\n';
-            }
-        });
-
         // Find and decode HTML entity encoded tables (like &lt;table&gt;)
         function cleanAndExtractContent(content, title, isGoogleSite, debugData = null) {
             const tempDiv = document.createElement('div');
@@ -724,30 +776,25 @@
                                 
                                 let decoded = encodedMatch;
                                 
-                                // Decode HTML entities
-                                if (encodedMatch.includes('&lt;')) {
-                                    decoded = decoded
-                                        .replace(/&lt;/g, '<')
-                                        .replace(/&gt;/g, '>')
-                                        .replace(/&quot;/g, '"')
-                                        .replace(/&#39;/g, "'")
-                                        .replace(/&amp;/g, '&');
-                                }
+                                // Decode HTML entities using our enhanced processor
+                                decoded = processTableContent(decoded);
                                 
                                 // Decode URL encoding
-                                if (encodedMatch.includes('%3C')) {
+                                if (decoded.includes('%3C')) {
                                     try {
                                         decoded = decodeURIComponent(decoded);
+                                        decoded = processTableContent(decoded); // Process again after URL decode
                                     } catch (e) {
                                         console.log('URL decode failed, continuing...');
                                     }
                                 }
                                 
                                 // Decode Unicode
-                                if (encodedMatch.includes('\\u003c')) {
+                                if (decoded.includes('\\u003c')) {
                                     decoded = decoded
                                         .replace(/\\u003c/g, '<')
                                         .replace(/\\u003e/g, '>');
+                                    decoded = processTableContent(decoded); // Process again after Unicode decode
                                 }
                                 
                                 console.log(`✅ Decoded content: ${decoded.substring(0, 200)}...`);
@@ -901,17 +948,20 @@
 
         function cleanMarkdown(markdown) {
             return markdown
-                // Normalize excessive line breaks but preserve intentional spacing
-                .replace(/\n{4,}/g, '\n\n\n')  // Max 3 line breaks instead of 2
+                // Normalize excessive line breaks but preserve table structure
+                .replace(/\n{5,}/g, '\n\n\n')  // Max 3 line breaks instead of unlimited
                 // Remove only truly empty markdown elements
                 .replace(/\*\*\s*\*\*/g, '')  // Empty bold
-                .replace(/\*\s*\*/g, '')      // Empty italic
+                .replace(/\*\s*\*/g, '')      // Empty italic  
                 .replace(/^#+\s*$/gm, '')     // Empty headings
-                // Clean up table formatting but preserve structure
+                // Improve table formatting while preserving complex content
                 .replace(/\|\s*\|\s*\|/g, '| | |')  // Normalize empty table cells
-                // Remove leading/trailing whitespace from lines but preserve content
-                .replace(/^[ \t]+|[ \t]+$/gm, '')
-                // Preserve paragraph structure - don't remove all line breaks
+                // Handle line breaks within table cells (preserve <br> tags in tables)
+                .replace(/(\|[^|\n]*)<br>([^|\n]*)/g, '$1<br>$2')  // Keep <br> in table cells
+                // Clean up excessive spaces but preserve table structure
+                .replace(/^[ \t]+(?=\|)/gm, '')  // Remove leading spaces before table pipes
+                .replace(/(?<=\|)[ \t]+$/gm, '') // Remove trailing spaces after table pipes
+                // Clean up line endings
                 .replace(/^[\n\r]*|[\n\r]*$/g, '')
                 .trim();
         }
@@ -984,7 +1034,7 @@
                 
                 const isGoogleSite = data.pageType === 'google-sites' || data.url.includes('sites.google.com');
                 
-                showStatus(`🔄 Converting content with debug analysis...`, 'loading');
+                showStatus(`🔄 Converting content with enhanced table processing...`, 'loading');
                 
                 // Pass debug data if available
                 const debugData = {
@@ -1005,7 +1055,7 @@
                     markdown += `> **Source:** [${data.url}](${data.url})\n`;
                     markdown += `> **Extracted:** ${new Date(data.timestamp).toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Debug Mode)`;
+                        markdown += ` (Google Sites - Enhanced Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1024,7 +1074,7 @@
                 const tableCount = (markdown.match(/\|.*\|/g) || []).length;
                 const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
                 
-                const successMessage = `✅ Content converted with debug analysis! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
+                const successMessage = `✅ Content converted with enhanced table processing! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1152,7 +1202,7 @@
                 return;
             }
             
-            showStatus('📄 Processing HTML...', 'loading');
+            showStatus('🔄 Processing HTML...', 'loading');
             await processHTML(html, 'Manual HTML Input');
         }
 
@@ -1212,7 +1262,7 @@
                     throw new Error('Could not parse HTML content');
                 }
                 
-                showStatus('🔍 Processing content with enhanced analysis...', 'loading');
+                showStatus('🔍 Processing content with enhanced table analysis...', 'loading');
                 
                 const isGoogleSite = source.includes('sites.google.com') || 
                                    html.includes('sites.google.com') ||
@@ -1253,7 +1303,7 @@
                     throw new Error('No meaningful content found');
                 }
                 
-                showStatus('🔄 Converting to Markdown...', 'loading');
+                showStatus('🔄 Converting to Markdown with enhanced table processing...', 'loading');
                 
                 // Create debug data from the full HTML
                 const debugData = {
@@ -1274,7 +1324,7 @@
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Enhanced)`;
+                        markdown += ` (Google Sites - Enhanced Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1289,7 +1339,7 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                const successMessage = `✅ Successfully converted! Generated ${markdown.length} characters of Markdown.`;
+                const successMessage = `✅ Successfully converted with enhanced table processing! Generated ${markdown.length} characters of Markdown.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
