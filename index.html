@@ -744,17 +744,68 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
             
-            console.log('🔍 Looking for HTML entity encoded tables (like &lt;table&gt;)');
+            console.log('🔍 Looking for HTML entity encoded tables and data-code attributes');
             
             // First, find existing DOM tables
             const existingTables = tempDiv.querySelectorAll('table');
             console.log(`📊 Found ${existingTables.length} existing DOM tables`);
             
-            // Now search for encoded HTML table strings
+            // Look for data-code attributes specifically (Google Sites embeds)
+            const dataCodeElements = tempDiv.querySelectorAll('[data-code]');
+            console.log(`🎯 Found ${dataCodeElements.length} elements with data-code attributes`);
+            
+            dataCodeElements.forEach((element, index) => {
+                const dataCode = element.getAttribute('data-code');
+                if (dataCode && dataCode.includes('&lt;table')) {
+                    console.log(`📋 Processing data-code ${index + 1} with table content`);
+                    
+                    try {
+                        // Decode the HTML entities in the data-code
+                        let decodedHTML = processTableContent(dataCode);
+                        
+                        // Additional decoding for common patterns
+                        decodedHTML = decodedHTML
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .replace(/&amp;/g, '&');
+                        
+                        console.log(`🔄 Decoded data-code HTML: ${decodedHTML.substring(0, 200)}...`);
+                        
+                        // Parse the decoded HTML
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(decodedHTML, 'text/html');
+                        const tables = doc.querySelectorAll('table');
+                        
+                        console.log(`📊 Found ${tables.length} table(s) in data-code ${index + 1}`);
+                        
+                        tables.forEach((table, tableIndex) => {
+                            const rows = table.querySelectorAll('tr').length;
+                            const cells = table.querySelectorAll('td, th').length;
+                            const textContent = table.textContent?.trim().substring(0, 100) || '';
+                            
+                            console.log(`📊 Data-code Table ${tableIndex + 1}: ${rows} rows, ${cells} cells`);
+                            console.log(`   Content preview: "${textContent}..."`);
+                            
+                            // Add this table to our content
+                            const wrapper = document.createElement('div');
+                            wrapper.className = `data-code-table-${index}-${tableIndex}`;
+                            wrapper.appendChild(table.cloneNode(true));
+                            tempDiv.appendChild(wrapper);
+                        });
+                        
+                    } catch (error) {
+                        console.log(`❌ Error processing data-code ${index + 1}:`, error);
+                    }
+                }
+            });
+            
+            // Now search for encoded HTML table strings in other content
             let totalEncodedTablesFound = 0;
             
             function searchForEncodedTables(htmlContent, source) {
-                console.log(`🔍 Searching ${source} for encoded table content...`);
+                console.log(`🔍 Searching ${source} for additional encoded table content...`);
                 
                 // Look for encoded table patterns in the HTML string
                 const encodedTablePatterns = [
@@ -864,7 +915,7 @@
                 });
             }
             
-            // Search main content for encoded tables
+            // Search main content for additional encoded tables (excluding data-code which we already processed)
             searchForEncodedTables(content, 'main content');
             
             // Search debug data if available
@@ -879,14 +930,17 @@
             
             // Final count
             const finalTables = tempDiv.querySelectorAll('table');
-            console.log(`📊 FINAL RESULT: ${finalTables.length} total tables (${existingTables.length} original + ${totalEncodedTablesFound} decoded)`);
+            const dataCodeTables = tempDiv.querySelectorAll('[class*="data-code-table"]').length;
+            console.log(`📊 FINAL RESULT: ${finalTables.length} total tables (${existingTables.length} original + ${dataCodeTables} from data-code + ${totalEncodedTablesFound} other encoded)`);
             
             // Log details of each final table
             finalTables.forEach((table, i) => {
                 const rows = table.querySelectorAll('tr').length;
                 const cells = table.querySelectorAll('td, th').length;
                 const text = table.textContent?.trim().substring(0, 100) || '';
-                console.log(`📊 Final Table ${i + 1}: ${rows} rows, ${cells} cells, content: "${text}..."`);
+                const source = table.closest('[class*="data-code-table"]') ? 'data-code' : 
+                              table.closest('[class*="decoded-table"]') ? 'encoded-html' : 'original';
+                console.log(`📊 Final Table ${i + 1} (${source}): ${rows} rows, ${cells} cells, content: "${text}..."`);
             });
             
             // Clean up only obvious unwanted elements
@@ -907,7 +961,7 @@
                 }
             });
             
-            console.log('✅ Content extraction complete - decoded all HTML entity tables');
+            console.log('✅ Content extraction complete - extracted tables from data-code attributes and decoded HTML entities');
             return tempDiv.innerHTML;
         }
 
@@ -1034,7 +1088,7 @@
                 
                 const isGoogleSite = data.pageType === 'google-sites' || data.url.includes('sites.google.com');
                 
-                showStatus(`🔄 Converting content with enhanced table processing...`, 'loading');
+                showStatus(`🔄 Converting content with data-code table extraction...`, 'loading');
                 
                 // Pass debug data if available
                 const debugData = {
@@ -1055,7 +1109,7 @@
                     markdown += `> **Source:** [${data.url}](${data.url})\n`;
                     markdown += `> **Extracted:** ${new Date(data.timestamp).toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Enhanced Tables)`;
+                        markdown += ` (Google Sites - Data-Code Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1074,7 +1128,7 @@
                 const tableCount = (markdown.match(/\|.*\|/g) || []).length;
                 const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
                 
-                const successMessage = `✅ Content converted with enhanced table processing! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
+                const successMessage = `✅ Content converted with data-code table extraction! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1262,7 +1316,7 @@
                     throw new Error('Could not parse HTML content');
                 }
                 
-                showStatus('🔍 Processing content with enhanced table analysis...', 'loading');
+                showStatus('🔍 Processing content with data-code table analysis...', 'loading');
                 
                 const isGoogleSite = source.includes('sites.google.com') || 
                                    html.includes('sites.google.com') ||
@@ -1303,7 +1357,7 @@
                     throw new Error('No meaningful content found');
                 }
                 
-                showStatus('🔄 Converting to Markdown with enhanced table processing...', 'loading');
+                showStatus('🔄 Converting to Markdown with data-code table processing...', 'loading');
                 
                 // Create debug data from the full HTML
                 const debugData = {
@@ -1324,7 +1378,7 @@
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites - Enhanced Tables)`;
+                        markdown += ` (Google Sites - Data-Code Tables)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1339,7 +1393,7 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                const successMessage = `✅ Successfully converted with enhanced table processing! Generated ${markdown.length} characters of Markdown.`;
+                const successMessage = `✅ Successfully converted with data-code table processing! Generated ${markdown.length} characters of Markdown.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
