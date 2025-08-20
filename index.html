@@ -606,6 +606,9 @@
                 // Comprehensive extraction of encoded table content from Google Sites
                 const allElements = tempDiv.querySelectorAll('*');
                 allElements.forEach(element => {
+                    // Safety check to ensure element exists and has the expected properties
+                    if (!element || !element.attributes) return;
+                    
                     // Check all data attributes for encoded HTML content
                     Array.from(element.attributes).forEach(attr => {
                         if (attr.name.includes('data') && attr.value && 
@@ -667,10 +670,10 @@
                     }
                     
                     // Special handling for Google Sites table containers
-                    if (element.className && 
-                        (element.className.includes('sites-table') || 
-                         element.className.includes('table-container') ||
-                         element.className.includes('goog-table'))) {
+                    if (element.classList && 
+                        (element.classList.contains('sites-table') || 
+                         element.classList.contains('table-container') ||
+                         element.classList.contains('goog-table'))) {
                         element.setAttribute('data-table-container', 'true');
                     }
                 });
