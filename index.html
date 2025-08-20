@@ -367,7 +367,7 @@
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var content=document.body;var data={title:document.title,content:content.innerHTML,textContent:content.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-full',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted ('+data.textContent.length+' chars) and copied! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var iframes=document.querySelectorAll('iframe');var iframeContent='';iframes.forEach(function(iframe){try{if(iframe.contentDocument){iframeContent+=iframe.contentDocument.documentElement.outerHTML;}}catch(e){}});var scripts=document.querySelectorAll('script');var scriptContent='';scripts.forEach(function(script){if(script.textContent&&(script.textContent.includes('table')||script.textContent.includes('option')||script.textContent.includes('checkbox'))){scriptContent+=script.textContent;}});var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,iframeContent:iframeContent,scriptContent:scriptContent,textContent:document.body.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-debug',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Debug content extracted ('+data.textContent.length+' chars) with full HTML captured! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -687,125 +687,134 @@
             }
         });
 
-        // Smart content extraction - find main content and remove navigation
-        function cleanAndExtractContent(content, title, isGoogleSite) {
+        // Debug-enhanced content extraction to find hidden tables
+        function cleanAndExtractContent(content, title, isGoogleSite, debugData = null) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
             
-            console.log('🧹 Smart content extraction - finding main content area');
+            console.log('🔍 Debug mode: Comprehensive content analysis');
             
-            // First, let's find the actual main content area and ignore navigation
-            let mainContentArea = null;
-            
-            if (isGoogleSite) {
-                // Google Sites specific content area detection
-                const candidates = [
-                    tempDiv.querySelector('main'),
-                    tempDiv.querySelector('[role="main"]'),
-                    tempDiv.querySelector('#content'),
-                    ...Array.from(tempDiv.querySelectorAll('div')).filter(div => {
-                        const text = div.textContent?.trim() || '';
-                        const hasContent = text.length > 500;
-                        const hasStructure = div.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ul,ol,table').length > 3;
-                        const isNotNav = !div.closest('nav') && !div.querySelector('nav') && 
-                                        !text.toLowerCase().includes('skip to') &&
-                                        !div.getAttribute('role')?.includes('navigation');
-                        return hasContent && hasStructure && isNotNav;
-                    })
-                ];
+            if (debugData) {
+                console.log('📊 Debug data available:');
+                console.log('- Full HTML length:', debugData.fullHTML?.length || 0);
+                console.log('- Iframe content length:', debugData.iframeContent?.length || 0);
+                console.log('- Script content length:', debugData.scriptContent?.length || 0);
                 
-                // Score candidates by content quality
-                const scored = candidates.filter(el => el).map(el => {
-                    const text = el.textContent?.trim() || '';
-                    const structure = el.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ul,ol,table').length;
-                    const links = el.querySelectorAll('a').length;
-                    const linkDensity = links / Math.max(text.length, 1);
+                // Look for tables in script content (might be JSON data)
+                if (debugData.scriptContent) {
+                    console.log('🔍 Analyzing script content for table data...');
                     
-                    // High structure, moderate link density = good content
-                    const score = text.length + (structure * 100) - (linkDensity > 0.05 ? linkDensity * 1000 : 0);
+                    // Look for encoded table content in scripts
+                    const tablePatterns = [
+                        /&lt;table[\s\S]*?&lt;\/table&gt;/gi,
+                        /%3Ctable[\s\S]*?%3C\/table%3E/gi,
+                        /\\u003ctable[\s\S]*?\\u003c\/table\\u003e/gi,
+                        /"table"[\s\S]*?"\/table"/gi
+                    ];
                     
-                    return { element: el, score, textLength: text.length, structure };
-                }).sort((a, b) => b.score - a.score);
-                
-                console.log('📊 Content candidates found:', scored.length);
-                scored.slice(0, 3).forEach((candidate, i) => {
-                    console.log(`${i + 1}. Score: ${candidate.score}, Text: ${candidate.textLength}, Structure: ${candidate.structure}`);
-                });
-                
-                mainContentArea = scored[0]?.element;
-            }
-            
-            // If no good candidate found, fall back to body but clean it
-            if (!mainContentArea) {
-                console.log('🔄 No main content area found, cleaning entire body');
-                mainContentArea = tempDiv;
-                
-                // Remove obvious navigation elements
-                const navSelectors = [
-                    'nav',
-                    '[role="navigation"]',
-                    '[role="banner"]', 
-                    '[role="contentinfo"]',
-                    'header',
-                    'footer'
-                ];
-                
-                navSelectors.forEach(selector => {
-                    const navElements = mainContentArea.querySelectorAll(selector);
-                    navElements.forEach(nav => {
-                        const navText = nav.textContent?.trim() || '';
-                        // Remove if it's clearly navigation or has lots of links
-                        const linkCount = nav.querySelectorAll('a').length;
-                        const isNavigation = linkCount > 10 || 
-                                           navText.toLowerCase().includes('skip to') ||
-                                           navText.length > 1000 && linkCount > 5;
-                        
-                        if (isNavigation) {
-                            console.log('🗑️ Removing navigation element with', linkCount, 'links');
-                            nav.remove();
+                    tablePatterns.forEach((pattern, i) => {
+                        const matches = debugData.scriptContent.match(pattern);
+                        if (matches) {
+                            console.log(`📊 Found ${matches.length} table pattern(s) type ${i + 1} in scripts`);
+                            matches.forEach((match, j) => {
+                                try {
+                                    let decoded = match;
+                                    
+                                    // Try different decoding approaches
+                                    if (match.includes('&lt;')) {
+                                        decoded = decodeHTMLEntities(match);
+                                    } else if (match.includes('%3C')) {
+                                        decoded = decodeURIComponent(match);
+                                    } else if (match.includes('\\u003c')) {
+                                        decoded = match.replace(/\\u003c/g, '<').replace(/\\u003e/g, '>');
+                                    }
+                                    
+                                    if (decoded.includes('<table')) {
+                                        console.log(`✅ Successfully decoded table ${j + 1} from scripts`);
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(decoded, 'text/html');
+                                        const tables = doc.querySelectorAll('table');
+                                        
+                                        tables.forEach(table => {
+                                            const wrapper = document.createElement('div');
+                                            wrapper.className = 'script-extracted-table';
+                                            wrapper.appendChild(table.cloneNode(true));
+                                            tempDiv.appendChild(wrapper);
+                                        });
+                                    }
+                                } catch (e) {
+                                    console.log('Error processing script table:', e);
+                                }
+                            });
                         }
                     });
-                });
+                }
                 
-                // Remove elements with excessive link density (likely navigation)
-                const allElements = mainContentArea.querySelectorAll('div, ul, section');
-                allElements.forEach(element => {
-                    const text = element.textContent?.trim() || '';
-                    const links = element.querySelectorAll('a').length;
-                    const textLength = text.length;
+                // Look for tables in iframe content
+                if (debugData.iframeContent) {
+                    console.log('🔍 Analyzing iframe content for tables...');
+                    const iframeParser = new DOMParser();
+                    const iframeDoc = iframeParser.parseFromString(debugData.iframeContent, 'text/html');
+                    const iframeTables = iframeDoc.querySelectorAll('table');
                     
-                    // If more than 30% of content is links and it's long, probably navigation
-                    if (links > 5 && textLength > 500 && (links / textLength) > 0.02) {
-                        console.log('🗑️ Removing high-link-density element:', links, 'links in', textLength, 'chars');
-                        element.remove();
+                    if (iframeTables.length > 0) {
+                        console.log(`📊 Found ${iframeTables.length} tables in iframes`);
+                        iframeTables.forEach(table => {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'iframe-extracted-table';
+                            wrapper.appendChild(table.cloneNode(true));
+                            tempDiv.appendChild(wrapper);
+                        });
                     }
-                });
-            } else {
-                console.log('✅ Using main content area with', mainContentArea.textContent?.length, 'characters');
-                // Create a new container with just the main content
-                const contentContainer = document.createElement('div');
-                contentContainer.appendChild(mainContentArea.cloneNode(true));
-                mainContentArea = contentContainer;
+                }
+                
+                // Look for form elements and options in full HTML
+                if (debugData.fullHTML) {
+                    console.log('🔍 Analyzing full HTML for form elements...');
+                    const fullParser = new DOMParser();
+                    const fullDoc = fullParser.parseFromString(debugData.fullHTML, 'text/html');
+                    
+                    // Look for select/option elements
+                    const selects = fullDoc.querySelectorAll('select');
+                    const checkboxes = fullDoc.querySelectorAll('input[type="checkbox"]');
+                    const radios = fullDoc.querySelectorAll('input[type="radio"]');
+                    
+                    console.log(`📋 Found ${selects.length} select elements, ${checkboxes.length} checkboxes, ${radios.length} radios`);
+                    
+                    if (selects.length > 0 || checkboxes.length > 0 || radios.length > 0) {
+                        const formSection = document.createElement('div');
+                        formSection.className = 'extracted-form-elements';
+                        
+                        selects.forEach((select, i) => {
+                            const options = select.querySelectorAll('option');
+                            if (options.length > 0) {
+                                const list = document.createElement('ul');
+                                const title = document.createElement('h4');
+                                title.textContent = `Options for Question ${i + 1}:`;
+                                formSection.appendChild(title);
+                                
+                                options.forEach(option => {
+                                    if (option.textContent?.trim()) {
+                                        const li = document.createElement('li');
+                                        li.textContent = option.textContent.trim();
+                                        list.appendChild(li);
+                                    }
+                                });
+                                formSection.appendChild(list);
+                            }
+                        });
+                        
+                        if (formSection.children.length > 0) {
+                            tempDiv.appendChild(formSection);
+                        }
+                    }
+                }
             }
             
-            // Remove unwanted elements but preserve content structure
-            const unwantedSelectors = [
-                'script',
-                'style', 
-                'noscript',
-                'meta',
-                'link[rel="stylesheet"]'
-            ];
-            
-            unwantedSelectors.forEach(selector => {
-                const elements = mainContentArea.querySelectorAll(selector);
-                elements.forEach(el => el.remove());
-            });
-            
-            // Extract any encoded tables if this is Google Sites - enhanced approach
+            // Continue with existing enhanced extraction...
             if (isGoogleSite) {
                 console.log('📊 Enhanced Google Sites encoded content extraction');
-                const allElements = mainContentArea.querySelectorAll('*');
+                const allElements = tempDiv.querySelectorAll('*');
                 let tablesFound = 0;
                 
                 allElements.forEach(element => {
@@ -829,7 +838,10 @@
                             attrValue.includes('td') ||
                             attrValue.includes('th') ||
                             attrValue.includes('tbody') ||
-                            attrValue.includes('thead')
+                            attrValue.includes('thead') ||
+                            attrValue.includes('option') ||
+                            attrValue.includes('select') ||
+                            attrValue.includes('checkbox')
                         );
                         
                         if (hasEncodedHTML && hasTableContent) {
@@ -864,13 +876,15 @@
                                 }
                                 
                                 // Check if we now have valid HTML
-                                if (decoded.includes('<table') || decoded.includes('<tr') || decoded.includes('<td')) {
-                                    console.log('📊 Found valid table HTML after decoding');
+                                if (decoded.includes('<table') || decoded.includes('<tr') || decoded.includes('<td') ||
+                                    decoded.includes('<select') || decoded.includes('<option')) {
+                                    console.log('📊 Found valid HTML content after decoding');
                                     
                                     const parser = new DOMParser();
                                     const doc = parser.parseFromString(decoded, 'text/html');
                                     const extractedTables = doc.querySelectorAll('table');
                                     const extractedRows = doc.querySelectorAll('tr');
+                                    const extractedSelects = doc.querySelectorAll('select');
                                     
                                     if (extractedTables.length > 0) {
                                         console.log(`✅ Extracted ${extractedTables.length} tables`);
@@ -896,38 +910,28 @@
                                         element.appendChild(wrapper);
                                         tablesFound++;
                                     }
-                                }
-                                
-                                // Also look for form-like structures or option lists
-                                if (decoded.includes('<option') || decoded.includes('<input') || decoded.includes('<select')) {
-                                    console.log('📋 Found form elements, converting to list');
-                                    const doc = parser.parseFromString(decoded, 'text/html');
-                                    const options = doc.querySelectorAll('option');
-                                    const inputs = doc.querySelectorAll('input');
                                     
-                                    if (options.length > 0 || inputs.length > 0) {
-                                        const list = document.createElement('ul');
-                                        list.className = 'extracted-form-options';
-                                        
-                                        options.forEach(option => {
-                                            if (option.textContent?.trim()) {
-                                                const li = document.createElement('li');
-                                                li.textContent = option.textContent.trim();
-                                                list.appendChild(li);
+                                    if (extractedSelects.length > 0) {
+                                        console.log(`✅ Extracted ${extractedSelects.length} select elements`);
+                                        extractedSelects.forEach(select => {
+                                            const options = select.querySelectorAll('option');
+                                            if (options.length > 0) {
+                                                const list = document.createElement('ul');
+                                                list.className = 'extracted-form-options';
+                                                
+                                                options.forEach(option => {
+                                                    if (option.textContent?.trim()) {
+                                                        const li = document.createElement('li');
+                                                        li.textContent = option.textContent.trim();
+                                                        list.appendChild(li);
+                                                    }
+                                                });
+                                                
+                                                if (list.children.length > 0) {
+                                                    element.appendChild(list);
+                                                }
                                             }
                                         });
-                                        
-                                        inputs.forEach(input => {
-                                            if (input.value?.trim()) {
-                                                const li = document.createElement('li');
-                                                li.textContent = input.value.trim();
-                                                list.appendChild(li);
-                                            }
-                                        });
-                                        
-                                        if (list.children.length > 0) {
-                                            element.appendChild(list);
-                                        }
                                     }
                                 }
                                 
@@ -936,37 +940,27 @@
                             }
                         }
                     });
-                    
-                    // Also check text content for encoded patterns
-                    const textContent = element.textContent || '';
-                    if (textContent.includes('&lt;table') || textContent.includes('%3Ctable')) {
-                        try {
-                            console.log('📊 Found encoded table in text content');
-                            let decoded = decodeHTMLEntities(textContent);
-                            
-                            if (decoded.includes('<table') || decoded.includes('<tr')) {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(decoded, 'text/html');
-                                const tables = doc.querySelectorAll('table, tr');
-                                
-                                if (tables.length > 0) {
-                                    console.log('✅ Extracted tables from text content');
-                                    // Replace the text with the extracted HTML
-                                    element.innerHTML = doc.body.innerHTML;
-                                    tablesFound++;
-                                }
-                            }
-                        } catch (e) {
-                            console.log('Error processing text content:', e);
-                        }
-                    }
                 });
                 
                 console.log(`✅ Total tables/structures found and extracted: ${tablesFound}`);
             }
             
-            console.log('✅ Content extraction complete - preserved main content, removed navigation');
-            return mainContentArea.innerHTML;
+            // Remove only obvious navigation
+            const navElements = tempDiv.querySelectorAll('nav, [role="navigation"]');
+            navElements.forEach(nav => {
+                const text = nav.textContent?.trim() || '';
+                const links = nav.querySelectorAll('a').length;
+                if (links > 5 || text.toLowerCase().includes('skip to')) {
+                    nav.remove();
+                }
+            });
+            
+            // Remove scripts and styles
+            const unwanted = tempDiv.querySelectorAll('script, style, noscript');
+            unwanted.forEach(el => el.remove());
+            
+            console.log('✅ Content extraction complete');
+            return tempDiv.innerHTML;
         }
 
         function decodeHTMLEntities(text) {
@@ -1089,9 +1083,16 @@
                 
                 const isGoogleSite = data.pageType === 'google-sites' || data.url.includes('sites.google.com');
                 
-                showStatus(`🔄 Converting content...`, 'loading');
+                showStatus(`🔄 Converting content with debug analysis...`, 'loading');
                 
-                const cleanContent = cleanAndExtractContent(data.content, data.title, isGoogleSite);
+                // Pass debug data if available
+                const debugData = {
+                    fullHTML: data.fullHTML,
+                    iframeContent: data.iframeContent,
+                    scriptContent: data.scriptContent
+                };
+                
+                const cleanContent = cleanAndExtractContent(data.content, data.title, isGoogleSite, debugData);
                 
                 let markdown = '';
                 
@@ -1103,7 +1104,7 @@
                     markdown += `> **Source:** [${data.url}](${data.url})\n`;
                     markdown += `> **Extracted:** ${new Date(data.timestamp).toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites)`;
+                        markdown += ` (Google Sites - Debug Mode)`;
                     }
                     markdown += `\n\n`;
                 }
@@ -1118,7 +1119,11 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                const successMessage = `✅ Content successfully converted! Generated ${markdown.length} characters of Markdown.`;
+                // Count tables and structures found
+                const tableCount = (markdown.match(/\|.*\|/g) || []).length;
+                const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
+                
+                const successMessage = `✅ Content converted with debug analysis! Generated ${markdown.length} characters with ${Math.floor(tableCount/2)} tables and ${listCount} list items.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1306,7 +1311,7 @@
                     throw new Error('Could not parse HTML content');
                 }
                 
-                showStatus('🔍 Processing content with conservative approach...', 'loading');
+                showStatus('🔍 Processing content with enhanced analysis...', 'loading');
                 
                 const isGoogleSite = source.includes('sites.google.com') || 
                                    html.includes('sites.google.com') ||
@@ -1349,7 +1354,14 @@
                 
                 showStatus('🔄 Converting to Markdown...', 'loading');
                 
-                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite);
+                // Create debug data from the full HTML
+                const debugData = {
+                    fullHTML: html,
+                    iframeContent: '',
+                    scriptContent: html.match(/<script[^>]*>[\s\S]*?<\/script>/gi)?.join('\n') || ''
+                };
+                
+                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite, debugData);
                 
                 let markdown = '';
                 
@@ -1361,7 +1373,7 @@
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
                     if (isGoogleSite) {
-                        markdown += ` (Google Sites)`;
+                        markdown += ` (Google Sites - Enhanced)`;
                     }
                     markdown += `\n\n`;
                 }
