@@ -744,7 +744,8 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
             
-            console.log('🔍 Looking for HTML entity encoded tables and data-code attributes');
+            console.log('🔍 Looking for tables in all possible locations...');
+            console.log(`Content length: ${content.length} characters`);
             
             // First, find existing DOM tables
             const existingTables = tempDiv.querySelectorAll('table');
@@ -754,24 +755,33 @@
             const dataCodeElements = tempDiv.querySelectorAll('[data-code]');
             console.log(`🎯 Found ${dataCodeElements.length} elements with data-code attributes`);
             
+            let dataCodeTablesFound = 0;
             dataCodeElements.forEach((element, index) => {
                 const dataCode = element.getAttribute('data-code');
-                if (dataCode && dataCode.includes('&lt;table')) {
-                    console.log(`📋 Processing data-code ${index + 1} with table content`);
+                console.log(`📋 Processing data-code ${index + 1}: ${dataCode ? dataCode.substring(0, 200) : 'null'}...`);
+                
+                if (dataCode && (dataCode.includes('&lt;table') || dataCode.includes('<table'))) {
+                    console.log(`✅ Found table content in data-code ${index + 1}`);
                     
                     try {
                         // Decode the HTML entities in the data-code
-                        let decodedHTML = processTableContent(dataCode);
+                        let decodedHTML = dataCode;
                         
-                        // Additional decoding for common patterns
-                        decodedHTML = decodedHTML
-                            .replace(/&lt;/g, '<')
-                            .replace(/&gt;/g, '>')
-                            .replace(/&quot;/g, '"')
-                            .replace(/&#39;/g, "'")
-                            .replace(/&amp;/g, '&');
+                        // Multiple passes of decoding to handle double-encoding
+                        for (let pass = 0; pass < 3; pass++) {
+                            decodedHTML = decodedHTML
+                                .replace(/&lt;/g, '<')
+                                .replace(/&gt;/g, '>')
+                                .replace(/&quot;/g, '"')
+                                .replace(/&#39;/g, "'")
+                                .replace(/&amp;/g, '&')
+                                .replace(/&amp;#x2751;/g, '❋')
+                                .replace(/&#x2751;/g, '❋')
+                                .replace(/&amp;#x2022;/g, '•')
+                                .replace(/&#x2022;/g, '•');
+                        }
                         
-                        console.log(`🔄 Decoded data-code HTML: ${decodedHTML.substring(0, 200)}...`);
+                        console.log(`🔄 Decoded data-code HTML (pass 3): ${decodedHTML.substring(0, 300)}...`);
                         
                         // Parse the decoded HTML
                         const parser = new DOMParser();
@@ -783,26 +793,132 @@
                         tables.forEach((table, tableIndex) => {
                             const rows = table.querySelectorAll('tr').length;
                             const cells = table.querySelectorAll('td, th').length;
-                            const textContent = table.textContent?.trim().substring(0, 100) || '';
+                            const textContent = table.textContent?.trim().substring(0, 200) || '';
                             
                             console.log(`📊 Data-code Table ${tableIndex + 1}: ${rows} rows, ${cells} cells`);
                             console.log(`   Content preview: "${textContent}..."`);
                             
-                            // Add this table to our content
+                            // Add this table to our content with a clear marker
                             const wrapper = document.createElement('div');
                             wrapper.className = `data-code-table-${index}-${tableIndex}`;
+                            
+                            // Add a heading before the table to identify it
+                            const heading = document.createElement('h4');
+                            heading.textContent = `Decision Tree Table ${dataCodeTablesFound + 1}`;
+                            wrapper.appendChild(heading);
                             wrapper.appendChild(table.cloneNode(true));
+                            
                             tempDiv.appendChild(wrapper);
+                            dataCodeTablesFound++;
                         });
                         
                     } catch (error) {
                         console.log(`❌ Error processing data-code ${index + 1}:`, error);
                     }
+                } else if (dataCode) {
+                    console.log(`⚠️ Data-code ${index + 1} doesn't contain table content`);
                 }
             });
             
-            // Now search for encoded HTML table strings in other content
-            let totalEncodedTablesFound = 0;
+            // Also search in all text content for encoded tables
+            let allContent = content;
+            if (debugData) {
+                if (debugData.fullHTML) allContent += '\n\n' + debugData.fullHTML;
+                if (debugData.scriptContent) allContent += '\n\n' + debugData.scriptContent;
+            }
+            
+            console.log(`🔍 Searching ${Math.floor(allContent.length / 1000)}KB of content for encoded tables...`);
+            
+            // Look for various encoded table patterns
+            const tablePatterns = [
+                /data-code="[^"]*&lt;table[^"]*"/gi,
+                /data-code='[^']*&lt;table[^']*'/gi,
+                /&lt;table[\s\S]*?&lt;\/table&gt;/gi,
+                /%3Ctable[\s\S]*?%3C\/table%3E/gi,
+                /\\u003ctable[\s\S]*?\\u003c\/table\\u003e/gi
+            ];
+            
+            let encodedTablesFound = 0;
+            tablePatterns.forEach((pattern, patternIndex) => {
+                const matches = allContent.match(pattern);
+                if (matches) {
+                    console.log(`📊 Pattern ${patternIndex + 1}: Found ${matches.length} potential table(s)`);
+                    
+                    matches.forEach((match, matchIndex) => {
+                        try {
+                            let tableContent = match;
+                            
+                            // Extract content from data-code attributes
+                            if (match.includes('data-code=')) {
+                                const codeMatch = match.match(/data-code=["']([^"']+)["']/);
+                                if (codeMatch) {
+                                    tableContent = codeMatch[1];
+                                    console.log(`📋 Extracted from data-code: ${tableContent.substring(0, 200)}...`);
+                                }
+                            }
+                            
+                            // Decode the content
+                            let decoded = tableContent;
+                            for (let pass = 0; pass < 3; pass++) {
+                                decoded = decoded
+                                    .replace(/&lt;/g, '<')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&quot;/g, '"')
+                                    .replace(/&#39;/g, "'")
+                                    .replace(/&amp;/g, '&')
+                                    .replace(/&amp;#x2751;/g, '❋')
+                                    .replace(/&#x2751;/g, '❋');
+                            }
+                            
+                            // URL decode if needed
+                            if (decoded.includes('%3C')) {
+                                try {
+                                    decoded = decodeURIComponent(decoded);
+                                } catch (e) {
+                                    console.log('URL decode failed, continuing...');
+                                }
+                            }
+                            
+                            console.log(`🔄 Final decoded content: ${decoded.substring(0, 300)}...`);
+                            
+                            // Parse and extract tables
+                            if (decoded.includes('<table') || decoded.includes('<tr')) {
+                                try {
+                                    const parser = new DOMParser();
+                                    const doc = parser.parseFromString(`<html><body>${decoded}</body></html>`, 'text/html');
+                                    const tables = doc.querySelectorAll('table');
+                                    
+                                    tables.forEach((table, tableIndex) => {
+                                        const rows = table.querySelectorAll('tr').length;
+                                        const cells = table.querySelectorAll('td, th').length;
+                                        const textContent = table.textContent?.trim().substring(0, 200) || '';
+                                        
+                                        console.log(`📊 Encoded Table ${encodedTablesFound + 1}: ${rows} rows, ${cells} cells`);
+                                        console.log(`   Content: "${textContent}..."`);
+                                        
+                                        // Add table with clear identification
+                                        const wrapper = document.createElement('div');
+                                        wrapper.className = `encoded-table-${encodedTablesFound}`;
+                                        
+                                        const heading = document.createElement('h4');
+                                        heading.textContent = `Extracted Table ${encodedTablesFound + 1}`;
+                                        wrapper.appendChild(heading);
+                                        wrapper.appendChild(table.cloneNode(true));
+                                        
+                                        tempDiv.appendChild(wrapper);
+                                        encodedTablesFound++;
+                                    });
+                                } catch (parseError) {
+                                    console.log(`❌ Parse error:`, parseError);
+                                }
+                            }
+                            
+                        } catch (error) {
+                            console.log(`❌ Error processing match ${matchIndex + 1}:`, error);
+                        }
+                    });
+                }
+            });
             
             function searchForEncodedTables(htmlContent, source) {
                 console.log(`🔍 Searching ${source} for additional encoded table content...`);
@@ -928,20 +1044,57 @@
                 }
             }
             
-            // Final count
+            
+            // Final summary
             const finalTables = tempDiv.querySelectorAll('table');
             const dataCodeTables = tempDiv.querySelectorAll('[class*="data-code-table"]').length;
-            console.log(`📊 FINAL RESULT: ${finalTables.length} total tables (${existingTables.length} original + ${dataCodeTables} from data-code + ${totalEncodedTablesFound} other encoded)`);
+            const encodedTables = tempDiv.querySelectorAll('[class*="encoded-table"]').length;
             
-            // Log details of each final table
-            finalTables.forEach((table, i) => {
-                const rows = table.querySelectorAll('tr').length;
-                const cells = table.querySelectorAll('td, th').length;
-                const text = table.textContent?.trim().substring(0, 100) || '';
-                const source = table.closest('[class*="data-code-table"]') ? 'data-code' : 
-                              table.closest('[class*="decoded-table"]') ? 'encoded-html' : 'original';
-                console.log(`📊 Final Table ${i + 1} (${source}): ${rows} rows, ${cells} cells, content: "${text}..."`);
-            });
+            console.log(`📊 FINAL EXTRACTION SUMMARY:`);
+            console.log(`   - Original DOM tables: ${existingTables.length}`);
+            console.log(`   - Data-code tables: ${dataCodeTablesFound}`);
+            console.log(`   - Pattern-matched encoded tables: ${encodedTablesFound}`);
+            console.log(`   - Total tables found: ${finalTables.length}`);
+            
+            // If no tables found, log the content structure for debugging
+            if (finalTables.length === 0) {
+                console.log(`❌ NO TABLES FOUND! Debugging content structure:`);
+                console.log(`Content has ${tempDiv.children.length} top-level elements`);
+                
+                // Log elements that might contain table data
+                const potentialTableContainers = tempDiv.querySelectorAll('div, iframe, embed, object');
+                console.log(`Found ${potentialTableContainers.length} potential container elements`);
+                
+                potentialTableContainers.forEach((element, index) => {
+                    if (index < 10) { // Only log first 10 to avoid spam
+                        const attrs = Array.from(element.attributes).map(attr => `${attr.name}="${attr.value.substring(0, 100)}"`).join(' ');
+                        console.log(`Container ${index + 1}: <${element.tagName.toLowerCase()} ${attrs}>`);
+                    }
+                });
+                
+                // Look for any text content that might contain table patterns
+                const allText = tempDiv.textContent || '';
+                const hasTableKeywords = allText.includes('DECISION TREE') || allText.includes('LOGIC') || allText.includes('OPTION');
+                console.log(`Content contains table keywords: ${hasTableKeywords}`);
+                
+                if (hasTableKeywords) {
+                    console.log(`🔍 Found table keywords but no tables - checking for unprocessed table data`);
+                    const tableKeywordContext = allText.split(/DECISION TREE|LOGIC|OPTION/).slice(0, 3);
+                    tableKeywordContext.forEach((context, index) => {
+                        console.log(`Context ${index + 1}: "${context.substring(0, 200)}..."`);
+                    });
+                }
+            } else {
+                // Log details of each final table
+                finalTables.forEach((table, i) => {
+                    const rows = table.querySelectorAll('tr').length;
+                    const cells = table.querySelectorAll('td, th').length;
+                    const text = table.textContent?.trim().substring(0, 100) || '';
+                    const source = table.closest('[class*="data-code-table"]') ? 'data-code' : 
+                                  table.closest('[class*="encoded-table"]') ? 'encoded-pattern' : 'original';
+                    console.log(`📊 Final Table ${i + 1} (${source}): ${rows} rows, ${cells} cells, content: "${text}..."`);
+                });
+            }
             
             // Clean up only obvious unwanted elements
             const removeSelectors = ['script', 'style', 'noscript'];
