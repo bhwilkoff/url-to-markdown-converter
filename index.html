@@ -802,34 +802,167 @@
                 elements.forEach(el => el.remove());
             });
             
-            // Extract any encoded tables if this is Google Sites
+            // Extract any encoded tables if this is Google Sites - enhanced approach
             if (isGoogleSite) {
-                console.log('📊 Checking for encoded Google Sites content');
+                console.log('📊 Enhanced Google Sites encoded content extraction');
                 const allElements = mainContentArea.querySelectorAll('*');
+                let tablesFound = 0;
+                
                 allElements.forEach(element => {
                     if (!element || !element.attributes) return;
                     
-                    // Look for encoded HTML in data attributes
+                    // Check ALL attributes for any encoded content
                     Array.from(element.attributes).forEach(attr => {
-                        if (attr.name.startsWith('data-') && attr.value && 
-                            attr.value.includes('&lt;')) {
+                        const attrValue = attr.value || '';
+                        
+                        // Look for various encoding patterns
+                        const hasEncodedHTML = (
+                            attrValue.includes('&lt;') ||
+                            attrValue.includes('%3C') ||
+                            attrValue.includes('\\u003c') ||
+                            attrValue.includes('&amp;lt;')
+                        );
+                        
+                        const hasTableContent = (
+                            attrValue.includes('table') ||
+                            attrValue.includes('tr') ||
+                            attrValue.includes('td') ||
+                            attrValue.includes('th') ||
+                            attrValue.includes('tbody') ||
+                            attrValue.includes('thead')
+                        );
+                        
+                        if (hasEncodedHTML && hasTableContent) {
                             try {
-                                const decoded = decodeHTMLEntities(attr.value);
-                                if (decoded.includes('<table') || decoded.includes('<tr')) {
-                                    console.log('📊 Found encoded table content');
+                                console.log(`📊 Processing attribute ${attr.name} with encoded content`);
+                                
+                                // Try multiple decoding approaches
+                                let decoded = attrValue;
+                                
+                                // HTML entity decoding
+                                decoded = decoded
+                                    .replace(/&amp;lt;/g, '<')
+                                    .replace(/&amp;gt;/g, '>')
+                                    .replace(/&lt;/g, '<')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&quot;/g, '"')
+                                    .replace(/&#39;/g, "'")
+                                    .replace(/&amp;/g, '&');
+                                
+                                // URL decoding
+                                if (decoded.includes('%3C') || decoded.includes('%3E')) {
+                                    try {
+                                        decoded = decodeURIComponent(decoded);
+                                    } catch (e) {
+                                        // Continue with current decoded version
+                                    }
+                                }
+                                
+                                // Unicode decoding
+                                if (decoded.includes('\\u003c')) {
+                                    decoded = decoded.replace(/\\u003c/g, '<').replace(/\\u003e/g, '>');
+                                }
+                                
+                                // Check if we now have valid HTML
+                                if (decoded.includes('<table') || decoded.includes('<tr') || decoded.includes('<td')) {
+                                    console.log('📊 Found valid table HTML after decoding');
+                                    
                                     const parser = new DOMParser();
                                     const doc = parser.parseFromString(decoded, 'text/html');
-                                    const tables = doc.querySelectorAll('table');
-                                    tables.forEach(table => {
-                                        element.appendChild(table.cloneNode(true));
-                                    });
+                                    const extractedTables = doc.querySelectorAll('table');
+                                    const extractedRows = doc.querySelectorAll('tr');
+                                    
+                                    if (extractedTables.length > 0) {
+                                        console.log(`✅ Extracted ${extractedTables.length} tables`);
+                                        extractedTables.forEach(table => {
+                                            const wrapper = document.createElement('div');
+                                            wrapper.className = 'extracted-table-from-data';
+                                            wrapper.appendChild(table.cloneNode(true));
+                                            element.appendChild(wrapper);
+                                            tablesFound++;
+                                        });
+                                    } else if (extractedRows.length > 0) {
+                                        console.log(`✅ Extracted ${extractedRows.length} table rows, creating table`);
+                                        const table = document.createElement('table');
+                                        const tbody = document.createElement('tbody');
+                                        extractedRows.forEach(row => {
+                                            tbody.appendChild(row.cloneNode(true));
+                                        });
+                                        table.appendChild(tbody);
+                                        
+                                        const wrapper = document.createElement('div');
+                                        wrapper.className = 'extracted-table-from-data';
+                                        wrapper.appendChild(table);
+                                        element.appendChild(wrapper);
+                                        tablesFound++;
+                                    }
                                 }
+                                
+                                // Also look for form-like structures or option lists
+                                if (decoded.includes('<option') || decoded.includes('<input') || decoded.includes('<select')) {
+                                    console.log('📋 Found form elements, converting to list');
+                                    const doc = parser.parseFromString(decoded, 'text/html');
+                                    const options = doc.querySelectorAll('option');
+                                    const inputs = doc.querySelectorAll('input');
+                                    
+                                    if (options.length > 0 || inputs.length > 0) {
+                                        const list = document.createElement('ul');
+                                        list.className = 'extracted-form-options';
+                                        
+                                        options.forEach(option => {
+                                            if (option.textContent?.trim()) {
+                                                const li = document.createElement('li');
+                                                li.textContent = option.textContent.trim();
+                                                list.appendChild(li);
+                                            }
+                                        });
+                                        
+                                        inputs.forEach(input => {
+                                            if (input.value?.trim()) {
+                                                const li = document.createElement('li');
+                                                li.textContent = input.value.trim();
+                                                list.appendChild(li);
+                                            }
+                                        });
+                                        
+                                        if (list.children.length > 0) {
+                                            element.appendChild(list);
+                                        }
+                                    }
+                                }
+                                
                             } catch (e) {
-                                // Ignore encoding errors
+                                console.log('Error processing encoded content:', e);
                             }
                         }
                     });
+                    
+                    // Also check text content for encoded patterns
+                    const textContent = element.textContent || '';
+                    if (textContent.includes('&lt;table') || textContent.includes('%3Ctable')) {
+                        try {
+                            console.log('📊 Found encoded table in text content');
+                            let decoded = decodeHTMLEntities(textContent);
+                            
+                            if (decoded.includes('<table') || decoded.includes('<tr')) {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(decoded, 'text/html');
+                                const tables = doc.querySelectorAll('table, tr');
+                                
+                                if (tables.length > 0) {
+                                    console.log('✅ Extracted tables from text content');
+                                    // Replace the text with the extracted HTML
+                                    element.innerHTML = doc.body.innerHTML;
+                                    tablesFound++;
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Error processing text content:', e);
+                        }
+                    }
                 });
+                
+                console.log(`✅ Total tables/structures found and extracted: ${tablesFound}`);
             }
             
             console.log('✅ Content extraction complete - preserved main content, removed navigation');
