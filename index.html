@@ -349,7 +349,7 @@
     <div class="container">
         <div class="header">
             <h1>🔄 Enhanced URL to Markdown Converter</h1>
-            <p>Professional content extraction with advanced programmatic analysis and authentication support</p>
+            <p>Professional content extraction with smart navigation removal and intelligent content detection</p>
         </div>
 
         <div class="tabs">
@@ -375,10 +375,10 @@
                     <ol>
                         <li>Drag the bookmark above to your browser's bookmarks bar</li>
                         <li>Navigate to any webpage (including Google Sites, authenticated pages)</li>
-                        <li>Click the bookmark to extract content using programmatic analysis</li>
+                        <li>Click the bookmark to extract content with smart navigation removal</li>
                         <li>Content is automatically copied and converter opens with intelligent processing!</li>
                     </ol>
-                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex content structures, authenticated pages, and professional documentation with programmatic content analysis!</p>
+                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex content structures, authenticated pages, and professional documentation with smart content extraction!</p>
                 </div>
 
                 <div class="button-group">
@@ -474,8 +474,8 @@
                 <p>Access login-protected content using the bookmarklet method while logged into your accounts.</p>
             </div>
             <div class="feature-card">
-                <h4>📊 Smart Content Analysis</h4>
-                <p>Programmatic analysis of content structure, tables, and formatting without relying on hard-coded class names.</p>
+                <h4>🧠 Intelligent Content Detection</h4>
+                <p>Smart algorithms identify main content areas and remove navigation automatically while preserving tables and structured content.</p>
             </div>
             <div class="feature-card">
                 <h4>🚀 Modern Markdown</h4>
@@ -585,8 +585,64 @@
             }
         });
 
-        // Standard table conversion
-        turndownService.addRule('standardTable', {
+        // Add intelligent content structure detection
+        turndownService.addRule('smartContentBlocks', {
+            filter: function (node) {
+                if (node.nodeName !== 'DIV') return false;
+                
+                const text = node.textContent?.trim() || '';
+                const hasText = text.length > 0 && text.length < 300;
+                const hasNoStructure = !node.querySelector('h1,h2,h3,h4,h5,h6,p,ul,ol,table');
+                const isNotEmpty = text.length > 5;
+                
+                return hasText && hasNoStructure && isNotEmpty;
+            },
+            replacement: function (content, node) {
+                const text = content.trim();
+                if (!text) return '';
+                
+                // Detect heading patterns
+                const isAllCaps = text.toUpperCase() === text && text.length > 5 && text.length < 100;
+                const endsWithColon = text.endsWith(':');
+                const isNumbered = text.match(/^\d+\.\s/);
+                const isCheatSheet = text.includes('CHEAT SHEET');
+                const isInstruction = text.match(/^(Check|Using|Describe|Which|Does|Categorize)/i);
+                
+                if (isCheatSheet || (isAllCaps && text.length < 50)) {
+                    return `\n\n## ${text}\n\n`;
+                } else if (isNumbered || endsWithColon) {
+                    return `\n\n### ${text}\n\n`;
+                } else if (isInstruction || text.includes('?')) {
+                    return `\n\n**${text}**\n\n`;
+                } else if (text.length < 100 && !text.includes('.')) {
+                    return `\n\n*${text}*\n\n`;
+                }
+                
+                return `\n\n${text}\n\n`;
+            }
+        });
+
+        // Improve link handling to remove authuser parameters
+        turndownService.addRule('cleanLinks', {
+            filter: 'a',
+            replacement: function (content, node) {
+                const href = node.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) {
+                    return content;
+                }
+                
+                // Clean up Google Sites URLs
+                let cleanHref = href;
+                if (href.includes('authuser=')) {
+                    cleanHref = href.replace(/[?&]authuser=\d+/g, '');
+                }
+                
+                return `[${content}](${cleanHref})`;
+            }
+        });
+
+        // Better table handling
+        turndownService.addRule('improvedTable', {
             filter: 'table',
             replacement: function (content, node) {
                 const rows = Array.from(node.querySelectorAll('tr'));
@@ -594,12 +650,25 @@
                 
                 let markdown = '\n\n';
                 let hasHeader = false;
+                let maxColumns = 0;
+                
+                // Determine max columns
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td, th'));
+                    maxColumns = Math.max(maxColumns, cells.length);
+                });
+                
+                if (maxColumns === 0) return '';
                 
                 rows.forEach((row, rowIndex) => {
                     const cells = Array.from(row.querySelectorAll('td, th'));
-                    if (cells.length === 0) return;
+                    const isHeaderRow = cells.some(cell => cell.tagName.toLowerCase() === 'th') || 
+                                       (rowIndex === 0 && !hasHeader);
                     
-                    const isHeaderRow = cells.some(cell => cell.tagName.toLowerCase() === 'th') || rowIndex === 0;
+                    // Pad to max columns
+                    while (cells.length < maxColumns) {
+                        cells.push({ textContent: '' });
+                    }
                     
                     const rowContent = cells.map(cell => {
                         let cellText = cell.textContent?.trim() || '';
@@ -609,7 +678,7 @@
                     markdown += `| ${rowContent} |\n`;
                     
                     if (isHeaderRow && !hasHeader) {
-                        markdown += `|${cells.map(() => ' --- ').join('|')}|\n`;
+                        markdown += `|${Array(maxColumns).fill(' --- ').join('|')}|\n`;
                         hasHeader = true;
                     }
                 });
@@ -618,14 +687,108 @@
             }
         });
 
-        // Simple, conservative content cleaning - preserve content first, remove only obvious cruft
+        // Smart content extraction - find main content and remove navigation
         function cleanAndExtractContent(content, title, isGoogleSite) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
             
-            console.log('🧹 Applying conservative content cleaning - preserving content first');
+            console.log('🧹 Smart content extraction - finding main content area');
             
-            // Only remove clearly unwanted elements - be extremely conservative
+            // First, let's find the actual main content area and ignore navigation
+            let mainContentArea = null;
+            
+            if (isGoogleSite) {
+                // Google Sites specific content area detection
+                const candidates = [
+                    tempDiv.querySelector('main'),
+                    tempDiv.querySelector('[role="main"]'),
+                    tempDiv.querySelector('#content'),
+                    ...Array.from(tempDiv.querySelectorAll('div')).filter(div => {
+                        const text = div.textContent?.trim() || '';
+                        const hasContent = text.length > 500;
+                        const hasStructure = div.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ul,ol,table').length > 3;
+                        const isNotNav = !div.closest('nav') && !div.querySelector('nav') && 
+                                        !text.toLowerCase().includes('skip to') &&
+                                        !div.getAttribute('role')?.includes('navigation');
+                        return hasContent && hasStructure && isNotNav;
+                    })
+                ];
+                
+                // Score candidates by content quality
+                const scored = candidates.filter(el => el).map(el => {
+                    const text = el.textContent?.trim() || '';
+                    const structure = el.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ul,ol,table').length;
+                    const links = el.querySelectorAll('a').length;
+                    const linkDensity = links / Math.max(text.length, 1);
+                    
+                    // High structure, moderate link density = good content
+                    const score = text.length + (structure * 100) - (linkDensity > 0.05 ? linkDensity * 1000 : 0);
+                    
+                    return { element: el, score, textLength: text.length, structure };
+                }).sort((a, b) => b.score - a.score);
+                
+                console.log('📊 Content candidates found:', scored.length);
+                scored.slice(0, 3).forEach((candidate, i) => {
+                    console.log(`${i + 1}. Score: ${candidate.score}, Text: ${candidate.textLength}, Structure: ${candidate.structure}`);
+                });
+                
+                mainContentArea = scored[0]?.element;
+            }
+            
+            // If no good candidate found, fall back to body but clean it
+            if (!mainContentArea) {
+                console.log('🔄 No main content area found, cleaning entire body');
+                mainContentArea = tempDiv;
+                
+                // Remove obvious navigation elements
+                const navSelectors = [
+                    'nav',
+                    '[role="navigation"]',
+                    '[role="banner"]', 
+                    '[role="contentinfo"]',
+                    'header',
+                    'footer'
+                ];
+                
+                navSelectors.forEach(selector => {
+                    const navElements = mainContentArea.querySelectorAll(selector);
+                    navElements.forEach(nav => {
+                        const navText = nav.textContent?.trim() || '';
+                        // Remove if it's clearly navigation or has lots of links
+                        const linkCount = nav.querySelectorAll('a').length;
+                        const isNavigation = linkCount > 10 || 
+                                           navText.toLowerCase().includes('skip to') ||
+                                           navText.length > 1000 && linkCount > 5;
+                        
+                        if (isNavigation) {
+                            console.log('🗑️ Removing navigation element with', linkCount, 'links');
+                            nav.remove();
+                        }
+                    });
+                });
+                
+                // Remove elements with excessive link density (likely navigation)
+                const allElements = mainContentArea.querySelectorAll('div, ul, section');
+                allElements.forEach(element => {
+                    const text = element.textContent?.trim() || '';
+                    const links = element.querySelectorAll('a').length;
+                    const textLength = text.length;
+                    
+                    // If more than 30% of content is links and it's long, probably navigation
+                    if (links > 5 && textLength > 500 && (links / textLength) > 0.02) {
+                        console.log('🗑️ Removing high-link-density element:', links, 'links in', textLength, 'chars');
+                        element.remove();
+                    }
+                });
+            } else {
+                console.log('✅ Using main content area with', mainContentArea.textContent?.length, 'characters');
+                // Create a new container with just the main content
+                const contentContainer = document.createElement('div');
+                contentContainer.appendChild(mainContentArea.cloneNode(true));
+                mainContentArea = contentContainer;
+            }
+            
+            // Remove unwanted elements but preserve content structure
             const unwantedSelectors = [
                 'script',
                 'style', 
@@ -635,25 +798,14 @@
             ];
             
             unwantedSelectors.forEach(selector => {
-                const elements = tempDiv.querySelectorAll(selector);
+                const elements = mainContentArea.querySelectorAll(selector);
                 elements.forEach(el => el.remove());
-            });
-            
-            // Only remove navigation if it has very specific characteristics
-            const navElements = tempDiv.querySelectorAll('nav, [role="navigation"]');
-            navElements.forEach(nav => {
-                const navText = nav.textContent?.trim() || '';
-                // Only remove if it's clearly just navigation with skip links
-                if (navText.length < 50 && navText.toLowerCase().includes('skip to')) {
-                    nav.remove();
-                    console.log('🗑️ Removed skip navigation');
-                }
             });
             
             // Extract any encoded tables if this is Google Sites
             if (isGoogleSite) {
                 console.log('📊 Checking for encoded Google Sites content');
-                const allElements = tempDiv.querySelectorAll('*');
+                const allElements = mainContentArea.querySelectorAll('*');
                 allElements.forEach(element => {
                     if (!element || !element.attributes) return;
                     
@@ -680,8 +832,8 @@
                 });
             }
             
-            console.log('✅ Content cleaning complete - preserved maximum content');
-            return tempDiv.innerHTML;
+            console.log('✅ Content extraction complete - preserved main content, removed navigation');
+            return mainContentArea.innerHTML;
         }
 
         function decodeHTMLEntities(text) {
@@ -1101,15 +1253,113 @@
         }
 
         function extractGoogleSitesContent(doc) {
-            console.log('🎯 Simple Google Sites content extraction');
+            console.log('🎯 Smart Google Sites content extraction');
             
-            // Just return the body content - let the cleaning function handle the rest
-            return {
-                title: doc.title || 'Google Site',
-                content: doc.body.innerHTML,
-                textContent: doc.body.textContent || '',
-                sourceType: 'google-sites-simple'
-            };
+            // Try to find the main content area, not just return the body
+            const contentCandidates = [
+                doc.querySelector('main'),
+                doc.querySelector('[role="main"]'),
+                doc.querySelector('#content'),
+                doc.querySelector('.content')
+            ];
+            
+            // Add divs that look like main content (high text, low navigation)
+            const divs = Array.from(doc.querySelectorAll('div')).filter(div => {
+                const text = div.textContent?.trim() || '';
+                const hasGoodContent = text.length > 200;
+                const hasStructure = div.querySelectorAll('h1,h2,h3,h4,h5,h6,p,table,ul,ol').length > 2;
+                const notInNav = !div.closest('nav') && !div.closest('[role="navigation"]');
+                const linkCount = div.querySelectorAll('a').length;
+                const linkDensity = linkCount / Math.max(text.length, 1);
+                
+                return hasGoodContent && hasStructure && notInNav && linkDensity < 0.05;
+            });
+            
+            contentCandidates.push(...divs.slice(0, 5)); // Only check top 5 div candidates
+            
+            // Score each candidate
+            const scored = contentCandidates.filter(el => el).map(element => {
+                const text = element.textContent?.trim() || '';
+                const textLength = text.length;
+                const structure = element.querySelectorAll('h1,h2,h3,h4,h5,h6,p,table,ul,ol').length;
+                const tables = element.querySelectorAll('table').length;
+                const links = element.querySelectorAll('a').length;
+                const linkDensity = links / Math.max(textLength, 1);
+                
+                // Score: prefer text length + structure, penalize high link density
+                let score = textLength + (structure * 50) + (tables * 100);
+                if (linkDensity > 0.02) {
+                    score -= linkDensity * 10000; // Heavy penalty for link-heavy content
+                }
+                
+                return {
+                    element,
+                    score,
+                    textLength,
+                    structure,
+                    tables,
+                    linkDensity: Math.round(linkDensity * 1000) / 1000
+                };
+            }).sort((a, b) => b.score - a.score);
+            
+            console.log('📊 Content scoring results:');
+            scored.slice(0, 3).forEach((candidate, i) => {
+                console.log(`${i + 1}. Score: ${candidate.score}, Text: ${candidate.textLength}, Structure: ${candidate.structure}, Tables: ${candidate.tables}, Link density: ${candidate.linkDensity}`);
+            });
+            
+            const bestCandidate = scored[0];
+            
+            if (bestCandidate && bestCandidate.score > 100) {
+                console.log('✅ Selected best content candidate');
+                return {
+                    title: doc.title || 'Google Site',
+                    content: bestCandidate.element.innerHTML,
+                    textContent: bestCandidate.element.textContent || '',
+                    sourceType: 'google-sites-smart'
+                };
+            } else {
+                console.log('🔄 No good content candidate found, using fallback with navigation removal');
+                
+                // Fallback: use body but remove obvious navigation
+                const bodyClone = doc.body.cloneNode(true);
+                
+                // Remove navigation elements more aggressively
+                const navSelectors = [
+                    'nav',
+                    '[role="navigation"]',
+                    '[role="banner"]',
+                    '[role="contentinfo"]',
+                    'header:has(nav)',
+                    'aside'
+                ];
+                
+                navSelectors.forEach(selector => {
+                    const elements = bodyClone.querySelectorAll(selector);
+                    elements.forEach(el => el.remove());
+                });
+                
+                // Remove elements with high link density
+                const allElements = bodyClone.querySelectorAll('div, section, ul');
+                allElements.forEach(element => {
+                    const text = element.textContent?.trim() || '';
+                    const links = element.querySelectorAll('a').length;
+                    
+                    if (links > 10 && text.length > 1000) {
+                        const linkDensity = links / text.length;
+                        if (linkDensity > 0.02) { // More than 2% of content is links
+                            console.log('🗑️ Removing navigation-heavy element:', links, 'links');
+                            element.remove();
+                        }
+                    }
+                });
+                
+                return {
+                    title: doc.title || 'Google Site',
+                    content: bodyClone.innerHTML,
+                    textContent: bodyClone.textContent || '',
+                    sourceType: 'google-sites-fallback'
+                };
+            }
         }
 
         function downloadMarkdown() {
