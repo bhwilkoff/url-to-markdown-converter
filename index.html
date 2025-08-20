@@ -349,7 +349,7 @@
     <div class="container">
         <div class="header">
             <h1>🔄 Enhanced URL to Markdown Converter</h1>
-            <p>Professional content extraction with advanced table handling and authentication support</p>
+            <p>Professional content extraction with advanced programmatic analysis and authentication support</p>
         </div>
 
         <div class="tabs">
@@ -367,7 +367,7 @@
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=window.location.hostname.includes('sites.google.com')||document.querySelector('.sites-layout')||document.title.includes('Google Sites');var contentEl;if(isGoogleSite){var selectors=['.qeLZfd','.jZfhZe','.VyLNzb','.sites-layout__main','.sites-canvas-main','[role=main]','main','.DshO8c'];for(var i=0;i<selectors.length;i++){var el=document.querySelector(selectors[i]);if(el&&el.textContent.trim().length>200){contentEl=el;break;}}if(!contentEl)contentEl=document.body;}else{contentEl=document.querySelector('article')||document.querySelector('main')||document.querySelector('.content')||document.body;}var data={title:document.title||'Extracted Content',content:contentEl.outerHTML,textContent:contentEl.textContent||'',url:window.location.href,timestamp:Date.now(),source:'bookmarklet-simple',pageType:isGoogleSite?'google-sites':'standard'};var chars=data.textContent.length;navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted ('+chars+' chars) and copied! Open converter?')){window.open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard&chars='+chars,'_blank');}}).catch(function(){alert('Clipboard failed. Use Manual HTML tab.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var isGoogleSite=location.hostname.includes('sites.google.com');var content;if(isGoogleSite){var mainElements=document.querySelectorAll('div');var best=null;var bestScore=0;for(var i=0;i<mainElements.length;i++){var el=mainElements[i];var textLen=el.textContent.length;if(textLen>bestScore){best=el;bestScore=textLen;}}content=best||document.body;}else{content=document.querySelector('main')||document.querySelector('article')||document.body;}var data={title:document.title,content:content.outerHTML,textContent:content.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-simple',pageType:isGoogleSite?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted ('+data.textContent.length+' chars) and copied! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -375,10 +375,10 @@
                     <ol>
                         <li>Drag the bookmark above to your browser's bookmarks bar</li>
                         <li>Navigate to any webpage (including Google Sites, authenticated pages)</li>
-                        <li>Click the bookmark to extract raw content from the page</li>
-                        <li>Content is automatically copied and converter opens with advanced processing!</li>
+                        <li>Click the bookmark to extract content using programmatic analysis</li>
+                        <li>Content is automatically copied and converter opens with intelligent processing!</li>
                     </ol>
-                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex tables, authenticated content, and professional documentation. All advanced table processing happens in the converter tool!</p>
+                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex content structures, authenticated pages, and professional documentation with programmatic content analysis!</p>
                 </div>
 
                 <div class="button-group">
@@ -474,8 +474,8 @@
                 <p>Access login-protected content using the bookmarklet method while logged into your accounts.</p>
             </div>
             <div class="feature-card">
-                <h4>📊 Enhanced Table Handling</h4>
-                <p>Advanced parsing of Google Sites tables and complex HTML table structures.</p>
+                <h4>📊 Smart Content Analysis</h4>
+                <p>Programmatic analysis of content structure, tables, and formatting without relying on hard-coded class names.</p>
             </div>
             <div class="feature-card">
                 <h4>🚀 Modern Markdown</h4>
@@ -573,7 +573,7 @@
             }
         });
 
-        // Enhanced list handling
+        // Enhanced list handling that preserves Google Sites nested structures
         turndownService.addRule('enhancedList', {
             filter: ['ul', 'ol'],
             replacement: function (content, node) {
@@ -585,7 +585,18 @@
                 
                 items.forEach((item, index) => {
                     const marker = isOrdered ? `${index + 1}. ` : '- ';
-                    const itemContent = turndownService.turndown(item.innerHTML).trim();
+                    let itemContent = turndownService.turndown(item.innerHTML).trim();
+                    
+                    // Handle nested lists better
+                    if (itemContent.includes('\n')) {
+                        const lines = itemContent.split('\n');
+                        itemContent = lines[0];
+                        const remaining = lines.slice(1).join('\n');
+                        if (remaining.trim()) {
+                            itemContent += '\n' + remaining.replace(/^/gm, '  '); // Indent nested content
+                        }
+                    }
+                    
                     if (itemContent) {
                         markdown += marker + itemContent + '\n';
                     }
@@ -595,30 +606,117 @@
             }
         });
 
-        // Enhanced Google Sites content cleaning with comprehensive table extraction
+        // Programmatic content structure preservation
+        turndownService.addRule('preserveContentBlocks', {
+            filter: function (node) {
+                // Preserve any element marked as content during cleaning
+                return node.hasAttribute && node.hasAttribute('data-content-preserve');
+            },
+            replacement: function (content, node) {
+                const text = content.trim();
+                if (!text) return '';
+                
+                // Analyze content patterns to determine formatting
+                const isShortContent = text.length < 150;
+                const hasColonEnd = text.endsWith(':');
+                const isNumbered = text.match(/^\d+\.\s/);
+                const isAllCaps = text.toUpperCase() === text && text.length > 5;
+                const hasQuestionStructure = text.includes('?') || text.includes(':');
+                
+                // Determine if this should be a heading
+                if (isShortContent && (hasColonEnd || isNumbered || isAllCaps)) {
+                    if (isNumbered) {
+                        return `\n\n### ${text}\n\n`;
+                    } else if (isAllCaps || hasColonEnd) {
+                        return `\n\n## ${text}\n\n`;
+                    }
+                }
+                
+                // Check if it's a question or instruction block
+                if (hasQuestionStructure && isShortContent) {
+                    return `\n\n**${text}**\n\n`;
+                }
+                
+                // Regular content
+                return `\n\n${text}\n\n`;
+            }
+        });
+
+        // Programmatic div handling based on content analysis
+        turndownService.addRule('intelligentDivProcessing', {
+            filter: function (node) {
+                if (node.nodeName !== 'DIV') return false;
+                
+                const textContent = node.textContent?.trim() || '';
+                const hasText = textContent.length > 0;
+                const hasStructure = node.querySelector('ul, ol, table, h1, h2, h3, h4, h5, h6, p');
+                const isShort = textContent.length < 200;
+                const directTextOnly = !hasStructure && hasText;
+                
+                return directTextOnly && isShort;
+            },
+            replacement: function (content, node) {
+                const text = content.trim();
+                if (!text) return '';
+                
+                // Analyze text patterns
+                const isHeadingLike = (
+                    text.match(/^[A-Z][^.]*:$/) ||           // Ends with colon
+                    text.match(/^\d+\.\s*[A-Z]/) ||          // Numbered item
+                    text.toUpperCase() === text && text.length < 100 && text.length > 10 || // All caps
+                    text.match(/^[A-Z\s]{3,}$/) ||           // Multiple capital words
+                    text.match(/^CHECK\s|^USING\s|^DESCRIBE\s|^WHICH\s|^DOES\s/i) // Question starters
+                );
+                
+                const isQuestionOrInstruction = (
+                    text.includes('?') ||
+                    text.match(/^(Check|Using|Describe|Which|Does|Is|Are|Can|Will|Should)/i) ||
+                    text.includes('CHECK ALL THAT APPLY') ||
+                    text.includes(':')
+                );
+                
+                if (isHeadingLike) {
+                    // Determine heading level
+                    if (text.match(/^\d+\.\s/) || text.includes('CHEAT SHEET')) {
+                        return `\n\n### ${text}\n\n`;
+                    } else {
+                        return `\n\n## ${text}\n\n`;
+                    }
+                } else if (isQuestionOrInstruction) {
+                    return `\n\n**${text}**\n\n`;
+                } else if (text.length < 100 && !text.includes('.')) {
+                    return `\n\n*${text}*\n\n`;
+                }
+                
+                return `\n${text}\n`;
+            }
+        });
+
+        // Programmatic Google Sites content cleaning without hard-coded classes
         function cleanAndExtractContent(content, title, isGoogleSite) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
             
             if (isGoogleSite) {
-                console.log('🧹 Applying enhanced Google Sites cleaning with comprehensive table processing');
+                console.log('🧹 Applying programmatic Google Sites content processing');
                 
-                // Comprehensive extraction of encoded table content from Google Sites
+                // Programmatic extraction of encoded table content from Google Sites
                 const allElements = tempDiv.querySelectorAll('*');
                 allElements.forEach(element => {
                     // Safety check to ensure element exists and has the expected properties
                     if (!element || !element.attributes) return;
                     
-                    // Check all data attributes for encoded HTML content
+                    // Check all data attributes for encoded HTML content (programmatic approach)
                     Array.from(element.attributes).forEach(attr => {
-                        if (attr.name.includes('data') && attr.value && 
+                        if (attr.name.startsWith('data-') && attr.value && 
                             (attr.value.includes('&lt;table') || 
                              attr.value.includes('&lt;tr') || 
                              attr.value.includes('&lt;td') ||
                              attr.value.includes('%3Ctable') ||
-                             attr.value.includes('%3Ctr'))) {
+                             attr.value.includes('%3Ctr') ||
+                             attr.value.includes('table') && attr.value.includes('&lt;'))) {
                             try {
-                                // Try both HTML entity decoding and URL decoding
+                                // Try multiple decoding approaches
                                 let decoded = decodeHTMLEntities(attr.value);
                                 if (!decoded.includes('<table') && decoded.includes('%3C')) {
                                     decoded = decodeURIComponent(decoded);
@@ -633,7 +731,7 @@
                                     tables.forEach(table => {
                                         // Create a wrapper and insert the table
                                         const wrapper = document.createElement('div');
-                                        wrapper.className = 'extracted-table';
+                                        wrapper.className = 'extracted-table-content';
                                         wrapper.appendChild(table.cloneNode(true));
                                         element.appendChild(wrapper);
                                         console.log('✅ Extracted table with', table.querySelectorAll('tr').length, 'rows');
@@ -645,7 +743,7 @@
                         }
                     });
                     
-                    // Check text content for encoded HTML
+                    // Check text content for encoded HTML (programmatic approach)
                     if (element.textContent && 
                         (element.textContent.includes('&lt;table') || 
                          element.textContent.includes('&lt;tr') || 
@@ -669,65 +767,57 @@
                         }
                     }
                     
-                    // Special handling for Google Sites table containers
-                    if (element.classList && 
-                        (element.classList.contains('sites-table') || 
-                         element.classList.contains('table-container') ||
-                         element.classList.contains('goog-table'))) {
-                        element.setAttribute('data-table-container', 'true');
-                    }
-                });
-                
-                // Look for script tags that might contain table data
-                const scripts = tempDiv.querySelectorAll('script');
-                scripts.forEach(script => {
-                    if (script.textContent && script.textContent.includes('table')) {
-                        try {
-                            // Look for JSON data that might contain table information
-                            const jsonMatches = script.textContent.match(/"[^"]*table[^"]*"/gi);
-                            if (jsonMatches) {
-                                jsonMatches.forEach(match => {
-                                    try {
-                                        const decoded = decodeHTMLEntities(JSON.parse(match));
-                                        if (decoded.includes('<table')) {
-                                            console.log('📊 Found table data in script tag');
-                                            const parser = new DOMParser();
-                                            const doc = parser.parseFromString(decoded, 'text/html');
-                                            const tables = doc.querySelectorAll('table');
-                                            tables.forEach(table => {
-                                                script.parentNode.insertBefore(table.cloneNode(true), script);
-                                            });
-                                        }
-                                    } catch (e) {
-                                        // Skip invalid JSON
-                                    }
-                                });
-                            }
-                        } catch (e) {
-                            console.log('Error processing script content:', e);
-                        }
-                    }
-                });
-                
-                // Preserve important Google Sites elements and their structure
-                const gsElements = tempDiv.querySelectorAll('.zfr3Q, .CDt4Ke, .C9DxTc, .n8H08c, .UVNKR, .BKnRcf, .TYR86d, .lsiHE, .eD0Rn, .DshO8c');
-                gsElements.forEach(element => {
-                    if (element.textContent && element.textContent.trim()) {
-                        element.setAttribute('data-gs-preserve', 'true');
+                    // Programmatic detection of content blocks that should be preserved
+                    const textContent = element.textContent?.trim() || '';
+                    const hasStructuralContent = element.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ul, ol, li, table').length > 0;
+                    const isContentBlock = textContent.length > 20 && (
+                        hasStructuralContent || 
+                        textContent.length > 50 ||
+                        element.children.length > 2 ||
+                        element.querySelector('strong, em, b, i') ||
+                        textContent.match(/^\d+\./) || // Numbered items
+                        textContent.includes(':') // Likely labels or definitions
+                    );
+                    
+                    if (isContentBlock) {
+                        element.setAttribute('data-content-preserve', 'true');
                     }
                 });
             }
             
-            // Remove unwanted elements but preserve table structures and important content
+            // Programmatic removal of unwanted elements
             const removeSelectors = [
-                'script:not([data-table-data])', 'style', 'noscript', 
-                'iframe:not([src*="table"]):not([src*="embed"])', 
-                'object', 'embed', 'nav', 'header', 'footer', 'aside',
-                '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
-                '.sites-header', '.sites-footer', '.sites-navigation',
-                '.sites-breadcrumb', '.sites-sidebar'
+                'script:not([type="application/json"])', 
+                'style', 
+                'noscript'
             ];
             
+            // Programmatically identify and remove navigation elements
+            const allElements = tempDiv.querySelectorAll('*');
+            allElements.forEach(element => {
+                const tagName = element.tagName.toLowerCase();
+                const role = element.getAttribute('role');
+                const textContent = element.textContent?.trim() || '';
+                
+                // Identify navigation elements programmatically
+                const isNavigation = (
+                    tagName === 'nav' ||
+                    role === 'navigation' ||
+                    role === 'banner' ||
+                    role === 'contentinfo' ||
+                    tagName === 'header' && textContent.length < 200 ||
+                    tagName === 'footer' && textContent.length < 200 ||
+                    textContent.toLowerCase().includes('skip to') ||
+                    textContent.toLowerCase().includes('navigation') && textContent.length < 100
+                );
+                
+                if (isNavigation) {
+                    element.remove();
+                    console.log('🗑️ Removed navigation element:', tagName, role);
+                }
+            });
+            
+            // Remove traditional unwanted elements
             removeSelectors.forEach(selector => {
                 try {
                     const elements = tempDiv.querySelectorAll(selector);
@@ -737,29 +827,18 @@
                 }
             });
             
-            // Remove empty elements but preserve table structures and media
-            const emptyElements = tempDiv.querySelectorAll('*:not(table):not(tr):not(td):not(th):not(img):not(br):not(hr):not(input):not([data-gs-preserve]):not([data-table-container])');
+            // Only remove truly empty elements, preserve structure
+            const emptyElements = tempDiv.querySelectorAll('div:empty, span:empty, p:empty');
             emptyElements.forEach(el => {
-                if (!el.textContent.trim() && 
-                    !el.querySelector('table, img, br, hr, input, [data-gs-preserve]') && 
-                    !el.hasAttribute('data-table-container')) {
+                if (!el.hasAttribute('data-content-preserve') && 
+                    !el.querySelector('*') &&
+                    !el.textContent?.trim()) {
                     el.remove();
                 }
             });
             
-            // Final cleanup: merge adjacent tables if they seem related
-            const tables = tempDiv.querySelectorAll('table');
-            tables.forEach((table, index) => {
-                if (index > 0) {
-                    const prevTable = tables[index - 1];
-                    const between = table.previousElementSibling;
-                    if (between && !between.textContent.trim() && 
-                        prevTable.parentNode === table.parentNode) {
-                        // Tables are adjacent with only empty content between - keep separate but note relationship
-                        table.setAttribute('data-related-table', index.toString());
-                    }
-                }
-            });
+            const preservedElements = tempDiv.querySelectorAll('[data-content-preserve]').length;
+            console.log('✅ Content cleaning complete. Preserved', preservedElements, 'content elements programmatically');
             
             return tempDiv.innerHTML;
         }
@@ -801,11 +880,18 @@
 
         function cleanMarkdown(markdown) {
             return markdown
-                .replace(/\n{3,}/g, '\n\n')
-                .replace(/^\s+|\s+$/gm, '')
-                .replace(/\*\*\s*\*\*/g, '')
-                .replace(/\*\s*\*/g, '')
-                .replace(/^\s*\n/gm, '')
+                // Normalize excessive line breaks but preserve intentional spacing
+                .replace(/\n{4,}/g, '\n\n\n')  // Max 3 line breaks instead of 2
+                // Remove only truly empty markdown elements
+                .replace(/\*\*\s*\*\*/g, '')  // Empty bold
+                .replace(/\*\s*\*/g, '')      // Empty italic
+                .replace(/^#+\s*$/gm, '')     // Empty headings
+                // Clean up table formatting but preserve structure
+                .replace(/\|\s*\|\s*\|/g, '| | |')  // Normalize empty table cells
+                // Remove leading/trailing whitespace from lines but preserve content
+                .replace(/^[ \t]+|[ \t]+$/gm, '')
+                // Preserve paragraph structure - don't remove all line breaks
+                .replace(/^[\n\r]*|[\n\r]*$/g, '')
                 .trim();
         }
 
@@ -855,7 +941,7 @@
                 }
                 
                 if (!data.content || !data.source || !data.source.includes('bookmarklet')) {
-                    showStatus('❌ Invalid bookmarklet data format. Please use the enhanced bookmarklet above.', 'error');
+                    showStatus('❌ Invalid bookmarklet data format. Please use the enhanced bookmarklet above to extract content first.', 'error');
                     return;
                 }
                 
@@ -875,17 +961,27 @@
             try {
                 originalUrl = data.url;
                 
-                // Enhanced detection of Google Sites
-                const isGoogleSite = data.pageType === 'google-sites' || 
-                                   data.url.includes('sites.google.com') ||
-                                   data.content.includes('sites-layout') ||
-                                   data.content.includes('sites-canvas') ||
-                                   data.title.includes('Google Sites');
+                // Programmatic detection of Google Sites content
+                const isGoogleSite = (
+                    data.pageType === 'google-sites' || 
+                    data.url.includes('sites.google.com') ||
+                    data.content.includes('sites.google.com') ||
+                    data.content.includes('_/scs/abc-static/') ||
+                    data.content.includes('www.gstatic.com/atari') ||
+                    data.title.includes('Google Sites') ||
+                    // Analyze content patterns
+                    (function() {
+                        const divMatches = (data.content.match(/<div/g) || []).length;
+                        const hasGoogleAPIs = data.content.includes('googleapis.com') || data.content.includes('gstatic.com');
+                        const hasDataAttributes = data.content.includes('data-ved') || data.content.includes('jsmodel');
+                        return (divMatches > 20 && hasGoogleAPIs) || hasDataAttributes;
+                    })()
+                );
                 
-                const pageTypeText = isGoogleSite ? ' (Google Sites - Enhanced Processing)' : 
+                const pageTypeText = isGoogleSite ? ' (Google Sites - Programmatic Processing)' : 
                                    data.pageType ? ` (${data.pageType})` : '';
                 
-                showStatus(`🔄 Converting content with enhanced table extraction${pageTypeText}...`, 'loading');
+                showStatus(`🔄 Converting content with programmatic analysis${pageTypeText}...`, 'loading');
                 
                 const cleanContent = cleanAndExtractContent(data.content, data.title, isGoogleSite);
                 
@@ -914,12 +1010,14 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                // Count extracted tables for user feedback
+                // Count extracted content for user feedback
                 const tableCount = (markdown.match(/\|.*\|/g) || []).length;
                 const hasTableContent = tableCount > 0;
+                const headingCount = (markdown.match(/^#+\s/gm) || []).length;
+                const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
                 
                 const successMessage = isGoogleSite ? 
-                    `✅ Google Sites content successfully converted! ${hasTableContent ? `Extracted ${Math.floor(tableCount/2)} tables with` : 'Generated'} ${markdown.length} characters.` :
+                    `✅ Google Sites content successfully converted with programmatic analysis! ${hasTableContent ? `Extracted ${Math.floor(tableCount/2)} tables with` : 'Generated'} ${markdown.length} characters, ${headingCount} headings, and ${listCount} list items.` :
                     `✅ Content successfully converted! Generated ${markdown.length} characters of clean Markdown.`;
                 
                 showStatus(successMessage, 'success');
@@ -949,18 +1047,36 @@
                 
                 const chars = data.textContent ? data.textContent.length : 0;
                 const pageType = data.pageType || 'unknown';
-                const isGoogleSite = pageType === 'google-sites' || data.url.includes('sites.google.com');
+                
+                // Programmatic detection of Google Sites and content features
+                const isGoogleSite = (
+                    pageType === 'google-sites' || 
+                    data.url.includes('sites.google.com') ||
+                    data.content.includes('sites.google.com') ||
+                    data.content.includes('_/scs/abc-static/') ||
+                    data.content.includes('www.gstatic.com/atari')
+                );
+                
                 const hasTableIndicators = data.content && (
                     data.content.includes('<table') || 
                     data.content.includes('&lt;table') ||
                     data.content.includes('%3Ctable') ||
-                    data.content.includes('sites-table')
+                    data.content.includes('data-') && data.content.includes('table')
+                );
+                
+                const hasStructure = data.content && (
+                    data.content.includes('<h1') ||
+                    data.content.includes('<h2') ||
+                    data.content.includes('<ul') ||
+                    data.content.includes('<ol') ||
+                    data.content.includes('<p')
                 );
                 
                 const tableInfo = hasTableIndicators ? ' (contains table data)' : '';
+                const structureInfo = hasStructure ? ' with structured content' : '';
                 const siteInfo = isGoogleSite ? ' - Google Sites detected' : '';
                 
-                showStatus(`✅ Test successful! Found ${chars} characters of ${pageType} content${tableInfo}${siteInfo}`, 'success');
+                showStatus(`✅ Test successful! Found ${chars} characters of ${pageType} content${tableInfo}${structureInfo}${siteInfo}`, 'success');
                 
             } catch (error) {
                 showStatus(`❌ Test failed: ${error.message}`, 'error');
@@ -1091,22 +1207,43 @@
                     throw new Error('Could not parse HTML content');
                 }
                 
-                showStatus('🔍 Analyzing content...', 'loading');
+                showStatus('🔍 Analyzing content with programmatic Google Sites detection...', 'loading');
                 
-                const isGoogleSite = source.includes('sites.google.com') || 
-                                   html.includes('sites-layout') ||
-                                   html.includes('Google Sites') ||
-                                   doc.querySelector('.sites-layout');
+                // Programmatic Google Sites detection
+                const isGoogleSite = (
+                    source.includes('sites.google.com') ||
+                    doc.title.includes('Google Sites') ||
+                    !!doc.querySelector('meta[content*="Google Sites"]') ||
+                    !!doc.querySelector('meta[name="generator"][content*="Google Sites"]') ||
+                    html.includes('sites.google.com') ||
+                    html.includes('_/scs/abc-static/') || // Google Sites static assets
+                    html.includes('www.gstatic.com/atari') || // Google Sites framework
+                    // Programmatic detection of Google Sites DOM patterns
+                    (function() {
+                        const divCount = doc.querySelectorAll('div').length;
+                        const hasGoogleAPIs = html.includes('googleapis.com') || html.includes('gstatic.com');
+                        const hasTypicalStructure = divCount > 20 && hasGoogleAPIs;
+                        const hasDataAttributes = !!doc.querySelector('div[data-ved], div[data-atf], div[jsmodel]');
+                        return hasTypicalStructure || hasDataAttributes;
+                    })()
+                );
+                
+                console.log('🎯 Google Sites detection result:', isGoogleSite);
                 
                 let article;
                 try {
-                    if (typeof Readability !== 'undefined' && !isGoogleSite) {
+                    if (isGoogleSite) {
+                        console.log('🎯 Using programmatic Google Sites extraction');
+                        article = extractGoogleSitesContent(doc);
+                        article.pageType = 'google-sites-programmatic';
+                    } else if (typeof Readability !== 'undefined') {
                         console.log('📖 Using Readability.js for content extraction');
                         const reader = new Readability(doc);
                         const result = reader.parse();
                         
                         if (result && result.content) {
                             article = result;
+                            article.pageType = 'readability';
                         } else {
                             throw new Error('Readability failed');
                         }
@@ -1116,27 +1253,24 @@
                 } catch (e) {
                     console.log('🔄 Using enhanced fallback extraction');
                     
-                    if (isGoogleSite) {
-                        article = extractGoogleSitesContent(doc);
-                    } else {
-                        const contentElement = doc.querySelector('article') || 
-                                             doc.querySelector('main') || 
-                                             doc.querySelector('.content') ||
-                                             doc.body;
-                        
-                        article = {
-                            title: doc.title || 'Extracted Content',
-                            content: contentElement.innerHTML,
-                            textContent: contentElement.textContent || ''
-                        };
-                    }
+                    const contentElement = doc.querySelector('article') || 
+                                         doc.querySelector('main') || 
+                                         doc.querySelector('.content') ||
+                                         doc.body;
+                    
+                    article = {
+                        title: doc.title || 'Extracted Content',
+                        content: contentElement.innerHTML,
+                        textContent: contentElement.textContent || '',
+                        pageType: 'fallback-enhanced'
+                    };
                 }
                 
                 if (!article.textContent || article.textContent.trim().length < 10) {
                     throw new Error('No meaningful content found');
                 }
                 
-                showStatus('🔄 Converting to Markdown...', 'loading');
+                showStatus('🔄 Converting to Markdown with programmatic processing...', 'loading');
                 
                 const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite);
                 
@@ -1148,7 +1282,11 @@
                 
                 if (source !== 'Manual HTML Input') {
                     markdown += `> **Source:** ${source}\n`;
-                    markdown += `> **Processed:** ${new Date().toLocaleString()}\n\n`;
+                    markdown += `> **Processed:** ${new Date().toLocaleString()}`;
+                    if (isGoogleSite) {
+                        markdown += ` (Google Sites - Programmatic Processing)`;
+                    }
+                    markdown += `\n\n`;
                 }
                 
                 const contentMarkdown = turndownService.turndown(cleanContent);
@@ -1161,8 +1299,13 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
+                // Count extracted content for user feedback
+                const tableCount = (markdown.match(/\|.*\|/g) || []).length;
+                const headingCount = (markdown.match(/^#+\s/gm) || []).length;
+                const listCount = (markdown.match(/^[-*+]\s/gm) || []).length;
+                
                 const successMessage = isGoogleSite ? 
-                    `✅ Google Sites content converted with enhanced table processing! Generated ${markdown.length} characters.` :
+                    `✅ Google Sites content successfully converted with programmatic analysis! Generated ${markdown.length} characters with ${headingCount} headings, ${Math.floor(tableCount/2)} tables, and ${listCount} list items.` :
                     `✅ Successfully converted! Generated ${markdown.length} characters of clean Markdown.`;
                 
                 showStatus(successMessage, 'success');
@@ -1174,40 +1317,124 @@
         }
 
         function extractGoogleSitesContent(doc) {
-            const allDivs = Array.from(doc.querySelectorAll('div'));
+            console.log('🎯 Programmatic Google Sites content extraction');
             
-            const scored = allDivs.map(div => {
-                const text = (div.textContent || '').trim();
-                const html = div.innerHTML || '';
-                const links = div.querySelectorAll('a').length;
-                const tables = div.querySelectorAll('table').length;
-                const lists = div.querySelectorAll('li').length;
-                const textLen = text.length;
-                const linkDensity = links / (textLen || 1) * 1000;
-                
-                let score = 0;
-                
-                if (textLen > 100) score += Math.min(textLen / 100, 8);
-                if (textLen / (html.length || 1) > 0.3) score += 4;
-                if (div.querySelectorAll('li, p').length > 2) score += 3;
-                if (tables > 0) score += 5;
-                if (lists > 3) score += 2;
-                
-                if (linkDensity > 50) score -= 5;
-                if (links > textLen / 20) score -= 3;
-                if (div.closest('nav') || div.getAttribute('role') === 'navigation') score -= 10;
-                
-                return { el: div, score: score, len: textLen, tables: tables };
-            }).sort((a, b) => b.score - a.score);
+            // Programmatic approach: find content areas by analyzing structure and content
+            const allElements = Array.from(doc.querySelectorAll('div'));
             
-            const best = scored.find(c => c.score > 0 && c.len > 50);
-            const contentElement = best ? best.el : doc.body;
+            const contentCandidates = allElements.map(element => {
+                const textContent = element.textContent?.trim() || '';
+                const textLength = textContent.length;
+                
+                // Skip if too small to be meaningful content
+                if (textLength < 100) return null;
+                
+                // Analyze content characteristics
+                const hasHeadings = element.querySelectorAll('h1,h2,h3,h4,h5,h6').length;
+                const hasParagraphs = element.querySelectorAll('p').length;
+                const hasLists = element.querySelectorAll('ul,ol').length;
+                const hasTables = element.querySelectorAll('table').length;
+                const hasLinks = element.querySelectorAll('a').length;
+                const directChildren = element.children.length;
+                
+                // Calculate content density and structure score
+                const structureScore = hasHeadings * 100 + hasParagraphs * 20 + hasLists * 30 + hasTables * 150;
+                const contentScore = textLength + structureScore + directChildren * 10;
+                
+                // Penalize elements that are likely navigation or header/footer
+                let penalty = 0;
+                const isNavigation = (
+                    element.closest('nav') ||
+                    element.closest('header') ||
+                    element.closest('footer') ||
+                    element.getAttribute('role') === 'navigation' ||
+                    element.getAttribute('role') === 'banner' ||
+                    element.getAttribute('role') === 'contentinfo' ||
+                    textContent.toLowerCase().includes('skip to') ||
+                    textContent.toLowerCase().includes('navigation') && textLength < 200
+                );
+                
+                if (isNavigation) penalty += 10000;
+                
+                // Penalize high link density (likely navigation)
+                const linkDensity = hasLinks / Math.max(textLength, 1);
+                if (linkDensity > 0.1) penalty += linkDensity * 5000;
+                
+                const finalScore = contentScore - penalty;
+                
+                return {
+                    element,
+                    score: finalScore,
+                    textLength,
+                    structureElements: hasHeadings + hasParagraphs + hasLists + hasTables,
+                    isNavigation
+                };
+            }).filter(candidate => candidate !== null);
+            
+            // Sort by score and find the best content area
+            contentCandidates.sort((a, b) => b.score - a.score);
+            
+            console.log('📊 Content analysis results:');
+            contentCandidates.slice(0, 5).forEach((candidate, index) => {
+                console.log(`${index + 1}. Score: ${candidate.score}, Text: ${candidate.textLength} chars, Structure: ${candidate.structureElements} elements`);
+            });
+            
+            let bestContentElement = null;
+            
+            // Find the best non-navigation content area
+            for (const candidate of contentCandidates) {
+                if (!candidate.isNavigation && candidate.score > 500 && candidate.textLength > 200) {
+                    bestContentElement = candidate.element;
+                    console.log('✅ Selected content area with', candidate.textLength, 'characters and', candidate.structureElements, 'structural elements');
+                    break;
+                }
+            }
+            
+            // If no good candidate found, fall back to semantic elements
+            if (!bestContentElement) {
+                console.log('🔄 No optimal content area found, trying semantic elements');
+                
+                const semanticElements = [
+                    doc.querySelector('main'),
+                    doc.querySelector('[role="main"]'),
+                    doc.querySelector('article'),
+                    doc.querySelector('#content'),
+                    doc.querySelector('.content')
+                ].filter(el => el && el.textContent?.trim().length > 200);
+                
+                if (semanticElements.length > 0) {
+                    bestContentElement = semanticElements[0];
+                    console.log('✅ Using semantic element:', bestContentElement.tagName);
+                } else {
+                    // Last resort: clean up the body
+                    console.log('🔄 Using cleaned body as fallback');
+                    const bodyClone = doc.body.cloneNode(true);
+                    
+                    // Remove obvious navigation elements programmatically
+                    const navElements = bodyClone.querySelectorAll('nav, header, footer, [role="navigation"], [role="banner"], [role="contentinfo"]');
+                    navElements.forEach(nav => {
+                        const navText = nav.textContent?.trim() || '';
+                        if (navText.length < 300 || navText.toLowerCase().includes('skip to')) {
+                            nav.remove();
+                        }
+                    });
+                    
+                    bestContentElement = bodyClone;
+                }
+            }
+            
+            const finalTextLength = bestContentElement.textContent?.trim().length || 0;
+            const tableCount = bestContentElement.querySelectorAll('table').length;
+            const listCount = bestContentElement.querySelectorAll('ul, ol').length;
+            const headingCount = bestContentElement.querySelectorAll('h1,h2,h3,h4,h5,h6').length;
+            
+            console.log(`✅ Final extraction: ${finalTextLength} characters, ${headingCount} headings, ${tableCount} tables, ${listCount} lists`);
             
             return {
                 title: doc.title || 'Google Site',
-                content: contentElement.innerHTML,
-                textContent: contentElement.textContent || '',
-                sourceType: 'google-sites-enhanced'
+                content: bestContentElement.innerHTML,
+                textContent: bestContentElement.textContent || '',
+                sourceType: 'google-sites-programmatic'
             };
         }
 
