@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No Build Process](https://img.shields.io/badge/No%20Build-Vanilla%20JS-yellow.svg)](#)
 
-A powerful, client-side tool that converts web pages into clean Markdown format. Works with public pages, authenticated content, and has special optimizations for Google Sites with dynamic class names
+A powerful, client-side tool that converts web pages into clean Markdown format. Works with public pages, authenticated content, and has special optimizations for Google Sites with dynamic class names.
 
 ## ✨ Features
 
