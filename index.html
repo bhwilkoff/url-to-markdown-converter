@@ -500,44 +500,49 @@
                     let markdown = '\n\n';
                     let maxColumns = 0;
                     
-                    // Determine max columns
-                    rows.forEach(row => {
+                    // Determine max columns and collect all row data
+                    const tableData = [];
+                    
+                    rows.forEach((row, rowIndex) => {
                         const cells = Array.from(row.querySelectorAll('td, th'));
                         maxColumns = Math.max(maxColumns, cells.length);
+                        
+                        const rowData = cells.map(cell => {
+                            let cellText = cell.textContent || cell.innerText || '';
+                            
+                            // Clean and format cell text
+                            cellText = cellText
+                                .trim()
+                                .replace(/\s{2,}/g, ' ')  // Replace multiple spaces with single space
+                                .replace(/\n/g, ' ')      // Replace newlines with spaces
+                                .replace(/\r/g, '')       // Remove carriage returns
+                                .replace(/\|/g, '\\|')    // Escape pipes
+                                .replace(/^\s+|\s+$/g, ''); // Trim again
+                            
+                            return cellText || ' ';
+                        });
+                        
+                        // Pad row to max columns
+                        while (rowData.length < maxColumns) {
+                            rowData.push(' ');
+                        }
+                        
+                        tableData.push({
+                            cells: rowData,
+                            isHeader: cells.some(cell => cell.tagName.toLowerCase() === 'th') || rowIndex === 0
+                        });
                     });
                     
                     if (maxColumns === 0) return '';
                     
-                    rows.forEach((row, rowIndex) => {
-                        const cells = Array.from(row.querySelectorAll('td, th'));
-                        const isHeaderRow = cells.some(cell => cell.tagName.toLowerCase() === 'th') || 
-                                           (rowIndex === 0 && cells.length > 0);
-                        
-                        // Pad row to max columns
-                        while (cells.length < maxColumns) {
-                            const emptyCell = document.createElement('td');
-                            emptyCell.textContent = '';
-                            cells.push(emptyCell);
-                        }
-                        
-                        const rowContent = cells.map(cell => {
-                            let cellText = cell.textContent || cell.innerText || '';
-                            
-                            // Enhanced cell text processing
-                            cellText = cellText
-                                .trim()
-                                .replace(/\s{2,}/g, ' ')
-                                .replace(/\|/g, '\\|')
-                                .replace(/\n/g, '<br>')
-                                .replace(/\r/g, '');
-                            
-                            return cellText || ' ';
-                        }).join(' | ');
-                        
-                        markdown += `| ${rowContent} |\n`;
+                    // Generate markdown table
+                    tableData.forEach((rowData, rowIndex) => {
+                        // Create the row
+                        const rowText = rowData.cells.join(' | ');
+                        markdown += `| ${rowText} |\n`;
                         
                         // Add separator after header row
-                        if (isHeaderRow) {
+                        if (rowData.isHeader) {
                             const separator = Array(maxColumns).fill('---').join(' | ');
                             markdown += `| ${separator} |\n`;
                         }
@@ -706,88 +711,129 @@
                 return;
             }
             
-            // Enhanced section patterns for better matching
+            // More specific section patterns that match the exact content structure
             const sectionPatterns = [
-                { pattern: /3\.\s*CATEGORIZE THE RESPONSE/i, inserted: false },
-                { pattern: /1\.\s*CATEGORIZE THE RESPONSE/i, inserted: false },
-                { pattern: /2\.\s*CATEGORIZE THE RESPONSE/i, inserted: false },
-                { pattern: /DESCRIBE THE VOCABULARY USED/i, inserted: false },
-                { pattern: /ORGANIZATIONAL CHARACTERISTICS/i, inserted: false },
-                { pattern: /TAKE RESPONSIBILITY/i, inserted: false },
-                { pattern: /1\.\s*CHECK ALL THAT APPLY/i, inserted: false },
-                { pattern: /2\.\s*CHECK ALL THAT APPLY/i, inserted: false },
-                { pattern: /DECISION TREE OPTION/i, inserted: false },
-                { pattern: /LOGIC/i, inserted: false }
+                { 
+                    pattern: /3\.\s*CATEGORIZE THE RESPONSE:/i, 
+                    inserted: false,
+                    name: "Concept Categorize Response"
+                },
+                { 
+                    pattern: /1\.\s*CATEGORIZE THE RESPONSE:/i, 
+                    inserted: false,
+                    name: "Negative Experience Categorize Response"
+                },
+                { 
+                    pattern: /3\.\s*DESCRIBE THE VOCABULARY USED:/i, 
+                    inserted: false,
+                    name: "Vocabulary Description"
+                },
+                { 
+                    pattern: /4\.\s*WHICH OF THE FOLLOWING ORGANIZATIONAL CHARACTERISTICS/i, 
+                    inserted: false,
+                    name: "Organizational Characteristics"
+                },
+                { 
+                    pattern: /5\.\s*DOES THE APPLICANT TAKE RESPONSIBILITY/i, 
+                    inserted: false,
+                    name: "Take Responsibility"
+                },
+                { 
+                    pattern: /1\.\s*CHECK ALL THAT APPLY:/i, 
+                    inserted: false,
+                    name: "First Check All That Apply"
+                },
+                { 
+                    pattern: /2\.\s*CHECK ALL THAT APPLY:/i, 
+                    inserted: false,
+                    name: "Second Check All That Apply"
+                }
             ];
             
-            // Find all text-containing elements
-            const allElements = Array.from(tempDiv.querySelectorAll('*')).filter(el => 
-                el.textContent && el.textContent.trim().length > 10
-            );
+            // Create a document order map to track element positions
+            const allElements = Array.from(tempDiv.querySelectorAll('*'));
+            const elementPositions = new Map();
+            allElements.forEach((el, index) => {
+                elementPositions.set(el, index);
+            });
             
             console.log(`🔍 Searching through ${allElements.length} elements for section patterns`);
             
-            let insertedCount = 0;
+            // Find section headers with their positions
+            const sectionsFound = [];
             
-            // Find section headers and insert tables
             allElements.forEach((element, elementIndex) => {
                 const elementText = element.textContent.trim();
                 
-                for (let i = 0; i < sectionPatterns.length && insertedCount < extractedTables.length; i++) {
-                    const pattern = sectionPatterns[i];
-                    
+                sectionPatterns.forEach((pattern, patternIndex) => {
                     if (!pattern.inserted && pattern.pattern.test(elementText)) {
-                        console.log(`📍 Found section match: "${elementText.substring(0, 50)}..." matches ${pattern.pattern}`);
+                        console.log(`📍 Found section match: "${elementText.substring(0, 50)}..." matches ${pattern.name}`);
                         
-                        const table = extractedTables[insertedCount];
-                        
-                        // Create a clean table container
-                        const tableContainer = document.createElement('div');
-                        tableContainer.className = 'contextual-table-container';
-                        tableContainer.innerHTML = `\n\n${table.element.outerHTML}\n\n`;
-                        
-                        // Find the best insertion point
-                        let insertionPoint = element;
-                        
-                        // Try to find a parent section or container
-                        const sectionParent = element.closest('section, div[class*="section"], .content-block');
-                        if (sectionParent) {
-                            insertionPoint = sectionParent;
+                        sectionsFound.push({
+                            element: element,
+                            pattern: pattern,
+                            position: elementIndex,
+                            text: elementText.substring(0, 50)
+                        });
+                    }
+                });
+            });
+            
+            // Sort sections by their document order
+            sectionsFound.sort((a, b) => a.position - b.position);
+            
+            console.log(`📋 Found ${sectionsFound.length} section headers in document order`);
+            
+            // Insert tables after each section in order
+            sectionsFound.forEach((section, index) => {
+                if (index < extractedTables.length) {
+                    const table = extractedTables[index];
+                    
+                    // Find the best insertion point - look for the paragraph containing the section header
+                    let insertionPoint = section.element;
+                    
+                    // Look for parent paragraph, div, or section
+                    while (insertionPoint && insertionPoint.parentNode) {
+                        if (['P', 'DIV', 'SECTION', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(insertionPoint.tagName)) {
+                            break;
+                        }
+                        insertionPoint = insertionPoint.parentNode;
+                    }
+                    
+                    // Create a marker element that will be easier to identify in markdown
+                    const tableMarker = document.createElement('div');
+                    tableMarker.className = 'contextual-table-marker';
+                    tableMarker.setAttribute('data-table-index', index);
+                    tableMarker.innerHTML = `\n\n<!-- TABLE_MARKER_${index} -->\n${table.element.outerHTML}\n<!-- END_TABLE_MARKER_${index} -->\n\n`;
+                    
+                    // Insert the table right after the section element
+                    if (insertionPoint && insertionPoint.parentNode) {
+                        if (insertionPoint.nextSibling) {
+                            insertionPoint.parentNode.insertBefore(tableMarker, insertionPoint.nextSibling);
+                        } else {
+                            insertionPoint.parentNode.appendChild(tableMarker);
                         }
                         
-                        // Insert after the section
-                        if (insertionPoint.parentNode) {
-                            if (insertionPoint.nextSibling) {
-                                insertionPoint.parentNode.insertBefore(tableContainer, insertionPoint.nextSibling);
-                            } else {
-                                insertionPoint.parentNode.appendChild(tableContainer);
-                            }
-                            
-                            console.log(`✅ Inserted table ${insertedCount + 1} after section "${elementText.substring(0, 30)}..."`);
-                            pattern.inserted = true;
-                            insertedCount++;
-                        }
-                        
-                        break;
+                        console.log(`✅ Inserted table ${index + 1} after section "${section.text}..."`);
+                        section.pattern.inserted = true;
                     }
                 }
             });
             
-            // If we still have tables that weren't inserted contextually, append them at logical points
-            if (insertedCount < extractedTables.length) {
-                console.log(`📎 Inserting remaining ${extractedTables.length - insertedCount} tables at document end`);
+            // Insert any remaining tables at the end
+            const remainingTables = extractedTables.slice(sectionsFound.length);
+            if (remainingTables.length > 0) {
+                console.log(`📎 Inserting remaining ${remainingTables.length} tables at document end`);
                 
-                for (let i = insertedCount; i < extractedTables.length; i++) {
-                    const table = extractedTables[i];
-                    const tableContainer = document.createElement('div');
-                    tableContainer.className = 'fallback-table-container';
-                    tableContainer.innerHTML = `\n\n${table.element.outerHTML}\n\n`;
-                    tempDiv.appendChild(tableContainer);
-                    console.log(`📎 Appended table ${i + 1} at document end`);
-                }
+                remainingTables.forEach((table, index) => {
+                    const tableMarker = document.createElement('div');
+                    tableMarker.className = 'fallback-table-marker';
+                    tableMarker.innerHTML = `\n\n<!-- FALLBACK_TABLE_${index} -->\n${table.element.outerHTML}\n<!-- END_FALLBACK_TABLE_${index} -->\n\n`;
+                    tempDiv.appendChild(tableMarker);
+                });
             }
             
-            console.log(`📊 Contextual table placement complete: ${insertedCount} contextually placed, ${extractedTables.length - insertedCount} appended`);
+            console.log(`📊 Contextual table placement complete: ${sectionsFound.length} contextually placed, ${remainingTables.length} appended`);
         }
 
         // Enhanced content cleaning and processing
@@ -797,7 +843,11 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
             
-            // Remove unwanted elements
+            // FIRST: Extract all tables before any cleaning that might remove them
+            const extractedTables = extractAllTables(tempDiv, debugData);
+            console.log(`📊 Extracted ${extractedTables.length} tables before content cleaning`);
+            
+            // Remove unwanted elements (but preserve structure for table placement)
             const removeSelectors = [
                 'script', 'style', 'noscript', 'meta', 'link',
                 '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
@@ -809,11 +859,14 @@
             removeSelectors.forEach(selector => {
                 const elements = tempDiv.querySelectorAll(selector);
                 elements.forEach(el => {
-                    // Preserve elements that contain important content like tables
+                    // Preserve elements that contain important content like tables or key text
                     const hasImportantContent = el.querySelectorAll('table, h1, h2, h3, h4, h5, h6').length > 0;
                     const hasKeywords = el.textContent?.includes('DECISION TREE') || 
                                        el.textContent?.includes('CATEGORIZE') ||
-                                       el.textContent?.includes('CHECK ALL THAT APPLY');
+                                       el.textContent?.includes('CHECK ALL THAT APPLY') ||
+                                       el.textContent?.includes('VOCABULARY USED') ||
+                                       el.textContent?.includes('ORGANIZATIONAL CHARACTERISTICS') ||
+                                       el.textContent?.includes('TAKE RESPONSIBILITY');
                     
                     if (!hasImportantContent && !hasKeywords) {
                         el.remove();
@@ -821,23 +874,28 @@
                 });
             });
             
-            // Extract all tables using enhanced method
-            const extractedTables = extractAllTables(tempDiv, debugData);
+            // Remove existing table elements from DOM (we'll insert them contextually)
+            const existingTables = tempDiv.querySelectorAll('table');
+            console.log(`🗑️ Removing ${existingTables.length} existing DOM tables for re-insertion`);
+            existingTables.forEach(table => table.remove());
             
-            // Remove existing tables to avoid duplication
-            tempDiv.querySelectorAll('table').forEach(table => table.remove());
+            // Remove any existing table containers from previous processing
+            tempDiv.querySelectorAll('.contextual-table-marker, .fallback-table-marker, .contextual-table-container, .fallback-table-container').forEach(container => {
+                container.remove();
+            });
             
-            // Insert tables contextually
-            insertTablesContextually(tempDiv, extractedTables);
+            // SECOND: Insert tables contextually in the cleaned content
+            if (extractedTables.length > 0) {
+                insertTablesContextually(tempDiv, extractedTables);
+            }
             
-            // Additional content cleaning
+            // Clean up navigation text nodes
             const navigationTexts = [
                 'BACK', 'NEXT', 'Skip to main content', 'Skip to navigation',
                 'Page updated', 'Contact', 'Search this site', 'Embedded Files',
                 'Sign in', 'Menu', 'Home', 'About', 'Services'
             ];
             
-            // Remove navigation text nodes
             const walker = document.createTreeWalker(
                 tempDiv,
                 NodeFilter.SHOW_TEXT,
@@ -854,19 +912,25 @@
             textNodes.forEach(textNode => {
                 const text = textNode.textContent.trim();
                 if (navigationTexts.some(navText => text.includes(navText)) && text.length < 100) {
-                    textNode.remove();
+                    // Only remove if it's not part of important content
+                    const parent = textNode.parentElement;
+                    if (parent && !parent.closest('.contextual-table-marker, .fallback-table-marker')) {
+                        textNode.remove();
+                    }
                 }
             });
             
-            // Clean up empty elements
+            // Clean up empty elements (but preserve table markers)
             tempDiv.querySelectorAll('*').forEach(el => {
-                if (!el.textContent.trim() && !el.querySelector('table, img, hr') && 
-                    !['br', 'hr'].includes(el.tagName.toLowerCase())) {
+                if (!el.textContent.trim() && 
+                    !el.querySelector('table, img, hr, .contextual-table-marker, .fallback-table-marker') && 
+                    !['br', 'hr'].includes(el.tagName.toLowerCase()) &&
+                    !el.className.includes('table-marker')) {
                     el.remove();
                 }
             });
             
-            console.log(`✅ Content cleaning complete. Found and processed ${extractedTables.length} tables.`);
+            console.log(`✅ Content cleaning complete. Processed ${extractedTables.length} tables contextually.`);
             return tempDiv.innerHTML;
         }
 
@@ -1159,10 +1223,10 @@
                 document.getElementById('outputSection').classList.remove('hidden');
                 updateStats(markdown);
                 
-                const tableCount = (markdown.match(/\|/g) || []).length;
-                const estimatedTables = Math.floor(tableCount / 4); // Rough estimate
+                const tableCount = (markdown.match(/\|\s*[^|\n]+\s*\|/g) || []).length;
+                const estimatedTables = Math.floor(tableCount / 3); // More accurate estimate based on actual table rows
                 
-                const successMessage = `✅ Successfully converted with enhanced table detection! Generated ${markdown.length} characters with approximately ${estimatedTables} tables properly formatted.`;
+                const successMessage = `✅ Successfully converted with enhanced table detection! Generated ${markdown.length} characters with ${estimatedTables} tables properly positioned contextually.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1182,8 +1246,13 @@
             return markdown
                 .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
                 .replace(/^\s+|\s+$/g, '') // Trim whitespace
+                .replace(/<!-- TABLE_MARKER_\d+ -->/g, '') // Remove table markers
+                .replace(/<!-- END_TABLE_MARKER_\d+ -->/g, '') // Remove end table markers
+                .replace(/<!-- FALLBACK_TABLE_\d+ -->/g, '') // Remove fallback table markers
+                .replace(/<!-- END_FALLBACK_TABLE_\d+ -->/g, '') // Remove end fallback markers
                 .replace(/\|(\s*\|)+/g, '|') // Clean up table formatting
-                .replace(/\n\s*\n\s*\n/g, '\n\n'); // Normalize spacing
+                .replace(/\n\s*\n\s*\n/g, '\n\n') // Normalize spacing
+                .replace(/(\|[^\n]*\|)\n{3,}/g, '$1\n\n'); // Clean spacing after tables
         }
 
         function updateStats(markdown) {
