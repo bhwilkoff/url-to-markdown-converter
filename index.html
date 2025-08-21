@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed URL to Markdown Converter</title>
+    <title>Structural HTML to Markdown Converter</title>
     <style>
         * {
             margin: 0;
@@ -361,8 +361,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔄 Fixed URL to Markdown Converter</h1>
-            <p>Working table extraction with improved programmatic placement (KEEPING WORKING FUNCTIONALITY)</p>
+            <h1>🏗️ Structural HTML to Markdown Converter</h1>
+            <p>Preserves original document structure by decoding tables in place</p>
         </div>
 
         <div class="tabs">
@@ -376,11 +376,11 @@
         <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section">
                 <h3>📱 Bookmarklet Method (Recommended)</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">This method can access authenticated content, handle JavaScript-heavy sites, and extract complex table structures from Google Sites.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">This method preserves HTML structure by decoding tables in their original positions.</p>
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var iframes=document.querySelectorAll('iframe');var iframeContent='';iframes.forEach(function(iframe){try{if(iframe.contentDocument){iframeContent+=iframe.contentDocument.documentElement.outerHTML;}}catch(e){}});var scripts=document.querySelectorAll('script');var scriptContent='';scripts.forEach(function(script){if(script.textContent&&(script.textContent.includes('table')||script.textContent.includes('option')||script.textContent.includes('checkbox'))){scriptContent+=script.textContent;}});var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,iframeContent:iframeContent,scriptContent:scriptContent,textContent:document.body.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-debug',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Debug content extracted ('+data.textContent.length+' chars) with full HTML captured! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var iframes=document.querySelectorAll('iframe');var iframeContent='';iframes.forEach(function(iframe){try{if(iframe.contentDocument){iframeContent+=iframe.contentDocument.documentElement.outerHTML;}}catch(e){}});var scripts=document.querySelectorAll('script');var scriptContent='';scripts.forEach(function(script){if(script.textContent&&(script.textContent.includes('table')||script.textContent.includes('option')||script.textContent.includes('checkbox'))){scriptContent+=script.textContent;}});var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,iframeContent:iframeContent,scriptContent:scriptContent,textContent:document.body.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-debug',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Structural URL→Markdown</a>
                 </div>
 
                 <div class="instructions">
@@ -388,10 +388,10 @@
                     <ol>
                         <li>Drag the bookmark above to your browser's bookmarks bar</li>
                         <li>Navigate to any webpage (including Google Sites, authenticated pages)</li>
-                        <li>Click the bookmark to extract content with working table extraction</li>
-                        <li>Content is automatically copied and converter opens with table placement!</li>
+                        <li>Click the bookmark to extract content with structural preservation</li>
+                        <li>Content is automatically copied and converter opens!</li>
                     </ol>
-                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex content structures, authenticated pages, and forms with tables!</p>
+                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Any page with tables that should maintain their original document positions!</p>
                 </div>
 
                 <div class="button-group">
@@ -426,7 +426,7 @@
         <div class="tab-content" id="manual-tab">
             <div class="input-section">
                 <h3>📄 Manual HTML Input</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Great for copy-pasted content from authenticated pages.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Paste HTML content that will be structurally preserved.</p>
                 
                 <div class="input-group">
                     <label for="htmlInput">HTML Content:</label>
@@ -445,7 +445,7 @@
         <div class="tab-content" id="upload-tab">
             <div class="input-section">
                 <h3>📁 File Upload</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files, saved webpages, or other supported formats.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files with structural preservation.</p>
                 
                 <div class="input-group">
                     <label for="fileInput">Select File:</label>
@@ -487,12 +487,12 @@
                 <p>Access login-protected content using the bookmarklet method while logged into your accounts.</p>
             </div>
             <div class="feature-card">
-                <h4>🧠 Working Table Extraction</h4>
-                <p>Proven algorithms that successfully extract tables from data-code attributes and place them correctly.</p>
+                <h4>🏗️ Structural Preservation</h4>
+                <p>Decodes tables in place within the HTML structure, maintaining original document flow.</p>
             </div>
             <div class="feature-card">
                 <h4>🚀 Modern Markdown</h4>
-                <p>Supports all modern markdown elements including tables, lists, links, and formatting.</p>
+                <p>Supports all modern markdown elements with proper table formatting.</p>
             </div>
             <div class="feature-card">
                 <h4>⚡ JavaScript Content</h4>
@@ -511,7 +511,7 @@
         let uploadedFile = null;
         let turndownService;
 
-        // Initialize Turndown service (KEEPING WORKING VERSION)
+        // Initialize Turndown service
         function initializeTurndown() {
             turndownService = new TurndownService({
                 headingStyle: 'atx',
@@ -524,7 +524,7 @@
                 linkReferenceStyle: 'full'
             });
 
-            // Enhanced table rule (KEEPING WORKING VERSION)
+            // Enhanced table rule
             turndownService.addRule('enhancedTable', {
                 filter: 'table',
                 replacement: function (content, node) {
@@ -584,23 +584,22 @@
             turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object']);
         }
 
-        // WORKING VERSION: Enhanced table extraction from data-code attributes
-        function extractTablesFromDataCode(html) {
-            console.log('🔍 Extracting tables from data-code attributes...');
+        // SIMPLE SOLUTION: Decode data-code tables in place within the HTML structure
+        function decodeTablesInPlace(html) {
+            console.log('🏗️ Decoding tables in place within HTML structure...');
             
-            const extractedTables = [];
-            
-            // Find all data-code attributes with table content
+            // Find all data-code attributes that contain table HTML
             const dataCodeRegex = /data-code="([^"]*(?:&lt;table|<table)[^"]*)"/gi;
-            let match;
+            let decodedHtml = html;
+            let tableCount = 0;
             
-            while ((match = dataCodeRegex.exec(html)) !== null) {
+            decodedHtml = decodedHtml.replace(dataCodeRegex, (match, encodedTable) => {
                 try {
-                    let tableHtml = match[1];
-                    console.log(`📊 Found data-code table with length: ${tableHtml.length}`);
+                    let tableHtml = encodedTable;
                     
-                    // Decode HTML entities multiple times to handle nested encoding
-                    for (let i = 0; i < 5; i++) {
+                    // Decode HTML entities multiple times for nested encoding
+                    for (let i = 0; i < 10; i++) {
+                        const before = tableHtml;
                         tableHtml = tableHtml
                             .replace(/&lt;/g, '<')
                             .replace(/&gt;/g, '>')
@@ -609,158 +608,58 @@
                             .replace(/&amp;#x2751;/g, '❋')
                             .replace(/&#x2751;/g, '❋')
                             .replace(/&amp;/g, '&');
+                        
+                        if (before === tableHtml) break; // No more changes
                     }
                     
-                    // Parse the decoded HTML
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(tableHtml, 'text/html');
-                    const tables = doc.querySelectorAll('table');
-                    
-                    tables.forEach((table, tableIndex) => {
-                        const tableContent = table.textContent?.trim() || '';
-                        if (tableContent.length > 30) {
-                            extractedTables.push({
-                                element: table.cloneNode(true),
-                                content: tableContent,
-                                source: `data-code-${extractedTables.length + 1}`
-                            });
-                            console.log(`✅ Extracted table ${extractedTables.length}: "${tableContent.substring(0, 50)}..."`);
-                        }
-                    });
-                    
+                    // Validate it's actually table HTML
+                    if (tableHtml.includes('<table') && tableHtml.includes('</table>')) {
+                        tableCount++;
+                        console.log(`✅ Decoded table ${tableCount} in place`);
+                        // Return the decoded table HTML to replace the data-code attribute
+                        return tableHtml;
+                    }
                 } catch (error) {
-                    console.log(`❌ Error processing data-code table:`, error);
+                    console.log(`❌ Error decoding table: ${error.message}`);
                 }
-            }
-            
-            console.log(`📊 Total tables extracted from data-code: ${extractedTables.length}`);
-            return extractedTables;
-        }
-
-        // IMPROVED: Dynamic section pattern detection while keeping working functionality
-        function findTablePlacementSections(markdown) {
-            const lines = markdown.split('\n');
-            const placementSections = [];
-            
-            lines.forEach((line, index) => {
-                const trimmed = line.trim();
                 
-                // Look for numbered list items with keywords that typically precede tables
-                const numberedListMatch = trimmed.match(/^\d+\.\s+(.+)/);
-                if (numberedListMatch) {
-                    const content = numberedListMatch[1].toUpperCase();
-                    
-                    // Check for table-indicating keywords
-                    const tableKeywords = [
-                        'CATEGORIZE', 'CHECK ALL', 'APPLY', 'SELECT', 'CHOOSE',
-                        'WHICH OF THE FOLLOWING', 'ORGANIZATIONAL CHARACTERISTICS',
-                        'TAKE RESPONSIBILITY', 'DESCRIBE', 'VOCABULARY'
-                    ];
-                    
-                    const hasTableKeyword = tableKeywords.some(keyword => content.includes(keyword));
-                    
-                    if (hasTableKeyword) {
-                        const position = lines.slice(0, index).join('\n').length;
-                        const lineEnd = markdown.indexOf('\n', position);
-                        
-                        placementSections.push({
-                            text: trimmed,
-                            position: lineEnd > -1 ? lineEnd + 1 : markdown.length,
-                            keywords: tableKeywords.filter(keyword => content.includes(keyword))
-                        });
-                        
-                        console.log(`📍 Found table placement section: "${trimmed.substring(0, 50)}..."`);
-                    }
-                }
+                // If decoding failed, return original
+                return match;
             });
             
-            return placementSections;
+            console.log(`🏗️ Successfully decoded ${tableCount} tables in place`);
+            return decodedHtml;
         }
 
-        // IMPROVED: Insert tables at detected sections (keeping working logic)
-        function insertTablesContextually(markdown, extractedTables) {
-            if (extractedTables.length === 0) {
-                console.log('⚠️ No tables to insert contextually');
-                return markdown;
-            }
-            
-            console.log('📍 Inserting tables contextually...');
-            
-            // Find placement sections dynamically
-            const placementSections = findTablePlacementSections(markdown);
-            
-            let result = markdown;
-            let tableIndex = 0;
-            
-            // Insert tables after each placement section
-            placementSections.forEach(section => {
-                if (tableIndex >= extractedTables.length) return;
-                
-                console.log(`📍 Placing table after: "${section.text}"`);
-                
-                // Convert table to markdown
-                const table = extractedTables[tableIndex];
-                const tableMarkdown = turndownService.turndown(table.element.outerHTML);
-                
-                // Insert table after this section
-                result = result.slice(0, section.position) + 
-                        '\n' + tableMarkdown + 
-                        result.slice(section.position);
-                
-                console.log(`✅ Inserted table ${tableIndex + 1} after "${section.text.substring(0, 30)}..."`);
-                tableIndex++;
-            });
-            
-            // Add any remaining tables at the end
-            while (tableIndex < extractedTables.length) {
-                const table = extractedTables[tableIndex];
-                const tableMarkdown = turndownService.turndown(table.element.outerHTML);
-                result += '\n' + tableMarkdown;
-                console.log(`📎 Added remaining table ${tableIndex + 1} at end`);
-                tableIndex++;
-            }
-            
-            console.log(`🎯 Contextual insertion complete: ${tableIndex} tables placed`);
-            return result;
-        }
-
-        // WORKING VERSION: Enhanced content cleaning
-        function cleanAndExtractContent(html, title, isGoogleSite = false, debugData = {}) {
-            console.log('🧹 Enhanced content cleaning and table extraction starting...');
+        // Enhanced content cleaning (minimal - preserve structure)
+        function cleanAndPreserveStructure(html) {
+            console.log('🧹 Cleaning content while preserving structure...');
             
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
             
-            // FIRST: Extract tables from data-code before any cleaning
-            const extractedTables = extractTablesFromDataCode(html);
-            
-            // Remove unwanted elements but preserve content structure
+            // Remove only clearly unwanted elements
             const removeSelectors = [
-                'script', 'style', 'noscript', 'meta', 'link',
+                'script:not([type*="table"])', 'style', 'noscript', 'meta', 'link',
                 '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
-                '.navigation', '.nav', '.menu', '.sidebar', '.footer', '.header',
-                '.breadcrumb', '.pagination', '.social-share', '.advertisement',
-                '[aria-label*="navigation"]', '[aria-label*="menu"]'
+                '.navigation:not(:has(table))', '.nav:not(:has(table))', 
+                '.menu:not(:has(table))', '.sidebar:not(:has(table))',
+                '.breadcrumb', '.pagination', '.social-share', '.advertisement'
             ];
             
             removeSelectors.forEach(selector => {
-                const elements = tempDiv.querySelectorAll(selector);
-                elements.forEach(el => {
-                    const hasImportantContent = el.querySelectorAll('table, h1, h2, h3, h4, h5, h6').length > 0;
-                    const hasKeywords = el.textContent?.includes('DECISION') || 
-                                       el.textContent?.includes('CATEGORIZE') ||
-                                       el.textContent?.includes('CHECK ALL');
-                    
-                    if (!hasImportantContent && !hasKeywords) {
-                        el.remove();
-                    }
-                });
+                try {
+                    const elements = tempDiv.querySelectorAll(selector);
+                    elements.forEach(el => el.remove());
+                } catch (e) {
+                    // Selector might not be supported in all browsers
+                }
             });
             
-            // Clean up navigation text
+            // Clean up obvious navigation text
             const navigationTexts = [
-                'BACK', 'NEXT', 'Skip to main content', 'Skip to navigation',
-                'Page updated', 'Contact', 'Search this site', 'Embedded Files'
+                'Skip to main content', 'Skip to navigation',
+                'Page updated', 'Search this site'
             ];
             
             const walker = document.createTreeWalker(
@@ -778,19 +677,16 @@
             
             textNodes.forEach(textNode => {
                 const text = textNode.textContent.trim();
-                if (navigationTexts.some(navText => text.includes(navText)) && text.length < 100) {
+                if (navigationTexts.some(navText => text === navText)) {
                     textNode.remove();
                 }
             });
             
-            // Store extracted tables for later use
-            tempDiv._extractedTables = extractedTables;
-            
-            console.log(`✅ Content cleaning complete. Found ${extractedTables.length} tables.`);
+            console.log('✅ Content cleaned while preserving structure');
             return tempDiv.innerHTML;
         }
 
-        // WORKING VERSION: Main processing function
+        // Main processing function - SIMPLIFIED
         async function processHTML(html, source, isBookmarklet = false, debugData = {}) {
             try {
                 let article;
@@ -808,36 +704,47 @@
                     }
                 }
                 
-                // Try Readability first, fall back to manual processing
+                showStatus('🏗️ Decoding tables in place and preserving structure...', 'loading');
+                
+                // STEP 1: Decode all data-code tables in place within the HTML
+                const htmlWithTables = decodeTablesInPlace(html);
+                
+                // STEP 2: Try Readability first, fall back to manual processing
+                let processedHtml;
                 try {
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
+                    const doc = parser.parseFromString(htmlWithTables, 'text/html');
                     const reader = new Readability(doc);
                     article = reader.parse();
                     
-                    if (!article || !article.content) {
+                    if (article && article.content) {
+                        processedHtml = article.content;
+                    } else {
                         throw new Error('Readability parsing failed');
                     }
                 } catch (readabilityError) {
                     console.log('Readability failed, using manual extraction');
+                    
+                    // Extract content manually while preserving structure
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlWithTables, 'text/html');
+                    
                     article = {
-                        title: extractTitleFromHTML(html),
-                        content: extractGoogleSitesContent(new DOMParser().parseFromString(html, 'text/html'))
+                        title: extractTitleFromHTML(htmlWithTables),
+                        content: extractMainContent(doc)
                     };
+                    
+                    processedHtml = article.content;
                 }
                 
-                if (!article || !article.content) {
+                if (!processedHtml) {
                     throw new Error('Could not extract content from the page');
                 }
                 
-                showStatus('🔄 Converting to Markdown with proven table placement...', 'loading');
+                // STEP 3: Minimal cleaning while preserving structure
+                const cleanContent = cleanAndPreserveStructure(processedHtml);
                 
-                const isGoogleSite = source.includes('sites.google.com') || 
-                                    html.includes('sites.google.com') ||
-                                    debugData.pageType === 'google-sites';
-                
-                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite, debugData);
-                
+                // STEP 4: Convert to markdown (tables are now in their natural positions)
                 let markdown = '';
                 
                 if (article.title && article.title.trim()) {
@@ -847,23 +754,15 @@
                 if (source !== 'Manual HTML Input') {
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
-                    if (isGoogleSite) {
-                        markdown += ` (Google Sites - Working Tables)`;
+                    if (source.includes('sites.google.com')) {
+                        markdown += ` (Google Sites - Structure Preserved)`;
                     }
                     markdown += `\n\n`;
                 }
                 
+                // Convert the entire HTML to markdown (tables are now in correct positions)
                 const contentMarkdown = turndownService.turndown(cleanContent);
                 markdown += contentMarkdown;
-                
-                // Get extracted tables and insert them using WORKING method
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cleanContent;
-                const extractedTables = tempDiv._extractedTables || extractTablesFromDataCode(html);
-                
-                if (extractedTables.length > 0) {
-                    markdown = insertTablesContextually(markdown, extractedTables);
-                }
                 
                 markdown = cleanMarkdown(markdown);
                 extractedContent = markdown;
@@ -875,7 +774,7 @@
                 const tableCount = (markdown.match(/\|[^|\n]+\|/g) || []).length;
                 const estimatedTables = Math.floor(tableCount / 3);
                 
-                const successMessage = `✅ Successfully converted with working table placement! Generated ${markdown.length} characters with ${estimatedTables} tables positioned correctly.`;
+                const successMessage = `✅ Successfully converted with structural preservation! Generated ${markdown.length} characters with ${estimatedTables} tables in original positions.`;
                 showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -892,16 +791,18 @@
             return title ? title.textContent.trim() : 'Converted Document';
         }
 
-        function extractGoogleSitesContent(doc) {
+        function extractMainContent(doc) {
+            // Find main content area
             const contentCandidates = [
                 doc.querySelector('main'),
                 doc.querySelector('[role="main"]'),
                 doc.querySelector('#content'),
                 doc.querySelector('.content'),
+                doc.querySelector('article'),
                 doc.body
             ];
             
-            const content = contentCandidates.find(el => el) || doc.body;
+            const content = contentCandidates.find(el => el && el.innerHTML.trim()) || doc.body;
             return content ? content.innerHTML : '';
         }
 
@@ -977,7 +878,7 @@
                     return;
                 }
                 
-                showStatus('🔄 Processing bookmarklet content with working table extraction...', 'loading');
+                showStatus('🏗️ Processing content with structural preservation...', 'loading');
                 await processHTML(text, 'Bookmarklet Content', true);
                 
             } catch (error) {
@@ -1066,7 +967,7 @@
                 return;
             }
             
-            showStatus('🔄 Processing HTML with working table extraction...', 'loading');
+            showStatus('🏗️ Processing HTML with structural preservation...', 'loading');
             await processHTML(html, 'Manual HTML Input');
         }
 
