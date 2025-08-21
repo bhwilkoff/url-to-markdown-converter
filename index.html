@@ -345,7 +345,7 @@
     <div class="container">
         <div class="header">
             <h1>📄 Enhanced URL to Markdown Converter</h1>
-            <p>Professional content extraction with improved heading detection and text formatting preservation</p>
+            <p>Professional content extraction with improved heading detection, sophisticated table extraction, and intelligent content processing</p>
         </div>
 
         <div class="tabs">
@@ -359,7 +359,7 @@
         <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section">
                 <h3>📱 Bookmarklet Method (Recommended)</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">This method can access authenticated content, handle JavaScript-heavy sites, and preserve heading hierarchies from complex sites.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">This method can access authenticated content, handle JavaScript-heavy sites, preserve heading hierarchies, and extract complex table structures from Google Sites.</p>
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
@@ -486,7 +486,7 @@
         let uploadedFile = null;
         let turndownService;
 
-        // Initialize Turndown service with enhanced heading detection
+        // Initialize Turndown service
         function initializeTurndown() {
             turndownService = new TurndownService({
                 headingStyle: 'atx',
@@ -636,50 +636,60 @@
                 }
             });
 
-            // Remove certain elements but preserve structure
+            // Remove certain elements
             turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object']);
         }
 
-        // Enhanced table extraction from data-code attributes
+        // FIXED: Enhanced table extraction from data-code attributes
         function extractTablesFromDataCode(html) {
             console.log('🔍 Extracting tables from data-code attributes...');
             
             const extractedTables = [];
             
             // Find all data-code attributes with table content
-            const dataCodeRegex = /data-code="([^"]*(?:\\.[^"]*)*)"/g;
+            const dataCodeRegex = /data-code="([^"]*(?:&lt;table|<table)[^"]*)"/gi;
             let match;
             
             while ((match = dataCodeRegex.exec(html)) !== null) {
                 try {
-                    const decodedContent = match[1]
-                        .replace(/\\"/g, '"')
-                        .replace(/\\n/g, '\n')
-                        .replace(/\\t/g, '\t')
-                        .replace(/\\\\/g, '\\');
+                    let tableHtml = match[1];
+                    console.log(`📊 Found data-code table with length: ${tableHtml.length}`);
                     
-                    if (decodedContent.includes('<table') || decodedContent.includes('table-')) {
-                        console.log('📊 Found table in data-code:', decodedContent.substring(0, 100) + '...');
-                        
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = decodedContent;
-                        
-                        const tables = tempDiv.querySelectorAll('table');
-                        tables.forEach((table, index) => {
-                            console.log(`📋 Processing table ${extractedTables.length + 1} from data-code`);
+                    // Decode HTML entities multiple times to handle nested encoding
+                    for (let i = 0; i < 5; i++) {
+                        tableHtml = tableHtml
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .replace(/&amp;#x2751;/g, '❋')
+                            .replace(/&#x2751;/g, '❋')
+                            .replace(/&amp;/g, '&');
+                    }
+                    
+                    // Parse the decoded HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(tableHtml, 'text/html');
+                    const tables = doc.querySelectorAll('table');
+                    
+                    tables.forEach((table, tableIndex) => {
+                        const tableContent = table.textContent?.trim() || '';
+                        if (tableContent.length > 30) {
                             extractedTables.push({
                                 element: table.cloneNode(true),
-                                source: 'data-code',
-                                context: decodedContent.substring(0, 200)
+                                content: tableContent,
+                                source: `data-code-${extractedTables.length + 1}`
                             });
-                        });
-                    }
-                } catch (e) {
-                    console.warn('⚠️ Error parsing data-code content:', e);
+                            console.log(`✅ Extracted table ${extractedTables.length}: "${tableContent.substring(0, 50)}..."`);
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.log(`❌ Error processing data-code table:`, error);
                 }
             }
             
-            console.log(`✅ Extracted ${extractedTables.length} tables from data-code attributes`);
+            console.log(`📊 Total tables extracted from data-code: ${extractedTables.length}`);
             return extractedTables;
         }
 
@@ -820,12 +830,130 @@
             return result;
         }
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeTurndown();
-            setupTabs();
-            checkForClipboardData();
-        });
+        // Main processing function
+        async function processHTML(html, source, isBookmarklet = false, debugData = {}) {
+            try {
+                let article;
+                
+                // Handle bookmarklet JSON data
+                if (isBookmarklet && typeof html === 'string' && html.startsWith('{')) {
+                    try {
+                        const data = JSON.parse(html);
+                        html = data.content || data.fullHTML || html;
+                        originalUrl = data.url || source;
+                        source = data.url || source;
+                        debugData = data;
+                    } catch (e) {
+                        console.log('Not JSON bookmarklet data, processing as HTML');
+                    }
+                }
+                
+                // Try Readability first, fall back to manual processing
+                try {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const reader = new Readability(doc);
+                    article = reader.parse();
+                    
+                    if (!article || !article.content) {
+                        throw new Error('Readability parsing failed');
+                    }
+                } catch (readabilityError) {
+                    console.log('Readability failed, using manual extraction');
+                    article = {
+                        title: extractTitleFromHTML(html),
+                        content: extractGoogleSitesContent(new DOMParser().parseFromString(html, 'text/html'))
+                    };
+                }
+                
+                if (!article || !article.content) {
+                    throw new Error('Could not extract content from the page');
+                }
+                
+                showStatus('🔄 Converting to Markdown with contextual table placement...', 'loading');
+                
+                const isGoogleSite = source.includes('sites.google.com') || 
+                                    html.includes('sites.google.com') ||
+                                    debugData.pageType === 'google-sites';
+                
+                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite, debugData);
+                
+                let markdown = '';
+                
+                if (article.title && article.title.trim()) {
+                    markdown += `# ${article.title.trim()}\n\n`;
+                }
+                
+                if (source !== 'Manual HTML Input') {
+                    markdown += `> **Source:** ${source}\n`;
+                    markdown += `> **Processed:** ${new Date().toLocaleString()}`;
+                    if (isGoogleSite) {
+                        markdown += ` (Google Sites - Enhanced Tables)`;
+                    }
+                    markdown += `\n\n`;
+                }
+                
+                const contentMarkdown = turndownService.turndown(cleanContent);
+                markdown += contentMarkdown;
+                
+                // FIXED: Get extracted tables and insert them contextually
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cleanContent;
+                const extractedTables = tempDiv._extractedTables || extractTablesFromDataCode(html);
+                
+                if (extractedTables.length > 0) {
+                    markdown = insertTablesContextually(markdown, extractedTables);
+                }
+                
+                markdown = cleanMarkdown(markdown);
+                extractedContent = markdown;
+                
+                document.getElementById('markdownOutput').value = markdown;
+                document.getElementById('outputSection').classList.remove('hidden');
+                updateStats(markdown);
+                
+                const tableCount = (markdown.match(/\|[^|\n]+\|/g) || []).length;
+                const estimatedTables = Math.floor(tableCount / 3);
+                
+                const successMessage = `✅ Successfully converted with contextual table placement! Generated ${markdown.length} characters with ${estimatedTables} tables positioned correctly.`;
+                showStatus(successMessage, 'success');
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                showStatus(`❌ Error processing content: ${error.message}`, 'error');
+                console.error('Processing error:', error);
+            }
+        }
+
+        function extractTitleFromHTML(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const title = doc.querySelector('title');
+            return title ? title.textContent.trim() : 'Converted Document';
+        }
+
+        function extractGoogleSitesContent(doc) {
+            // Try to find the main content area
+            const contentCandidates = [
+                doc.querySelector('main'),
+                doc.querySelector('[role="main"]'),
+                doc.querySelector('#content'),
+                doc.querySelector('.content'),
+                doc.body
+            ];
+            
+            const content = contentCandidates.find(el => el) || doc.body;
+            return content ? content.innerHTML : '';
+        }
+
+        function cleanMarkdown(markdown) {
+            return markdown
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/^[\s\n]+|[\s\n]+$/g, '')
+                .replace(/(\*\*\s*\*\*|\*\s*\*)/g, '')
+                .replace(/(\[\]\([^)]*\))/g, '')
+                .replace(/\n\s*\n\s*\n/g, '\n\n');
+        }
 
         // Tab functionality
         function setupTabs() {
@@ -882,13 +1010,9 @@
                 if (!response.ok) throw new Error('Failed to fetch');
                 
                 const data = await response.json();
-                const title = extractTitle(data.contents) || 'Converted Content';
-                
                 originalUrl = url;
-                extractedContent = cleanAndExtractContent(data.contents, title);
                 
-                displayResult();
-                showStatus('✅ Content converted successfully!', 'success');
+                await processHTML(data.contents, url);
             } catch (error) {
                 console.error('Error:', error);
                 showStatus('❌ Failed to fetch URL. Try the bookmarklet method for better compatibility.', 'error');
@@ -896,7 +1020,7 @@
         }
 
         // Convert from HTML
-        function convertFromHtml() {
+        async function convertFromHtml() {
             const html = document.getElementById('htmlInput').value.trim();
             if (!html) {
                 showStatus('❌ Please enter HTML content', 'error');
@@ -906,12 +1030,8 @@
             showStatus('🔄 Converting HTML...', 'loading');
 
             try {
-                const title = extractTitle(html) || 'Converted Content';
-                extractedContent = cleanAndExtractContent(html, title);
                 originalUrl = '';
-                
-                displayResult();
-                showStatus('✅ HTML converted successfully!', 'success');
+                await processHTML(html, 'Manual HTML Input');
             } catch (error) {
                 console.error('Error:', error);
                 showStatus('❌ Failed to convert HTML', 'error');
@@ -938,17 +1058,10 @@
                     return;
                 }
 
-                showStatus('🔄 Converting content with enhanced heading detection...', 'loading');
+                showStatus('🔄 Converting content with enhanced table extraction...', 'loading');
 
-                const html = data.fullHTML || data.content;
-                const title = data.title || 'Converted Content';
-                const isGoogleSite = data.pageType === 'google-sites';
-                
                 originalUrl = data.url || '';
-                extractedContent = cleanAndExtractContent(html, title, isGoogleSite, data);
-                
-                displayResult();
-                showStatus('✅ Bookmarklet content converted successfully!', 'success');
+                await processHTML(JSON.stringify(data), data.url || 'Bookmarklet', true, data);
             } catch (error) {
                 console.error('Error:', error);
                 showStatus('❌ Failed to access clipboard. Make sure you copied content using the bookmarklet.', 'error');
@@ -964,7 +1077,7 @@
             convertBtn.disabled = !uploadedFile;
         }
 
-        function convertFromFile() {
+        async function convertFromFile() {
             if (!uploadedFile) {
                 showStatus('❌ Please select a file first', 'error');
                 return;
@@ -973,16 +1086,12 @@
             showStatus('🔄 Reading file...', 'loading');
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const html = e.target.result;
-                    const title = uploadedFile.name.replace(/\.[^/.]+$/, "") || 'Converted Content';
-                    
-                    extractedContent = cleanAndExtractContent(html, title);
                     originalUrl = '';
                     
-                    displayResult();
-                    showStatus('✅ File converted successfully!', 'success');
+                    await processHTML(html, uploadedFile.name);
                 } catch (error) {
                     console.error('Error:', error);
                     showStatus('❌ Failed to convert file', 'error');
@@ -1013,14 +1122,21 @@
             output.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function updateStats() {
-            const content = extractedContent;
-            const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
-            const charCount = content.length;
+        function updateStats(content = null) {
+            const markdown = content || extractedContent;
+            const wordCount = markdown.trim() ? markdown.trim().split(/\s+/).length : 0;
+            const charCount = markdown.length;
             
             document.getElementById('wordCount').textContent = `${wordCount} words`;
             document.getElementById('charCount').textContent = `${charCount} characters`;
         }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTurndown();
+            setupTabs();
+            checkForClipboardData();
+        });
 
         // Paste functions
         async function pasteUrl() {
