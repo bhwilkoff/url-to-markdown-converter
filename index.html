@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed URL to Markdown Converter</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.2/turndown.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/readability/0.4.4/Readability.min.js"></script>
+    <title>Enhanced URL to Markdown Converter</title>
     <style>
         * {
             margin: 0;
@@ -168,6 +166,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
         .bookmarklet-area {
             background: #fff;
             border: 2px dashed #667eea;
@@ -278,7 +286,7 @@
             font-size: 14px;
         }
 
-        .output-textarea {
+        #markdownOutput {
             width: 100%;
             min-height: 400px;
             padding: 20px;
@@ -288,6 +296,7 @@
             font-size: 14px;
             line-height: 1.5;
             resize: vertical;
+            background: white;
         }
 
         .loading-spinner {
@@ -305,21 +314,23 @@
             100% { transform: rotate(360deg); }
         }
 
-        .output-actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
         }
 
-        .debug-info {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 12px;
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h4 {
+            margin-bottom: 10px;
+            color: #495057;
         }
 
         @media (max-width: 768px) {
@@ -350,12 +361,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📄 Fixed URL to Markdown Converter</h1>
-            <p>Simple, working table extraction and contextual placement</p>
+            <h1>📄 Enhanced URL to Markdown Converter</h1>
+            <p>Professional content extraction with smart navigation removal and intelligent content detection</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" data-tab="bookmarklet">📱 Bookmarklet</button>
+            <button class="tab active" data-tab="bookmarklet">📱 Bookmarklet (Best)</button>
             <button class="tab" data-tab="direct">🌐 Direct URL</button>
             <button class="tab" data-tab="manual">📄 Manual HTML</button>
             <button class="tab" data-tab="upload">📁 File Upload</button>
@@ -364,27 +375,28 @@
         <!-- Bookmarklet Tab -->
         <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section">
-                <h3>📱 Bookmarklet Method</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Extract content from any webpage including Google Sites with proper table placement.</p>
+                <h3>📱 Bookmarklet Method (Recommended)</h3>
+                <p style="margin-bottom: 20px; color: #6c757d;">This method can access authenticated content, handle JavaScript-heavy sites, and extract complex table structures from Google Sites.</p>
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-fixed'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Fixed URL→Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var iframes=document.querySelectorAll('iframe');var iframeContent='';iframes.forEach(function(iframe){try{if(iframe.contentDocument){iframeContent+=iframe.contentDocument.documentElement.outerHTML;}}catch(e){}});var scripts=document.querySelectorAll('script');var scriptContent='';scripts.forEach(function(script){if(script.textContent&&(script.textContent.includes('table')||script.textContent.includes('option')||script.textContent.includes('checkbox'))){scriptContent+=script.textContent;}});var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,iframeContent:iframeContent,scriptContent:scriptContent,textContent:document.body.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-debug',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Debug content extracted ('+data.textContent.length+' chars) with full HTML captured! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
                 </div>
 
                 <div class="instructions">
-                    <h4>📋 How to use:</h4>
+                    <h4>📋 How to use the bookmarklet:</h4>
                     <ol>
                         <li>Drag the bookmark above to your browser's bookmarks bar</li>
-                        <li>Navigate to any webpage (including Google Sites)</li>
-                        <li>Click the bookmark to extract content</li>
-                        <li>Content is copied and converter opens with proper table handling!</li>
+                        <li>Navigate to any webpage (including Google Sites, authenticated pages)</li>
+                        <li>Click the bookmark to extract content with smart navigation removal</li>
+                        <li>Content is automatically copied and converter opens with intelligent processing!</li>
                     </ol>
+                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex content structures, authenticated pages, and professional documentation with smart content extraction!</p>
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="pasteAndConvertBookmarklet()">📋 Paste & Convert</button>
-                    <button class="btn btn-secondary" onclick="testBookmarklet()">🧪 Test</button>
+                    <button class="btn btn-primary" onclick="pasteAndConvertBookmarklet()">📋 Paste Copied Content</button>
+                    <button class="btn btn-secondary" onclick="testBookmarklet()">🧪 Test Mode</button>
                 </div>
             </div>
         </div>
@@ -393,7 +405,7 @@
         <div class="tab-content" id="direct-tab">
             <div class="authentication-note">
                 <h4>⚠️ Authentication Limitations</h4>
-                <p>Direct URL fetching cannot access login-protected content. Use the bookmarklet method for authenticated pages.</p>
+                <p>Direct URL fetching cannot access login-protected content due to browser security restrictions. For authenticated content, use the bookmarklet method above.</p>
             </div>
 
             <div class="input-section">
@@ -414,7 +426,7 @@
         <div class="tab-content" id="manual-tab">
             <div class="input-section">
                 <h3>📄 Manual HTML Input</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Paste HTML content directly.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Great for copy-pasted content from authenticated pages.</p>
                 
                 <div class="input-group">
                     <label for="htmlInput">HTML Content:</label>
@@ -433,7 +445,7 @@
         <div class="tab-content" id="upload-tab">
             <div class="input-section">
                 <h3>📁 File Upload</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files or saved webpages.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files, saved webpages, or other supported formats.</p>
                 
                 <div class="input-group">
                     <label for="fileInput">Select File:</label>
@@ -449,9 +461,6 @@
         <!-- Status Display -->
         <div id="statusDisplay" class="hidden"></div>
 
-        <!-- Debug Info -->
-        <div id="debugInfo" class="debug-info hidden"></div>
-
         <!-- Output Section -->
         <div id="outputSection" class="output-section hidden">
             <div class="output-header">
@@ -461,24 +470,48 @@
                 </div>
             </div>
             
-            <textarea id="markdownOutput" class="output-textarea" readonly></textarea>
+            <textarea id="markdownOutput" readonly></textarea>
             
-            <div class="output-actions">
-                <button class="btn btn-primary" onclick="copyToClipboard()">📋 Copy Markdown</button>
-                <button class="btn btn-secondary" onclick="downloadMarkdown()">💾 Download .md</button>
-                <button class="btn btn-secondary" onclick="shareMarkdown()">🔗 Share</button>
+            <div class="button-group" style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="downloadMarkdown()">💾 Download .md</button>
+                <button class="btn btn-secondary" onclick="copyMarkdown()">📋 Copy to Clipboard</button>
+                <button class="btn btn-secondary" onclick="shareMarkdown()">📤 Share</button>
                 <button class="btn btn-secondary" onclick="clearOutput()">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🔒 Authentication Support</h4>
+                <p>Access login-protected content using the bookmarklet method while logged into your accounts.</p>
+            </div>
+            <div class="feature-card">
+                <h4>🧠 Intelligent Content Detection</h4>
+                <p>Smart algorithms identify main content areas and remove navigation automatically while preserving tables and structured content.</p>
+            </div>
+            <div class="feature-card">
+                <h4>🚀 Modern Markdown</h4>
+                <p>Supports all modern markdown elements including tables, lists, links, and formatting.</p>
+            </div>
+            <div class="feature-card">
+                <h4>⚡ JavaScript Content</h4>
+                <p>Bookmarklet method can extract content from JavaScript-heavy sites after rendering.</p>
             </div>
         </div>
     </div>
 
+    <!-- Include Turndown.js and Readability.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.1/turndown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/readability/0.5.0/Readability.min.js"></script>
+
     <script>
-        // Global variables
         let extractedContent = '';
+        let originalUrl = '';
         let uploadedFile = null;
         let turndownService;
 
-        // Initialize the converter
+        // Initialize Turndown service
         function initializeTurndown() {
             turndownService = new TurndownService({
                 headingStyle: 'atx',
@@ -491,68 +524,83 @@
                 linkReferenceStyle: 'full'
             });
 
-            // Simple table rule
-            turndownService.addRule('table', {
+            // Enhanced table rule with contextual processing
+            turndownService.addRule('enhancedTable', {
                 filter: 'table',
                 replacement: function (content, node) {
-                    return convertTableToMarkdown(node);
+                    console.log('📄 Converting table to Markdown');
+                    const rows = Array.from(node.querySelectorAll('tr'));
+                    if (rows.length === 0) return '';
+                    
+                    let markdown = '\n\n';
+                    let maxColumns = 0;
+                    
+                    // Determine max columns
+                    rows.forEach(row => {
+                        const cells = Array.from(row.querySelectorAll('td, th'));
+                        maxColumns = Math.max(maxColumns, cells.length);
+                    });
+                    
+                    if (maxColumns === 0) return '';
+                    
+                    rows.forEach((row, rowIndex) => {
+                        const cells = Array.from(row.querySelectorAll('td, th'));
+                        const isHeaderRow = cells.some(cell => cell.tagName.toLowerCase() === 'th') || 
+                                           (rowIndex === 0 && cells.length > 0);
+                        
+                        // Pad row to max columns
+                        while (cells.length < maxColumns) {
+                            const emptyCell = document.createElement('td');
+                            emptyCell.textContent = '';
+                            cells.push(emptyCell);
+                        }
+                        
+                        const rowContent = cells.map(cell => {
+                            let cellText = cell.textContent || cell.innerText || '';
+                            cellText = cellText
+                                .trim()
+                                .replace(/\s{2,}/g, ' ')
+                                .replace(/\|/g, '\\|')
+                                .replace(/\n/g, ' ')
+                                .replace(/\r/g, '');
+                            return cellText || ' ';
+                        }).join(' | ');
+                        
+                        markdown += `| ${rowContent} |\n`;
+                        
+                        // Add separator after header row
+                        if (isHeaderRow) {
+                            const separator = Array(maxColumns).fill('---').join(' | ');
+                            markdown += `| ${separator} |\n`;
+                        }
+                    });
+                    
+                    markdown += '\n';
+                    return markdown;
                 }
             });
 
+            // Remove certain elements
             turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object']);
         }
 
-        // Simple table conversion
-        function convertTableToMarkdown(table) {
-            const rows = Array.from(table.querySelectorAll('tr'));
-            if (rows.length === 0) return '';
+        // FIXED: Enhanced table extraction from data-code attributes
+        function extractTablesFromDataCode(html) {
+            console.log('🔍 Extracting tables from data-code attributes...');
             
-            let markdown = '\n\n';
-            
-            rows.forEach((row, rowIndex) => {
-                const cells = Array.from(row.querySelectorAll('td, th'));
-                if (cells.length === 0) return;
-                
-                const cellTexts = cells.map(cell => {
-                    let text = (cell.textContent || '').trim()
-                        .replace(/\|/g, '\\|')
-                        .replace(/\n/g, ' ')
-                        .replace(/\s+/g, ' ');
-                    return text || ' ';
-                });
-                
-                markdown += `| ${cellTexts.join(' | ')} |\n`;
-                
-                // Add separator after first row (header)
-                if (rowIndex === 0) {
-                    const separator = cellTexts.map(() => '---').join(' | ');
-                    markdown += `| ${separator} |\n`;
-                }
-            });
-            
-            markdown += '\n';
-            return markdown;
-        }
-
-        // Extract tables from data-code attributes and replace with placeholders
-        function processDataCodeTables(html) {
-            console.log('🔍 Processing data-code tables...');
-            let processedHtml = html;
-            const tables = [];
+            const extractedTables = [];
             
             // Find all data-code attributes with table content
             const dataCodeRegex = /data-code="([^"]*(?:&lt;table|<table)[^"]*)"/gi;
             let match;
-            let tableIndex = 0;
             
             while ((match = dataCodeRegex.exec(html)) !== null) {
-                console.log(`📊 Found data-code table ${tableIndex + 1}`);
-                
                 try {
                     let tableHtml = match[1];
+                    console.log(`📊 Found data-code table with length: ${tableHtml.length}`);
                     
-                    // Decode HTML entities
-                    for (let i = 0; i < 3; i++) {
+                    // Decode HTML entities multiple times to handle nested encoding
+                    for (let i = 0; i < 5; i++) {
                         tableHtml = tableHtml
                             .replace(/&lt;/g, '<')
                             .replace(/&gt;/g, '>')
@@ -563,37 +611,42 @@
                             .replace(/&amp;/g, '&');
                     }
                     
-                    // Parse the table HTML
+                    // Parse the decoded HTML
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(tableHtml, 'text/html');
-                    const tableElement = doc.querySelector('table');
+                    const tables = doc.querySelectorAll('table');
                     
-                    if (tableElement) {
-                        const markdownTable = convertTableToMarkdown(tableElement);
-                        tables.push(markdownTable);
-                        
-                        // Replace the entire data-code element with a placeholder
-                        const placeholder = `<!--TABLE_PLACEHOLDER_${tableIndex}-->`;
-                        processedHtml = processedHtml.replace(match[0], placeholder);
-                        
-                        console.log(`✅ Converted table ${tableIndex + 1} to markdown`);
-                        tableIndex++;
-                    }
+                    tables.forEach((table, tableIndex) => {
+                        const tableContent = table.textContent?.trim() || '';
+                        if (tableContent.length > 30) {
+                            extractedTables.push({
+                                element: table.cloneNode(true),
+                                content: tableContent,
+                                source: `data-code-${extractedTables.length + 1}`
+                            });
+                            console.log(`✅ Extracted table ${extractedTables.length}: "${tableContent.substring(0, 50)}..."`);
+                        }
+                    });
+                    
                 } catch (error) {
-                    console.log(`❌ Error processing table ${tableIndex + 1}:`, error);
+                    console.log(`❌ Error processing data-code table:`, error);
                 }
             }
             
-            console.log(`📋 Extracted ${tables.length} tables from data-code attributes`);
-            return { html: processedHtml, tables: tables };
+            console.log(`📊 Total tables extracted from data-code: ${extractedTables.length}`);
+            return extractedTables;
         }
 
-        // Insert tables after section headers
-        function insertTablesContextually(markdown, tables) {
-            if (tables.length === 0) return markdown;
+        // FIXED: Insert tables contextually after section headers
+        function insertTablesContextually(markdown, extractedTables) {
+            if (extractedTables.length === 0) {
+                console.log('⚠️ No tables to insert contextually');
+                return markdown;
+            }
             
             console.log('📍 Inserting tables contextually...');
             
+            // Section patterns that should be followed by tables
             const sectionPatterns = [
                 '3. CATEGORIZE THE RESPONSE:',
                 '1. CATEGORIZE THE RESPONSE:',
@@ -604,58 +657,141 @@
                 '2. CHECK ALL THAT APPLY:'
             ];
             
+            let result = markdown;
             let tableIndex = 0;
-            let processedMarkdown = markdown;
             
-            // Insert tables after each section header
-            for (const pattern of sectionPatterns) {
-                if (tableIndex >= tables.length) break;
+            // Insert tables after each matching section header
+            sectionPatterns.forEach(sectionHeader => {
+                if (tableIndex >= extractedTables.length) return;
                 
-                const index = processedMarkdown.indexOf(pattern);
-                if (index !== -1) {
-                    // Find the end of the line
-                    const lineEnd = processedMarkdown.indexOf('\n', index);
+                const sectionPos = result.indexOf(sectionHeader);
+                if (sectionPos !== -1) {
+                    console.log(`📍 Found section: "${sectionHeader}"`);
+                    
+                    // Find the end of this line
+                    const lineEnd = result.indexOf('\n', sectionPos);
                     if (lineEnd !== -1) {
-                        const insertPoint = lineEnd + 1;
-                        const table = tables[tableIndex];
+                        // Convert table to markdown
+                        const table = extractedTables[tableIndex];
+                        const tableMarkdown = turndownService.rules.array.find(rule => 
+                            rule.filter === 'table'
+                        ).replacement('', table.element);
                         
-                        processedMarkdown = 
-                            processedMarkdown.slice(0, insertPoint) + 
-                            '\n' + table + 
-                            processedMarkdown.slice(insertPoint);
+                        // Insert table after this line
+                        const insertPos = lineEnd + 1;
+                        result = result.slice(0, insertPos) + 
+                                '\n' + tableMarkdown + 
+                                result.slice(insertPos);
                         
-                        console.log(`✅ Inserted table ${tableIndex + 1} after "${pattern.substring(0, 30)}..."`);
+                        console.log(`✅ Inserted table ${tableIndex + 1} after "${sectionHeader}"`);
                         tableIndex++;
                     }
                 }
-            }
+            });
             
             // Add any remaining tables at the end
-            while (tableIndex < tables.length) {
-                processedMarkdown += '\n' + tables[tableIndex];
-                console.log(`📎 Appended remaining table ${tableIndex + 1}`);
+            while (tableIndex < extractedTables.length) {
+                const table = extractedTables[tableIndex];
+                const tableMarkdown = turndownService.rules.array.find(rule => 
+                    rule.filter === 'table'
+                ).replacement('', table.element);
+                result += '\n' + tableMarkdown;
+                console.log(`📎 Added remaining table ${tableIndex + 1} at end`);
                 tableIndex++;
             }
             
             console.log(`🎯 Contextual insertion complete: ${tableIndex} tables placed`);
-            return processedMarkdown;
+            return result;
+        }
+
+        // Enhanced content cleaning
+        function cleanAndExtractContent(html, title, isGoogleSite = false, debugData = {}) {
+            console.log('🧹 Enhanced content cleaning and table extraction starting...');
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // FIRST: Extract tables from data-code before any cleaning
+            const extractedTables = extractTablesFromDataCode(html);
+            
+            // Remove unwanted elements but preserve content structure
+            const removeSelectors = [
+                'script', 'style', 'noscript', 'meta', 'link',
+                '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
+                '.navigation', '.nav', '.menu', '.sidebar', '.footer', '.header',
+                '.breadcrumb', '.pagination', '.social-share', '.advertisement',
+                '[aria-label*="navigation"]', '[aria-label*="menu"]'
+            ];
+            
+            removeSelectors.forEach(selector => {
+                const elements = tempDiv.querySelectorAll(selector);
+                elements.forEach(el => {
+                    const hasImportantContent = el.querySelectorAll('table, h1, h2, h3, h4, h5, h6').length > 0;
+                    const hasKeywords = el.textContent?.includes('DECISION TREE') || 
+                                       el.textContent?.includes('CATEGORIZE') ||
+                                       el.textContent?.includes('CHECK ALL THAT APPLY');
+                    
+                    if (!hasImportantContent && !hasKeywords) {
+                        el.remove();
+                    }
+                });
+            });
+            
+            // Clean up navigation text
+            const navigationTexts = [
+                'BACK', 'NEXT', 'Skip to main content', 'Skip to navigation',
+                'Page updated', 'Contact', 'Search this site', 'Embedded Files'
+            ];
+            
+            const walker = document.createTreeWalker(
+                tempDiv,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+            
+            textNodes.forEach(textNode => {
+                const text = textNode.textContent.trim();
+                if (navigationTexts.some(navText => text.includes(navText)) && text.length < 100) {
+                    textNode.remove();
+                }
+            });
+            
+            // Store extracted tables for later use
+            tempDiv._extractedTables = extractedTables;
+            
+            console.log(`✅ Content cleaning complete. Found ${extractedTables.length} tables.`);
+            return tempDiv.innerHTML;
         }
 
         // Main processing function
-        async function processHTML(html, source) {
+        async function processHTML(html, source, isBookmarklet = false, debugData = {}) {
             try {
-                showStatus('🔄 Processing content...', 'loading');
-                
-                // Step 1: Extract tables from data-code attributes
-                const { html: cleanedHtml, tables } = processDataCodeTables(html);
-                
-                showDebug(`Found ${tables.length} tables in data-code attributes`);
-                
-                // Step 2: Clean HTML and convert to markdown
                 let article;
+                
+                // Handle bookmarklet JSON data
+                if (isBookmarklet && typeof html === 'string' && html.startsWith('{')) {
+                    try {
+                        const data = JSON.parse(html);
+                        html = data.content || data.fullHTML || html;
+                        originalUrl = data.url || source;
+                        source = data.url || source;
+                        debugData = data;
+                    } catch (e) {
+                        console.log('Not JSON bookmarklet data, processing as HTML');
+                    }
+                }
+                
+                // Try Readability first, fall back to manual processing
                 try {
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(cleanedHtml, 'text/html');
+                    const doc = parser.parseFromString(html, 'text/html');
                     const reader = new Readability(doc);
                     article = reader.parse();
                     
@@ -663,15 +799,24 @@
                         throw new Error('Readability parsing failed');
                     }
                 } catch (readabilityError) {
-                    console.log('Readability failed, using full content');
+                    console.log('Readability failed, using manual extraction');
                     article = {
-                        title: extractTitleFromHTML(cleanedHtml),
-                        content: cleanedHtml
+                        title: extractTitleFromHTML(html),
+                        content: extractGoogleSitesContent(new DOMParser().parseFromString(html, 'text/html'))
                     };
                 }
                 
-                // Step 3: Convert to markdown
-                showStatus('🔄 Converting to markdown...', 'loading');
+                if (!article || !article.content) {
+                    throw new Error('Could not extract content from the page');
+                }
+                
+                showStatus('🔄 Converting to Markdown with contextual table placement...', 'loading');
+                
+                const isGoogleSite = source.includes('sites.google.com') || 
+                                    html.includes('sites.google.com') ||
+                                    debugData.pageType === 'google-sites';
+                
+                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite, debugData);
                 
                 let markdown = '';
                 
@@ -682,24 +827,25 @@
                 if (source !== 'Manual HTML Input') {
                     markdown += `> **Source:** ${source}\n`;
                     markdown += `> **Processed:** ${new Date().toLocaleString()}`;
-                    if (source.includes('sites.google.com')) {
-                        markdown += ` (Google Sites - Fixed Tables)`;
+                    if (isGoogleSite) {
+                        markdown += ` (Google Sites - Enhanced Tables)`;
                     }
                     markdown += `\n\n`;
                 }
                 
-                const contentMarkdown = turndownService.turndown(article.content);
+                const contentMarkdown = turndownService.turndown(cleanContent);
                 markdown += contentMarkdown;
                 
-                // Step 4: Insert tables contextually
-                if (tables.length > 0) {
-                    showStatus('📍 Placing tables contextually...', 'loading');
-                    markdown = insertTablesContextually(markdown, tables);
+                // FIXED: Get extracted tables and insert them contextually
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cleanContent;
+                const extractedTables = tempDiv._extractedTables || extractTablesFromDataCode(html);
+                
+                if (extractedTables.length > 0) {
+                    markdown = insertTablesContextually(markdown, extractedTables);
                 }
                 
-                // Step 5: Clean up markdown
                 markdown = cleanMarkdown(markdown);
-                
                 extractedContent = markdown;
                 
                 document.getElementById('markdownOutput').value = markdown;
@@ -709,11 +855,12 @@
                 const tableCount = (markdown.match(/\|[^|\n]+\|/g) || []).length;
                 const estimatedTables = Math.floor(tableCount / 3);
                 
-                showStatus(`✅ Success! Generated ${markdown.length} characters with ${estimatedTables} properly placed tables.`, 'success');
+                const successMessage = `✅ Successfully converted with contextual table placement! Generated ${markdown.length} characters with ${estimatedTables} tables positioned correctly.`;
+                showStatus(successMessage, 'success');
                 document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
                 
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(`❌ Error processing content: ${error.message}`, 'error');
                 console.error('Processing error:', error);
             }
         }
@@ -725,11 +872,24 @@
             return title ? title.textContent.trim() : 'Converted Document';
         }
 
+        function extractGoogleSitesContent(doc) {
+            // Try to find the main content area
+            const contentCandidates = [
+                doc.querySelector('main'),
+                doc.querySelector('[role="main"]'),
+                doc.querySelector('#content'),
+                doc.querySelector('.content'),
+                doc.body
+            ];
+            
+            const content = contentCandidates.find(el => el) || doc.body;
+            return content ? content.innerHTML : '';
+        }
+
         function cleanMarkdown(markdown) {
             return markdown
                 .replace(/\n{3,}/g, '\n\n')
                 .replace(/^\s+|\s+$/g, '')
-                .replace(/<!--TABLE_PLACEHOLDER_\d+-->/g, '')
                 .trim();
         }
 
@@ -739,12 +899,6 @@
             
             document.getElementById('wordCount').textContent = `${words} words`;
             document.getElementById('charCount').textContent = `${chars} characters`;
-        }
-
-        function showDebug(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.textContent = `🐛 DEBUG: ${message}`;
-            debugDiv.classList.remove('hidden');
         }
 
         // Initialize on page load
@@ -791,6 +945,52 @@
             document.getElementById('statusDisplay').classList.add('hidden');
         }
 
+        // Bookmarklet handling
+        async function pasteAndConvertBookmarklet() {
+            try {
+                const text = await navigator.clipboard.readText();
+                
+                if (!text) {
+                    showStatus('❌ Clipboard is empty. Please use the bookmarklet first.', 'error');
+                    return;
+                }
+                
+                showStatus('🔄 Processing bookmarklet content...', 'loading');
+                await processHTML(text, 'Bookmarklet Content', true);
+                
+            } catch (error) {
+                showStatus(`❌ Error processing bookmarklet data: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBookmarklet() {
+            try {
+                const text = await navigator.clipboard.readText();
+                
+                if (!text) {
+                    showStatus('❌ Clipboard is empty', 'error');
+                    return;
+                }
+                
+                try {
+                    const data = JSON.parse(text);
+                    const chars = data.textContent ? data.textContent.length : 0;
+                    const pageType = data.pageType || 'unknown';
+                    const hasTableData = data.content && data.content.includes('data-code');
+                    
+                    const tableInfo = hasTableData ? ' (contains table data)' : '';
+                    const siteInfo = pageType === 'google-sites' ? ' - Google Sites detected' : '';
+                    
+                    showStatus(`✅ Test successful! Found ${chars} characters${tableInfo}${siteInfo}`, 'success');
+                } catch (e) {
+                    showStatus(`❌ Invalid bookmarklet data format`, 'error');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ Error testing bookmarklet: ${error.message}`, 'error');
+            }
+        }
+
         // URL conversion
         async function convertFromURL() {
             const url = document.getElementById('urlInput').value.trim();
@@ -800,9 +1000,10 @@
                 return;
             }
             
-            showStatus('🔄 Fetching content...', 'loading');
-            
             try {
+                originalUrl = url;
+                showStatus('🌐 Fetching content...', 'loading');
+                
                 const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
                 
@@ -843,6 +1044,7 @@
                 return;
             }
             
+            showStatus('🔄 Processing HTML...', 'loading');
             await processHTML(html, 'Manual HTML Input');
         }
 
@@ -892,82 +1094,45 @@
             }
         }
 
-        // Bookmarklet handling
-        async function pasteAndConvertBookmarklet() {
-            try {
-                const text = await navigator.clipboard.readText();
-                let data;
-                
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    showStatus('❌ No bookmarklet data found in clipboard.', 'error');
-                    return;
-                }
-                
-                if (!data.content || !data.source || !data.source.includes('bookmarklet')) {
-                    showStatus('❌ Invalid bookmarklet data format', 'error');
-                    return;
-                }
-                
-                showStatus('🔄 Processing bookmarklet content...', 'loading');
-                await processHTML(data.content, data.url || 'Bookmarklet Content');
-                
-            } catch (error) {
-                showStatus(`❌ Error processing bookmarklet data: ${error.message}`, 'error');
-            }
-        }
-
-        async function testBookmarklet() {
-            try {
-                const text = await navigator.clipboard.readText();
-                let data;
-                
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    showStatus('❌ No bookmarklet data found in clipboard', 'error');
-                    return;
-                }
-                
-                const chars = data.content ? data.content.length : 0;
-                const hasTableData = data.content && data.content.includes('data-code');
-                
-                showStatus(`✅ Test successful! Found ${chars} characters${hasTableData ? ' with table data' : ''}`, 'success');
-                
-            } catch (error) {
-                showStatus(`❌ Error testing bookmarklet: ${error.message}`, 'error');
-            }
-        }
-
         // Output functions
-        async function copyToClipboard() {
-            try {
-                await navigator.clipboard.writeText(extractedContent);
-                showStatus('✅ Markdown copied to clipboard!', 'success');
-            } catch (err) {
-                showStatus('❌ Could not copy to clipboard', 'error');
-            }
-        }
-
         function downloadMarkdown() {
             if (!extractedContent) {
                 showStatus('❌ No content to download', 'error');
                 return;
             }
             
+            const title = originalUrl ? 
+                new URL(originalUrl).hostname.replace('www.', '') : 
+                'converted-content';
+            
+            const filename = `${title}-${new Date().toISOString().split('T')[0]}.md`;
+            
             const blob = new Blob([extractedContent], { type: 'text/markdown' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
             
+            const a = document.createElement('a');
             a.href = url;
-            a.download = `converted-${Date.now()}.md`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
             showStatus('✅ Markdown file downloaded!', 'success');
+        }
+
+        async function copyMarkdown() {
+            if (!extractedContent) {
+                showStatus('❌ No content to copy', 'error');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(extractedContent);
+                showStatus('✅ Markdown copied to clipboard!', 'success');
+            } catch (err) {
+                showStatus('❌ Could not copy to clipboard', 'error');
+            }
         }
 
         async function shareMarkdown() {
@@ -979,25 +1144,25 @@
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: 'Converted Markdown',
+                        title: 'Converted Markdown Content',
                         text: extractedContent
                     });
-                    showStatus('✅ Content shared successfully!', 'success');
+                    showStatus('✅ Content shared!', 'success');
                 } catch (err) {
                     if (err.name !== 'AbortError') {
-                        await copyToClipboard();
+                        await copyMarkdown();
                     }
                 }
             } else {
-                await copyToClipboard();
+                await copyMarkdown();
             }
         }
 
         function clearOutput() {
             document.getElementById('markdownOutput').value = '';
             document.getElementById('outputSection').classList.add('hidden');
-            document.getElementById('debugInfo').classList.add('hidden');
             extractedContent = '';
+            originalUrl = '';
             hideStatus();
         }
     </script>
