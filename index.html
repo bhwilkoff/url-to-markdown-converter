@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced URL to Markdown Converter</title>
+    <title>Fixed URL to Markdown Converter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.2/turndown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/readability/0.4.4/Readability.min.js"></script>
     <style>
@@ -312,7 +312,7 @@
             flex-wrap: wrap;
         }
 
-        .table-debug {
+        .debug-info {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
             border-radius: 8px;
@@ -350,12 +350,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📄 Enhanced URL to Markdown Converter</h1>
-            <p>Professional content extraction with improved table detection and contextual placement</p>
+            <h1>📄 Fixed URL to Markdown Converter</h1>
+            <p>Simple, working table extraction and contextual placement</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" data-tab="bookmarklet">📱 Bookmarklet (Best)</button>
+            <button class="tab active" data-tab="bookmarklet">📱 Bookmarklet</button>
             <button class="tab" data-tab="direct">🌐 Direct URL</button>
             <button class="tab" data-tab="manual">📄 Manual HTML</button>
             <button class="tab" data-tab="upload">📁 File Upload</button>
@@ -364,28 +364,27 @@
         <!-- Bookmarklet Tab -->
         <div class="tab-content active" id="bookmarklet-tab">
             <div class="input-section">
-                <h3>📱 Bookmarklet Method (Recommended)</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">This method can access authenticated content, handle JavaScript-heavy sites, and extract all table structures from Google Sites.</p>
+                <h3>📱 Bookmarklet Method</h3>
+                <p style="margin-bottom: 20px; color: #6c757d;">Extract content from any webpage including Google Sites with proper table placement.</p>
                 
                 <div class="bookmarklet-area">
                     <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📌 Drag this bookmark to your browser's bookmarks bar:</p>
-                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var iframes=document.querySelectorAll('iframe');var iframeContent='';iframes.forEach(function(iframe){try{if(iframe.contentDocument){iframeContent+=iframe.contentDocument.documentElement.outerHTML;}}catch(e){}});var scripts=document.querySelectorAll('script');var scriptContent='';scripts.forEach(function(script){if(script.textContent&&(script.textContent.includes('table')||script.textContent.includes('option')||script.textContent.includes('checkbox'))){scriptContent+=script.textContent;}});var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,iframeContent:iframeContent,scriptContent:scriptContent,textContent:document.body.textContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-enhanced',pageType:location.hostname.includes('sites.google.com')?'google-sites':'standard'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Enhanced content extracted ('+data.textContent.length+' chars) with full HTML captured! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Enhanced URL→Markdown</a>
+                    <a href="javascript:(function(){if(window.urlToMarkdownBookmarklet){alert('Already running!');return;}window.urlToMarkdownBookmarklet=true;try{var fullContent=document.documentElement.outerHTML;var data={title:document.title,content:document.body.innerHTML,fullHTML:fullContent,url:location.href,timestamp:Date.now(),source:'bookmarklet-fixed'};navigator.clipboard.writeText(JSON.stringify(data)).then(function(){if(confirm('Content extracted! Open converter?')){open('https://bhwilkoff.github.io/url-to-markdown-converter/?method=clipboard','_blank');}}).catch(function(){alert('Clipboard failed.');});delete window.urlToMarkdownBookmarklet;}catch(e){alert('Error: '+e.message);delete window.urlToMarkdownBookmarklet;}})()" class="bookmarklet-link">🚀 Fixed URL→Markdown</a>
                 </div>
 
                 <div class="instructions">
-                    <h4>📋 How to use the bookmarklet:</h4>
+                    <h4>📋 How to use:</h4>
                     <ol>
                         <li>Drag the bookmark above to your browser's bookmarks bar</li>
-                        <li>Navigate to any webpage (including Google Sites, authenticated pages)</li>
-                        <li>Click the bookmark to extract content with enhanced table detection</li>
-                        <li>Content is automatically copied and converter opens with all tables properly detected!</li>
+                        <li>Navigate to any webpage (including Google Sites)</li>
+                        <li>Click the bookmark to extract content</li>
+                        <li>Content is copied and converter opens with proper table handling!</li>
                     </ol>
-                    <p style="margin-top: 15px; opacity: 0.9;"><strong>🎯 Perfect for:</strong> Google Sites with complex table structures, authenticated pages, and professional documentation with comprehensive table extraction!</p>
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="pasteAndConvertBookmarklet()">📋 Paste Copied Content</button>
-                    <button class="btn btn-secondary" onclick="testBookmarklet()">🧪 Test Mode</button>
+                    <button class="btn btn-primary" onclick="pasteAndConvertBookmarklet()">📋 Paste & Convert</button>
+                    <button class="btn btn-secondary" onclick="testBookmarklet()">🧪 Test</button>
                 </div>
             </div>
         </div>
@@ -394,7 +393,7 @@
         <div class="tab-content" id="direct-tab">
             <div class="authentication-note">
                 <h4>⚠️ Authentication Limitations</h4>
-                <p>Direct URL fetching cannot access login-protected content due to browser security restrictions. For authenticated content, use the bookmarklet method above.</p>
+                <p>Direct URL fetching cannot access login-protected content. Use the bookmarklet method for authenticated pages.</p>
             </div>
 
             <div class="input-section">
@@ -415,7 +414,7 @@
         <div class="tab-content" id="manual-tab">
             <div class="input-section">
                 <h3>📄 Manual HTML Input</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Great for copy-pasted content from authenticated pages.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Paste HTML content directly.</p>
                 
                 <div class="input-group">
                     <label for="htmlInput">HTML Content:</label>
@@ -434,7 +433,7 @@
         <div class="tab-content" id="upload-tab">
             <div class="input-section">
                 <h3>📁 File Upload</h3>
-                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files, saved webpages, or other supported formats.</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Upload HTML files or saved webpages.</p>
                 
                 <div class="input-group">
                     <label for="fileInput">Select File:</label>
@@ -449,6 +448,9 @@
 
         <!-- Status Display -->
         <div id="statusDisplay" class="hidden"></div>
+
+        <!-- Debug Info -->
+        <div id="debugInfo" class="debug-info hidden"></div>
 
         <!-- Output Section -->
         <div id="outputSection" class="output-section hidden">
@@ -489,192 +491,41 @@
                 linkReferenceStyle: 'full'
             });
 
-            // Remove table handling from turndown since we handle it ourselves
-            turndownService.remove(['table']);
+            // Simple table rule
+            turndownService.addRule('table', {
+                filter: 'table',
+                replacement: function (content, node) {
+                    return convertTableToMarkdown(node);
+                }
+            });
 
-            // Remove certain elements
             turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object']);
         }
 
-        // Enhanced table extraction with immediate markdown conversion
-        function extractAllTables(tempDiv, debugData = {}) {
-            console.log('🔍 Starting comprehensive table extraction...');
-            let allExtractedTables = [];
-            
-            // Method 1: Find existing DOM tables
-            const existingTables = tempDiv.querySelectorAll('table');
-            console.log(`📊 Found ${existingTables.length} existing DOM tables`);
-            existingTables.forEach((table, index) => {
-                const content = table.textContent?.trim() || '';
-                if (content.length > 50) {
-                    const markdownTable = convertTableToMarkdown(table);
-                    allExtractedTables.push({
-                        markdown: markdownTable,
-                        source: `existing-dom-${index}`,
-                        content: content,
-                        location: findTableLocation(table, tempDiv),
-                        priority: 1
-                    });
-                }
-            });
-            
-            // Method 2: Extract from data-code attributes
-            const dataCodeElements = tempDiv.querySelectorAll('[data-code]');
-            console.log(`🎯 Found ${dataCodeElements.length} elements with data-code attributes`);
-            
-            dataCodeElements.forEach((element, elementIndex) => {
-                const dataCode = element.getAttribute('data-code');
-                if (dataCode && (dataCode.includes('&lt;table') || dataCode.includes('<table'))) {
-                    console.log(`✅ Processing data-code ${elementIndex + 1} with table content`);
-                    
-                    try {
-                        let decodedHTML = dataCode;
-                        
-                        // Multiple passes of HTML entity decoding
-                        for (let pass = 0; pass < 5; pass++) {
-                            decodedHTML = decodedHTML
-                                .replace(/&lt;/g, '<')
-                                .replace(/&gt;/g, '>')
-                                .replace(/&quot;/g, '"')
-                                .replace(/&#39;/g, "'")
-                                .replace(/&amp;#x2751;/g, '❋')
-                                .replace(/&#x2751;/g, '❋')
-                                .replace(/&amp;/g, '&');
-                        }
-                        
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(decodedHTML, 'text/html');
-                        const tables = doc.querySelectorAll('table');
-                        
-                        tables.forEach((table, tableIndex) => {
-                            const content = table.textContent?.trim() || '';
-                            if (content.length > 30) {
-                                const markdownTable = convertTableToMarkdown(table);
-                                allExtractedTables.push({
-                                    markdown: markdownTable,
-                                    source: `data-code-${elementIndex}-${tableIndex}`,
-                                    content: content,
-                                    location: findTableLocation(element, tempDiv),
-                                    priority: 2
-                                });
-                            }
-                        });
-                        
-                    } catch (error) {
-                        console.log(`❌ Error processing data-code ${elementIndex + 1}:`, error);
-                    }
-                }
-            });
-            
-            // Method 3: Search in script tags for table data
-            if (debugData.scriptContent) {
-                const scriptMatches = debugData.scriptContent.match(/<table[\s\S]*?<\/table>/gi);
-                if (scriptMatches) {
-                    scriptMatches.forEach((tableHTML, index) => {
-                        try {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(tableHTML, 'text/html');
-                            const table = doc.querySelector('table');
-                            if (table) {
-                                const content = table.textContent?.trim() || '';
-                                if (content.length > 30) {
-                                    const markdownTable = convertTableToMarkdown(table);
-                                    allExtractedTables.push({
-                                        markdown: markdownTable,
-                                        source: `script-${index}`,
-                                        content: content,
-                                        location: -1,
-                                        priority: 3
-                                    });
-                                }
-                            }
-                        } catch (e) {
-                            console.log(`Error parsing script table ${index}:`, e);
-                        }
-                    });
-                }
-            }
-            
-            // Enhanced duplicate removal
-            const uniqueTables = [];
-            const seenSignatures = new Set();
-            
-            // Sort by priority and location
-            allExtractedTables.sort((a, b) => {
-                if (a.priority !== b.priority) return a.priority - b.priority;
-                return a.location - b.location;
-            });
-            
-            allExtractedTables.forEach((tableObj, index) => {
-                const tableText = tableObj.content.replace(/\s+/g, ' ').trim();
-                const firstCellText = tableText.substring(0, 50);
-                const signature = `${tableText.length}-${firstCellText}`;
-                
-                if (tableText.length > 30 && !seenSignatures.has(signature)) {
-                    seenSignatures.add(signature);
-                    uniqueTables.push(tableObj);
-                    console.log(`✅ Keeping unique table ${uniqueTables.length}: "${tableObj.source}" - "${firstCellText}..."`);
-                } else {
-                    console.log(`🔄 Skipping duplicate table: "${tableObj.source}" - "${firstCellText}..."`);
-                }
-            });
-            
-            console.log(`📊 Final result: ${uniqueTables.length} unique tables from ${allExtractedTables.length} total extracted`);
-            return uniqueTables;
-        }
-        
-        // Convert HTML table directly to markdown
+        // Simple table conversion
         function convertTableToMarkdown(table) {
             const rows = Array.from(table.querySelectorAll('tr'));
             if (rows.length === 0) return '';
             
             let markdown = '\n\n';
-            let maxColumns = 0;
-            
-            // Determine max columns and collect all row data
-            const tableData = [];
             
             rows.forEach((row, rowIndex) => {
                 const cells = Array.from(row.querySelectorAll('td, th'));
-                maxColumns = Math.max(maxColumns, cells.length);
+                if (cells.length === 0) return;
                 
-                const rowData = cells.map(cell => {
-                    let cellText = cell.textContent || cell.innerText || '';
-                    
-                    // Clean and format cell text
-                    cellText = cellText
-                        .trim()
-                        .replace(/\s{2,}/g, ' ')  // Replace multiple spaces with single space
-                        .replace(/\n/g, ' ')      // Replace newlines with spaces
-                        .replace(/\r/g, '')       // Remove carriage returns
-                        .replace(/\|/g, '\\|')    // Escape pipes
-                        .replace(/^\s+|\s+$/g, ''); // Trim again
-                    
-                    return cellText || ' ';
+                const cellTexts = cells.map(cell => {
+                    let text = (cell.textContent || '').trim()
+                        .replace(/\|/g, '\\|')
+                        .replace(/\n/g, ' ')
+                        .replace(/\s+/g, ' ');
+                    return text || ' ';
                 });
                 
-                // Pad row to max columns
-                while (rowData.length < maxColumns) {
-                    rowData.push(' ');
-                }
+                markdown += `| ${cellTexts.join(' | ')} |\n`;
                 
-                tableData.push({
-                    cells: rowData,
-                    isHeader: cells.some(cell => cell.tagName.toLowerCase() === 'th') || rowIndex === 0
-                });
-            });
-            
-            if (maxColumns === 0) return '';
-            
-            // Generate markdown table
-            tableData.forEach((rowData, rowIndex) => {
-                // Create the row
-                const rowText = rowData.cells.join(' | ');
-                markdown += `| ${rowText} |\n`;
-                
-                // Add separator after header row
-                if (rowData.isHeader) {
-                    const separator = Array(maxColumns).fill('---').join(' | ');
+                // Add separator after first row (header)
+                if (rowIndex === 0) {
+                    const separator = cellTexts.map(() => '---').join(' | ');
                     markdown += `| ${separator} |\n`;
                 }
             });
@@ -682,258 +533,218 @@
             markdown += '\n';
             return markdown;
         }
-        
-        // Helper function to find table location in document
-        function findTableLocation(element, container) {
-            const allElements = Array.from(container.querySelectorAll('*'));
-            return allElements.indexOf(element);
-        }
-        
-        // Enhanced contextual table placement with markdown text insertion
-        function insertTablesContextually(tempDiv, extractedTables) {
-            console.log('📍 Starting enhanced contextual table placement with markdown text...');
+
+        // Extract tables from data-code attributes and replace with placeholders
+        function processDataCodeTables(html) {
+            console.log('🔍 Processing data-code tables...');
+            let processedHtml = html;
+            const tables = [];
             
-            if (extractedTables.length === 0) {
-                console.log('⚠️ No tables to insert');
-                return;
-            }
+            // Find all data-code attributes with table content
+            const dataCodeRegex = /data-code="([^"]*(?:&lt;table|<table)[^"]*)"/gi;
+            let match;
+            let tableIndex = 0;
             
-            // More specific section patterns that match the exact content structure
-            const sectionPatterns = [
-                { 
-                    pattern: /3\.\s*CATEGORIZE THE RESPONSE:/i, 
-                    inserted: false,
-                    name: "Concept Categorize Response"
-                },
-                { 
-                    pattern: /1\.\s*CATEGORIZE THE RESPONSE:/i, 
-                    inserted: false,
-                    name: "Negative Experience Categorize Response"
-                },
-                { 
-                    pattern: /3\.\s*DESCRIBE THE VOCABULARY USED:/i, 
-                    inserted: false,
-                    name: "Vocabulary Description"
-                },
-                { 
-                    pattern: /4\.\s*WHICH OF THE FOLLOWING ORGANIZATIONAL CHARACTERISTICS/i, 
-                    inserted: false,
-                    name: "Organizational Characteristics"
-                },
-                { 
-                    pattern: /5\.\s*DOES THE APPLICANT TAKE RESPONSIBILITY/i, 
-                    inserted: false,
-                    name: "Take Responsibility"
-                },
-                { 
-                    pattern: /1\.\s*CHECK ALL THAT APPLY:/i, 
-                    inserted: false,
-                    name: "First Check All That Apply"
-                },
-                { 
-                    pattern: /2\.\s*CHECK ALL THAT APPLY:/i, 
-                    inserted: false,
-                    name: "Second Check All That Apply"
-                }
-            ];
-            
-            // Get all text content as a single string to work with
-            let textContent = tempDiv.textContent;
-            
-            console.log(`🔍 Searching for section patterns in text content`);
-            
-            // Find section headers with their positions in the text
-            const sectionsFound = [];
-            
-            sectionPatterns.forEach((pattern, patternIndex) => {
-                const match = textContent.match(pattern.pattern);
-                if (match) {
-                    const position = textContent.indexOf(match[0]);
-                    console.log(`📍 Found section "${pattern.name}" at position ${position}`);
+            while ((match = dataCodeRegex.exec(html)) !== null) {
+                console.log(`📊 Found data-code table ${tableIndex + 1}`);
+                
+                try {
+                    let tableHtml = match[1];
                     
-                    sectionsFound.push({
-                        pattern: pattern,
-                        position: position,
-                        text: match[0],
-                        patternIndex: patternIndex
-                    });
-                }
-            });
-            
-            // Sort sections by their text position
-            sectionsFound.sort((a, b) => a.position - b.position);
-            
-            console.log(`📋 Found ${sectionsFound.length} section headers in text order`);
-            
-            // Create a mapping of where to insert tables
-            const insertionMap = new Map();
-            sectionsFound.forEach((section, index) => {
-                if (index < extractedTables.length) {
-                    insertionMap.set(section.text, extractedTables[index].markdown);
-                    console.log(`📌 Mapped table ${index + 1} to section "${section.text}"`);
-                }
-            });
-            
-            // Now traverse the DOM and insert markdown text where needed
-            const walker = document.createTreeWalker(
-                tempDiv,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            const textNodes = [];
-            let node;
-            while (node = walker.nextNode()) {
-                textNodes.push(node);
-            }
-            
-            textNodes.forEach(textNode => {
-                const nodeText = textNode.textContent.trim();
-                
-                // Check if this text node contains any of our section headers
-                for (const [sectionText, markdownTable] of insertionMap) {
-                    if (nodeText.includes(sectionText)) {
-                        console.log(`✅ Found section header in DOM: "${sectionText.substring(0, 30)}..."`);
-                        
-                        // Create a new text node with the table after it
-                        const tableTextNode = document.createTextNode(`\n\n${markdownTable}\n\n`);
-                        
-                        // Find the parent element to insert after
-                        let parentElement = textNode.parentElement;
-                        
-                        // Look for a good parent container
-                        while (parentElement && ['SPAN', 'STRONG', 'B', 'EM', 'I'].includes(parentElement.tagName)) {
-                            parentElement = parentElement.parentElement;
-                        }
-                        
-                        if (parentElement && parentElement.parentNode) {
-                            // Insert the table after the parent element
-                            if (parentElement.nextSibling) {
-                                parentElement.parentNode.insertBefore(tableTextNode, parentElement.nextSibling);
-                            } else {
-                                parentElement.parentNode.appendChild(tableTextNode);
-                            }
-                            
-                            console.log(`✅ Inserted table after section "${sectionText.substring(0, 30)}..."`);
-                            insertionMap.delete(sectionText); // Mark as inserted
-                        }
-                        break;
+                    // Decode HTML entities
+                    for (let i = 0; i < 3; i++) {
+                        tableHtml = tableHtml
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .replace(/&amp;#x2751;/g, '❋')
+                            .replace(/&#x2751;/g, '❋')
+                            .replace(/&amp;/g, '&');
                     }
+                    
+                    // Parse the table HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(tableHtml, 'text/html');
+                    const tableElement = doc.querySelector('table');
+                    
+                    if (tableElement) {
+                        const markdownTable = convertTableToMarkdown(tableElement);
+                        tables.push(markdownTable);
+                        
+                        // Replace the entire data-code element with a placeholder
+                        const placeholder = `<!--TABLE_PLACEHOLDER_${tableIndex}-->`;
+                        processedHtml = processedHtml.replace(match[0], placeholder);
+                        
+                        console.log(`✅ Converted table ${tableIndex + 1} to markdown`);
+                        tableIndex++;
+                    }
+                } catch (error) {
+                    console.log(`❌ Error processing table ${tableIndex + 1}:`, error);
                 }
-            });
-            
-            // Insert any remaining tables at the end
-            const remainingTables = Array.from(insertionMap.values());
-            if (remainingTables.length > 0) {
-                console.log(`📎 Inserting remaining ${remainingTables.length} tables at document end`);
-                
-                remainingTables.forEach((markdownTable, index) => {
-                    const tableTextNode = document.createTextNode(`\n\n${markdownTable}\n\n`);
-                    tempDiv.appendChild(tableTextNode);
-                });
             }
             
-            console.log(`📊 Contextual table placement complete`);
+            console.log(`📋 Extracted ${tables.length} tables from data-code attributes`);
+            return { html: processedHtml, tables: tables };
         }
 
-        // Enhanced content cleaning and processing with markdown table insertion
-        function cleanAndExtractContent(html, title, isGoogleSite = false, debugData = {}) {
-            console.log('🧹 Enhanced content cleaning with markdown table insertion starting...');
+        // Insert tables after section headers
+        function insertTablesContextually(markdown, tables) {
+            if (tables.length === 0) return markdown;
             
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
+            console.log('📍 Inserting tables contextually...');
             
-            // FIRST: Extract all tables and convert to markdown before any cleaning
-            const extractedTables = extractAllTables(tempDiv, debugData);
-            console.log(`📊 Extracted ${extractedTables.length} tables and converted to markdown`);
-            
-            // Remove unwanted elements (but preserve structure for table placement)
-            const removeSelectors = [
-                'script', 'style', 'noscript', 'meta', 'link',
-                '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
-                '.navigation', '.nav', '.menu', '.sidebar', '.footer', '.header',
-                '.breadcrumb', '.pagination', '.social-share', '.advertisement',
-                '[aria-label*="navigation"]', '[aria-label*="menu"]'
+            const sectionPatterns = [
+                '3. CATEGORIZE THE RESPONSE:',
+                '1. CATEGORIZE THE RESPONSE:',
+                '3. DESCRIBE THE VOCABULARY USED:',
+                '4. WHICH OF THE FOLLOWING ORGANIZATIONAL CHARACTERISTICS',
+                '5. DOES THE APPLICANT TAKE RESPONSIBILITY',
+                '1. CHECK ALL THAT APPLY:',
+                '2. CHECK ALL THAT APPLY:'
             ];
             
-            removeSelectors.forEach(selector => {
-                const elements = tempDiv.querySelectorAll(selector);
-                elements.forEach(el => {
-                    // Preserve elements that contain important content like tables or key text
-                    const hasImportantContent = el.querySelectorAll('table, h1, h2, h3, h4, h5, h6').length > 0;
-                    const hasKeywords = el.textContent?.includes('DECISION TREE') || 
-                                       el.textContent?.includes('CATEGORIZE') ||
-                                       el.textContent?.includes('CHECK ALL THAT APPLY') ||
-                                       el.textContent?.includes('VOCABULARY USED') ||
-                                       el.textContent?.includes('ORGANIZATIONAL CHARACTERISTICS') ||
-                                       el.textContent?.includes('TAKE RESPONSIBILITY');
+            let tableIndex = 0;
+            let processedMarkdown = markdown;
+            
+            // Insert tables after each section header
+            for (const pattern of sectionPatterns) {
+                if (tableIndex >= tables.length) break;
+                
+                const index = processedMarkdown.indexOf(pattern);
+                if (index !== -1) {
+                    // Find the end of the line
+                    const lineEnd = processedMarkdown.indexOf('\n', index);
+                    if (lineEnd !== -1) {
+                        const insertPoint = lineEnd + 1;
+                        const table = tables[tableIndex];
+                        
+                        processedMarkdown = 
+                            processedMarkdown.slice(0, insertPoint) + 
+                            '\n' + table + 
+                            processedMarkdown.slice(insertPoint);
+                        
+                        console.log(`✅ Inserted table ${tableIndex + 1} after "${pattern.substring(0, 30)}..."`);
+                        tableIndex++;
+                    }
+                }
+            }
+            
+            // Add any remaining tables at the end
+            while (tableIndex < tables.length) {
+                processedMarkdown += '\n' + tables[tableIndex];
+                console.log(`📎 Appended remaining table ${tableIndex + 1}`);
+                tableIndex++;
+            }
+            
+            console.log(`🎯 Contextual insertion complete: ${tableIndex} tables placed`);
+            return processedMarkdown;
+        }
+
+        // Main processing function
+        async function processHTML(html, source) {
+            try {
+                showStatus('🔄 Processing content...', 'loading');
+                
+                // Step 1: Extract tables from data-code attributes
+                const { html: cleanedHtml, tables } = processDataCodeTables(html);
+                
+                showDebug(`Found ${tables.length} tables in data-code attributes`);
+                
+                // Step 2: Clean HTML and convert to markdown
+                let article;
+                try {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(cleanedHtml, 'text/html');
+                    const reader = new Readability(doc);
+                    article = reader.parse();
                     
-                    if (!hasImportantContent && !hasKeywords) {
-                        el.remove();
+                    if (!article || !article.content) {
+                        throw new Error('Readability parsing failed');
                     }
-                });
-            });
-            
-            // Remove ALL existing table elements from DOM (we'll insert markdown versions)
-            const existingTables = tempDiv.querySelectorAll('table');
-            console.log(`🗑️ Removing ${existingTables.length} existing DOM tables for markdown replacement`);
-            existingTables.forEach(table => table.remove());
-            
-            // Remove any data-code elements that contain tables (since we extracted them already)
-            const dataCodeElements = tempDiv.querySelectorAll('[data-code*="table"], [data-code*="&lt;table"]');
-            console.log(`🗑️ Removing ${dataCodeElements.length} data-code table containers`);
-            dataCodeElements.forEach(element => element.remove());
-            
-            // SECOND: Insert markdown tables contextually in the cleaned content
-            if (extractedTables.length > 0) {
-                insertTablesContextually(tempDiv, extractedTables);
-            }
-            
-            // Clean up navigation text nodes
-            const navigationTexts = [
-                'BACK', 'NEXT', 'Skip to main content', 'Skip to navigation',
-                'Page updated', 'Contact', 'Search this site', 'Embedded Files',
-                'Sign in', 'Menu', 'Home', 'About', 'Services'
-            ];
-            
-            const walker = document.createTreeWalker(
-                tempDiv,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            const textNodes = [];
-            let node;
-            while (node = walker.nextNode()) {
-                textNodes.push(node);
-            }
-            
-            textNodes.forEach(textNode => {
-                const text = textNode.textContent.trim();
-                if (navigationTexts.some(navText => text.includes(navText)) && text.length < 100) {
-                    // Only remove if it's not part of important content and not a table
-                    const textContent = textNode.textContent;
-                    if (!textContent.includes('|') && !textContent.includes('DECISION TREE')) {
-                        textNode.remove();
+                } catch (readabilityError) {
+                    console.log('Readability failed, using full content');
+                    article = {
+                        title: extractTitleFromHTML(cleanedHtml),
+                        content: cleanedHtml
+                    };
+                }
+                
+                // Step 3: Convert to markdown
+                showStatus('🔄 Converting to markdown...', 'loading');
+                
+                let markdown = '';
+                
+                if (article.title && article.title.trim()) {
+                    markdown += `# ${article.title.trim()}\n\n`;
+                }
+                
+                if (source !== 'Manual HTML Input') {
+                    markdown += `> **Source:** ${source}\n`;
+                    markdown += `> **Processed:** ${new Date().toLocaleString()}`;
+                    if (source.includes('sites.google.com')) {
+                        markdown += ` (Google Sites - Fixed Tables)`;
                     }
+                    markdown += `\n\n`;
                 }
-            });
-            
-            // Clean up empty elements but preserve text nodes with table content
-            tempDiv.querySelectorAll('*').forEach(el => {
-                const hasTableContent = el.textContent && el.textContent.includes('|');
-                if (!el.textContent.trim() && 
-                    !el.querySelector('img, hr') && 
-                    !['br', 'hr'].includes(el.tagName.toLowerCase()) &&
-                    !hasTableContent) {
-                    el.remove();
+                
+                const contentMarkdown = turndownService.turndown(article.content);
+                markdown += contentMarkdown;
+                
+                // Step 4: Insert tables contextually
+                if (tables.length > 0) {
+                    showStatus('📍 Placing tables contextually...', 'loading');
+                    markdown = insertTablesContextually(markdown, tables);
                 }
-            });
+                
+                // Step 5: Clean up markdown
+                markdown = cleanMarkdown(markdown);
+                
+                extractedContent = markdown;
+                
+                document.getElementById('markdownOutput').value = markdown;
+                document.getElementById('outputSection').classList.remove('hidden');
+                updateStats(markdown);
+                
+                const tableCount = (markdown.match(/\|[^|\n]+\|/g) || []).length;
+                const estimatedTables = Math.floor(tableCount / 3);
+                
+                showStatus(`✅ Success! Generated ${markdown.length} characters with ${estimatedTables} properly placed tables.`, 'success');
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                console.error('Processing error:', error);
+            }
+        }
+
+        function extractTitleFromHTML(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const title = doc.querySelector('title');
+            return title ? title.textContent.trim() : 'Converted Document';
+        }
+
+        function cleanMarkdown(markdown) {
+            return markdown
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/^\s+|\s+$/g, '')
+                .replace(/<!--TABLE_PLACEHOLDER_\d+-->/g, '')
+                .trim();
+        }
+
+        function updateStats(markdown) {
+            const words = markdown.trim().split(/\s+/).length;
+            const chars = markdown.length;
             
-            console.log(`✅ Content cleaning complete. Processed ${extractedTables.length} tables as markdown.`);
-            return tempDiv.innerHTML;
+            document.getElementById('wordCount').textContent = `${words} words`;
+            document.getElementById('charCount').textContent = `${chars} characters`;
+        }
+
+        function showDebug(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.textContent = `🐛 DEBUG: ${message}`;
+            debugDiv.classList.remove('hidden');
         }
 
         // Initialize on page load
@@ -945,7 +756,6 @@
                 tab.addEventListener('click', () => {
                     const tabName = tab.getAttribute('data-tab');
                     
-                    // Update active tab
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                     
@@ -954,7 +764,6 @@
                 });
             });
             
-            // Auto-detect clipboard content on load
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('method') === 'clipboard') {
                 setTimeout(pasteAndConvertBookmarklet, 1000);
@@ -991,11 +800,6 @@
                 return;
             }
             
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                showStatus('❌ Please enter a valid URL starting with http:// or https://', 'error');
-                return;
-            }
-            
             showStatus('🔄 Fetching content...', 'loading');
             
             try {
@@ -1009,7 +813,7 @@
                 await processHTML(data.contents, url);
                 
             } catch (error) {
-                showStatus(`❌ Error fetching URL: ${error.message}. Try using the bookmarklet method for better results.`, 'error');
+                showStatus(`❌ Error fetching URL: ${error.message}`, 'error');
             }
         }
 
@@ -1026,7 +830,7 @@
                     showStatus('❌ No valid URL found in clipboard.', 'error');
                 }
             } catch (err) {
-                showStatus('❌ Could not access clipboard. Please paste the URL manually.', 'error');
+                showStatus('❌ Could not access clipboard.', 'error');
             }
         }
 
@@ -1039,7 +843,6 @@
                 return;
             }
             
-            showStatus('🔄 Processing HTML...', 'loading');
             await processHTML(html, 'Manual HTML Input');
         }
 
@@ -1049,7 +852,7 @@
                 document.getElementById('htmlInput').value = text;
                 showStatus('✅ Content pasted from clipboard!', 'success');
             } catch (err) {
-                showStatus('❌ Could not access clipboard. Please paste manually.', 'error');
+                showStatus('❌ Could not access clipboard.', 'error');
             }
         }
 
@@ -1098,7 +901,7 @@
                 try {
                     data = JSON.parse(text);
                 } catch (e) {
-                    showStatus('❌ No bookmarklet data found in clipboard. Please use the bookmarklet first.', 'error');
+                    showStatus('❌ No bookmarklet data found in clipboard.', 'error');
                     return;
                 }
                 
@@ -1107,15 +910,8 @@
                     return;
                 }
                 
-                showStatus('🔄 Processing enhanced bookmarklet content...', 'loading');
-                
-                const debugData = {
-                    fullHTML: data.fullHTML || data.content,
-                    iframeContent: data.iframeContent || '',
-                    scriptContent: data.scriptContent || ''
-                };
-                
-                await processHTML(data.content, data.url || 'Bookmarklet Content', true, debugData);
+                showStatus('🔄 Processing bookmarklet content...', 'loading');
+                await processHTML(data.content, data.url || 'Bookmarklet Content');
                 
             } catch (error) {
                 showStatus(`❌ Error processing bookmarklet data: ${error.message}`, 'error');
@@ -1134,131 +930,14 @@
                     return;
                 }
                 
-                if (!data.textContent || !data.source || !data.source.includes('bookmarklet')) {
-                    showStatus('❌ Invalid bookmarklet data format', 'error');
-                    return;
-                }
+                const chars = data.content ? data.content.length : 0;
+                const hasTableData = data.content && data.content.includes('data-code');
                 
-                const chars = data.textContent ? data.textContent.length : 0;
-                const pageType = data.pageType || 'unknown';
-                const hasTableData = data.content && (
-                    data.content.includes('<table') || 
-                    data.content.includes('&lt;table') ||
-                    data.content.includes('data-code')
-                );
-                
-                const tableInfo = hasTableData ? ' (contains table data)' : '';
-                const siteInfo = pageType === 'google-sites' ? ' - Google Sites detected' : '';
-                
-                showStatus(`✅ Test successful! Found ${chars} characters${tableInfo}${siteInfo}`, 'success');
+                showStatus(`✅ Test successful! Found ${chars} characters${hasTableData ? ' with table data' : ''}`, 'success');
                 
             } catch (error) {
                 showStatus(`❌ Error testing bookmarklet: ${error.message}`, 'error');
             }
-        }
-
-        // Main processing function
-        async function processHTML(html, source, isBookmarklet = false, debugData = {}) {
-            try {
-                let article;
-                
-                if (isBookmarklet) {
-                    // For bookmarklet content, use enhanced processing
-                    article = {
-                        title: debugData.title || extractTitleFromHTML(html),
-                        content: html
-                    };
-                } else {
-                    // For other sources, try Readability first
-                    try {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const reader = new Readability(doc);
-                        article = reader.parse();
-                        
-                        if (!article || !article.content) {
-                            throw new Error('Readability parsing failed');
-                        }
-                    } catch (readabilityError) {
-                        console.log('Readability failed, using manual extraction');
-                        article = {
-                            title: extractTitleFromHTML(html),
-                            content: html
-                        };
-                    }
-                }
-                
-                if (!article || !article.content) {
-                    throw new Error('Could not extract content from the page');
-                }
-                
-                showStatus('🔄 Converting to Markdown with enhanced table processing...', 'loading');
-                
-                const isGoogleSite = source.includes('sites.google.com') || 
-                                    html.includes('sites.google.com') ||
-                                    debugData.pageType === 'google-sites';
-                
-                const cleanContent = cleanAndExtractContent(article.content, article.title, isGoogleSite, debugData);
-                
-                let markdown = '';
-                
-                if (article.title && article.title.trim()) {
-                    markdown += `# ${article.title.trim()}\n\n`;
-                }
-                
-                if (source !== 'Manual HTML Input') {
-                    markdown += `> **Source:** ${source}\n`;
-                    markdown += `> **Processed:** ${new Date().toLocaleString()}`;
-                    if (isGoogleSite) {
-                        markdown += ` (Google Sites - Enhanced Tables)`;
-                    }
-                    markdown += `\n\n`;
-                }
-                
-                const contentMarkdown = turndownService.turndown(cleanContent);
-                markdown += contentMarkdown;
-                
-                markdown = cleanMarkdown(markdown);
-                extractedContent = markdown;
-                
-                document.getElementById('markdownOutput').value = markdown;
-                document.getElementById('outputSection').classList.remove('hidden');
-                updateStats(markdown);
-                
-                // Count actual tables by looking for markdown table patterns
-                const tableMatches = markdown.match(/\|[^|\n]+\|[^|\n]+\|/g) || [];
-                const estimatedTables = Math.floor(tableMatches.length / 2); // Estimate based on table rows
-                
-                const successMessage = `✅ Successfully converted with enhanced contextual table placement! Generated ${markdown.length} characters with ${estimatedTables} tables properly positioned in context.`;
-                showStatus(successMessage, 'success');
-                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
-                
-            } catch (error) {
-                showStatus(`❌ Error processing content: ${error.message}`, 'error');
-            }
-        }
-
-        function extractTitleFromHTML(html) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const title = doc.querySelector('title');
-            return title ? title.textContent.trim() : 'Converted Document';
-        }
-
-        function cleanMarkdown(markdown) {
-            return markdown
-                .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
-                .replace(/^\s+|\s+$/g, '') // Trim whitespace
-                .replace(/(\|[^\n]*\|)\n{3,}/g, '$1\n\n') // Clean spacing after tables
-                .replace(/\n\s*\n\s*\n/g, '\n\n'); // Normalize spacing
-        }
-
-        function updateStats(markdown) {
-            const words = markdown.trim().split(/\s+/).length;
-            const chars = markdown.length;
-            
-            document.getElementById('wordCount').textContent = `${words} words`;
-            document.getElementById('charCount').textContent = `${chars} characters`;
         }
 
         // Output functions
@@ -1317,6 +996,7 @@
         function clearOutput() {
             document.getElementById('markdownOutput').value = '';
             document.getElementById('outputSection').classList.add('hidden');
+            document.getElementById('debugInfo').classList.add('hidden');
             extractedContent = '';
             hideStatus();
         }
