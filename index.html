@@ -511,7 +511,7 @@
         let uploadedFile = null;
         let turndownService;
 
-        // Initialize Turndown service
+        // Initialize Turndown service with improved heading handling
         function initializeTurndown() {
             turndownService = new TurndownService({
                 headingStyle: 'atx',
@@ -524,7 +524,63 @@
                 linkReferenceStyle: 'full'
             });
 
-            // Enhanced table rule
+            // IMPROVED: Better heading conversion for Google Sites
+            turndownService.addRule('improvedHeadings', {
+                filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+                replacement: function (content, node) {
+                    const level = parseInt(node.nodeName.charAt(1));
+                    const prefix = '#'.repeat(level);
+                    return '\n\n' + prefix + ' ' + content.trim() + '\n\n';
+                }
+            });
+
+            // IMPROVED: Handle styled headings that might not be proper h1-h6 tags
+            turndownService.addRule('styledHeadings', {
+                filter: function (node, options) {
+                    // Check for elements that look like headings based on styling or classes
+                    if (node.nodeName === 'DIV' || node.nodeName === 'SPAN' || node.nodeName === 'P') {
+                        const text = node.textContent || '';
+                        const style = node.getAttribute('style') || '';
+                        const className = node.getAttribute('class') || '';
+                        
+                        // Look for heading-like characteristics
+                        const isLargeText = style.includes('font-size') && (
+                            style.includes('1.5') || style.includes('2.') || style.includes('3.')
+                        );
+                        const isBold = style.includes('font-weight: bold') || style.includes('font-weight:bold');
+                        const hasHeadingClass = className.includes('heading') || className.includes('title');
+                        const isShortText = text.trim().length < 100 && text.trim().length > 0;
+                        const isAllCaps = text.trim() === text.trim().toUpperCase() && text.trim().length > 2;
+                        
+                        return (isLargeText || isBold || hasHeadingClass || isAllCaps) && isShortText;
+                    }
+                    return false;
+                },
+                replacement: function (content, node) {
+                    const text = content.trim();
+                    if (text.length === 0) return '';
+                    
+                    // Determine heading level based on styling
+                    const style = node.getAttribute('style') || '';
+                    let level = 3; // Default to h3
+                    
+                    if (style.includes('font-size')) {
+                        if (style.includes('3.') || style.includes('2.5')) level = 1;
+                        else if (style.includes('2.') || style.includes('1.8')) level = 2;
+                        else if (style.includes('1.5') || style.includes('1.6')) level = 3;
+                    }
+                    
+                    // Check if it's all caps (often indicates important headings)
+                    if (text === text.toUpperCase() && text.length > 10) {
+                        level = Math.min(level, 2); // Make all-caps at least h2
+                    }
+                    
+                    const prefix = '#'.repeat(level);
+                    return '\n\n' + prefix + ' ' + text + '\n\n';
+                }
+            });
+
+            // Enhanced table rule (keep existing)
             turndownService.addRule('enhancedTable', {
                 filter: 'table',
                 replacement: function (content, node) {
@@ -581,10 +637,10 @@
             });
 
             // Remove certain elements
-            turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object']);
+            turndownService.remove(['script', 'style', 'noscript', 'iframe', 'embed', 'object', 'svg']);
         }
 
-        // SIMPLE SOLUTION: Decode data-code tables in place within the HTML structure
+        // IMPROVED: Decode data-code tables in place and clean JavaScript artifacts
         function decodeTablesInPlace(html) {
             console.log('🏗️ Decoding tables in place within HTML structure...');
             
@@ -631,20 +687,67 @@
             return decodedHtml;
         }
 
-        // Enhanced content cleaning (minimal - preserve structure)
+        // NEW: Clean JavaScript artifacts and improve heading structure
+        function cleanJavaScriptArtifacts(html) {
+            console.log('🧹 Cleaning JavaScript artifacts...');
+            
+            let cleanedHtml = html;
+            
+            // Remove jsaction attributes and related JavaScript artifacts
+            cleanedHtml = cleanedHtml
+                .replace(/jsaction="[^"]*"/gi, '')
+                .replace(/jscontroller="[^"]*"/gi, '')
+                .replace(/jsname="[^"]*"/gi, '')
+                .replace(/jsshadow/gi, '')
+                .replace(/aria-describedby="[^"]*"/gi, '')
+                .replace(/data-tooltip[^=]*="[^"]*"/gi, '')
+                .replace(/role="button"/gi, '')
+                .replace(/tabindex="-?\d+"/gi, '');
+            
+            // Remove standalone jsaction text that appears in content
+            cleanedHtml = cleanedHtml.replace(/jsaction="[^"]*">/gi, '');
+            cleanedHtml = cleanedHtml.replace(/>\s*jsaction="[^"]*"/gi, '');
+            
+            // Clean up common Google Sites artifacts
+            cleanedHtml = cleanedHtml
+                .replace(/class="[^"]*"/gi, '') // Remove all class attributes
+                .replace(/style="[^"]*"/gi, '') // Remove all inline styles
+                .replace(/id="[^"]*"/gi, '') // Remove IDs
+                .replace(/data-[^=]*="[^"]*"/gi, ''); // Remove data attributes
+            
+            console.log('✅ JavaScript artifacts cleaned');
+            return cleanedHtml;
+        }
+
+        // IMPROVED: Enhanced content cleaning with JavaScript artifact removal
         function cleanAndPreserveStructure(html) {
             console.log('🧹 Cleaning content while preserving structure...');
             
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
             
-            // Remove only clearly unwanted elements
+            // Remove JavaScript-related elements and attributes
+            const jsSelectors = [
+                '[jsaction]', '[jscontroller]', '[jsname]', '[jsshadow]',
+                'script:not([type*="table"])', 'style', 'noscript', 'meta', 'link'
+            ];
+            
+            jsSelectors.forEach(selector => {
+                try {
+                    const elements = tempDiv.querySelectorAll(selector);
+                    elements.forEach(el => el.remove());
+                } catch (e) {
+                    // Selector might not be supported in all browsers
+                }
+            });
+            
+            // Remove unwanted structural elements
             const removeSelectors = [
-                'script:not([type*="table"])', 'style', 'noscript', 'meta', 'link',
                 '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
                 '.navigation:not(:has(table))', '.nav:not(:has(table))', 
                 '.menu:not(:has(table))', '.sidebar:not(:has(table))',
-                '.breadcrumb', '.pagination', '.social-share', '.advertisement'
+                '.breadcrumb', '.pagination', '.social-share', '.advertisement',
+                '.loading-spinner', '.spinner'
             ];
             
             removeSelectors.forEach(selector => {
@@ -656,10 +759,10 @@
                 }
             });
             
-            // Clean up obvious navigation text
+            // Clean up obvious navigation and UI text
             const navigationTexts = [
-                'Skip to main content', 'Skip to navigation',
-                'Page updated', 'Search this site'
+                'Skip to main content', 'Skip to navigation', 'Page updated', 
+                'Search this site', 'Copy heading link', 'Loading...', 'Please wait'
             ];
             
             const walker = document.createTreeWalker(
@@ -677,7 +780,7 @@
             
             textNodes.forEach(textNode => {
                 const text = textNode.textContent.trim();
-                if (navigationTexts.some(navText => text === navText)) {
+                if (navigationTexts.some(navText => text === navText || text.includes(navText))) {
                     textNode.remove();
                 }
             });
@@ -704,16 +807,19 @@
                     }
                 }
                 
-                showStatus('🏗️ Decoding tables in place and preserving structure...', 'loading');
+                showStatus('🏗️ Decoding tables and cleaning JavaScript artifacts...', 'loading');
                 
                 // STEP 1: Decode all data-code tables in place within the HTML
                 const htmlWithTables = decodeTablesInPlace(html);
                 
-                // STEP 2: Try Readability first, fall back to manual processing
+                // STEP 2: Clean JavaScript artifacts
+                const cleanedHtml = cleanJavaScriptArtifacts(htmlWithTables);
+                
+                // STEP 3: Try Readability first, fall back to manual processing
                 let processedHtml;
                 try {
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlWithTables, 'text/html');
+                    const doc = parser.parseFromString(cleanedHtml, 'text/html');
                     const reader = new Readability(doc);
                     article = reader.parse();
                     
@@ -727,10 +833,10 @@
                     
                     // Extract content manually while preserving structure
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlWithTables, 'text/html');
+                    const doc = parser.parseFromString(cleanedHtml, 'text/html');
                     
                     article = {
-                        title: extractTitleFromHTML(htmlWithTables),
+                        title: extractTitleFromHTML(cleanedHtml),
                         content: extractMainContent(doc)
                     };
                     
@@ -741,10 +847,10 @@
                     throw new Error('Could not extract content from the page');
                 }
                 
-                // STEP 3: Minimal cleaning while preserving structure
-                const cleanContent = cleanAndPreserveStructure(processedHtml);
+                // STEP 4: Final cleaning while preserving structure
+                const finalContent = cleanAndPreserveStructure(processedHtml);
                 
-                // STEP 4: Convert to markdown (tables are now in their natural positions)
+                // STEP 5: Convert to markdown (tables are now in their natural positions)
                 let markdown = '';
                 
                 if (article.title && article.title.trim()) {
@@ -761,7 +867,7 @@
                 }
                 
                 // Convert the entire HTML to markdown (tables are now in correct positions)
-                const contentMarkdown = turndownService.turndown(cleanContent);
+                const contentMarkdown = turndownService.turndown(finalContent);
                 markdown += contentMarkdown;
                 
                 markdown = cleanMarkdown(markdown);
@@ -808,8 +914,19 @@
 
         function cleanMarkdown(markdown) {
             return markdown
+                // Remove any remaining JavaScript artifacts
+                .replace(/jsaction="[^"]*">/gi, '')
+                .replace(/jscontroller="[^"]*"/gi, '')
+                .replace(/jsname="[^"]*"/gi, '')
+                .replace(/aria-describedby="[^"]*"/gi, '')
+                .replace(/data-tooltip[^=]*="[^"]*"/gi, '')
+                // Clean up excessive whitespace
                 .replace(/\n{3,}/g, '\n\n')
                 .replace(/^\s+|\s+$/g, '')
+                // Remove empty headings
+                .replace(/^#+\s*$/gm, '')
+                // Clean up any orphaned greater-than symbols
+                .replace(/>\s*$/gm, '')
                 .trim();
         }
 
